@@ -1,4 +1,4 @@
-import state
+from state import state
 
 
 class Tile:
@@ -21,4 +21,4 @@ class Tile:
         pass
 
     def is_player_tile(self):
-        return self.pos == state.state.player.pos
+        return self.pos == state.player.pos
