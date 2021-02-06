@@ -1,4 +1,4 @@
-import vector
+from vector import Vector
 
 
 class Grid:

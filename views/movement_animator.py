@@ -1,5 +1,5 @@
 import arcade
-import vector
+from vector import Vector
 from state import state
 
 
@@ -11,7 +11,7 @@ class MovementAnimator(arcade.View):
         self.grid_end = grid_end
         self.animation_steps = animation_steps
         self.current_steps = 0
-        self.tile_render_offset = vector.Vector(0, 0)
+        self.tile_render_offset = Vector(0, 0)
         self.affected_tiles = self.get_affected_tiles()
         self.empty_tiles = self.get_empty_tiles()
 
@@ -52,12 +52,12 @@ class MovementAnimator(arcade.View):
         center = state.screen_center
         arcade.draw_rectangle_outline(center.x, center.y, 500, 500, arcade.color.DARK_GRAY)
         for start, end in self.empty_tiles:
-            tile_center = vector.Vector(*arcade.lerp_vec(start, end, self.current_steps / self.animation_steps))
+            tile_center = Vector(*arcade.lerp_vec(start, end, self.current_steps / self.animation_steps))
             arcade.draw_rectangle_outline(tile_center.x, tile_center.y, state.cell_size.x - 2, state.cell_size.y - 2,
                                           arcade.color.DARK_GRAY)
 
         for tile, start, end in self.affected_tiles:
-            tile_center = vector.Vector(*arcade.lerp_vec(start, end, self.current_steps / self.animation_steps))
+            tile_center = Vector(*arcade.lerp_vec(start, end, self.current_steps / self.animation_steps))
             tile.on_render(tile_center, tile_center + (-(state.cell_size.x / 2), state.cell_size.y / 2), state.cell_size)
         arcade.draw_circle_filled(center.x, center.y, 25, arcade.color.AERO_BLUE)
         self.draw_edges(self.render_radius)
@@ -67,15 +67,15 @@ class MovementAnimator(arcade.View):
     def draw_edges(self, inner_radius):
         cell_size = state.cell_size
         for x_off in range(~inner_radius, inner_radius + 2):
-            render = (vector.Vector(x_off, inner_radius + 1) * cell_size) + state.screen_center
+            render = (Vector(x_off, inner_radius + 1) * cell_size) + state.screen_center
             arcade.draw_rectangle_filled(render.x, render.y, cell_size.x - 1, cell_size.y - 1, arcade.color.BLACK)
 
-            render = (vector.Vector(x_off, -(inner_radius + 1)) * cell_size) + state.screen_center
+            render = (Vector(x_off, -(inner_radius + 1)) * cell_size) + state.screen_center
             arcade.draw_rectangle_filled(render.x, render.y, cell_size.x - 1, cell_size.y - 1, arcade.color.BLACK)
 
         for y_off in range(~inner_radius, inner_radius + 2):
             arcade.draw_rectangle_filled(
-                (render := (vector.Vector(inner_radius + 1, y_off) * cell_size) + state.screen_center).x,
+                (render := (Vector(inner_radius + 1, y_off) * cell_size) + state.screen_center).x,
                 render.y,
                 cell_size.x - 1,
                 cell_size.y - 1,
@@ -83,7 +83,7 @@ class MovementAnimator(arcade.View):
             )
 
             arcade.draw_rectangle_filled(
-                (render := (vector.Vector(-(inner_radius + 1), y_off) * cell_size) + state.screen_center).x,
+                (render := (Vector(-(inner_radius + 1), y_off) * cell_size) + state.screen_center).x,
                 render.y,
                 cell_size.x - 1,
                 cell_size.y - 1,

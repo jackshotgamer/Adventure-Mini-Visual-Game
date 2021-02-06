@@ -1,20 +1,20 @@
 import hpentity
-import vector
+from vector import Vector
 import metadata
 import grid
 
 
 class State:
     def __init__(self):
-        self.player = hpentity.HpEntity('Temp', 50, vector.Vector(0, 0), metadata.MetaData(is_player=True))
+        self.player = hpentity.HpEntity('Temp', 50, Vector(0, 0), metadata.MetaData(is_player=True))
         self.window = None
         self.grid = grid.Grid()
-        self.cell_size = vector.Vector(100, 100)
+        self.cell_size = Vector(100, 100)
         self.render_radius = 2
 
     @property
     def screen_center(self):
-        return vector.Vector(self.window.width / 2, self.window.height / 2)
+        return Vector(self.window.width / 2, self.window.height / 2)
 
     @staticmethod
     def generate_radius(radius):
