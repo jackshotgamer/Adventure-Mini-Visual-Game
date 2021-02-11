@@ -45,7 +45,7 @@ class Explore(arcade.View):
             new_player_pos = prior_player_pos + offset
 
             from views import MovementAnimator
-            state.window.show_view(MovementAnimator(prior_player_pos, new_player_pos, 5))
+            state.window.show_view(MovementAnimator(prior_player_pos, new_player_pos, 15))
 
             state.player.pos = new_player_pos
             if tile := state.grid.get(*prior_player_pos):
