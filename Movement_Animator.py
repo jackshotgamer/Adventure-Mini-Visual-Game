@@ -62,19 +62,19 @@ class MovementAnimator(arcade.View):
         arcade.draw_text(str(State.state.player.pos.tuple()), center.x, center.y + (State.state.cell_size.y * .37), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=12, anchor_x='center', anchor_y='center')
 
-    def draw_edges(self, inner_radius):
+    @staticmethod
+    def draw_edges(inner_radius):
         cell_size = State.state.cell_size
-        for x_off in range(~ self.render_radius, self.render_radius + 2):
-            render = (Vector.Vector(x_off, self.render_radius + 1) * cell_size) + State.state.screen_center
+        for x_off in range(~ inner_radius, inner_radius + 2):
+            render = (Vector.Vector(x_off, inner_radius + 1) * cell_size) + State.state.screen_center
             arcade.draw_rectangle_filled(render.x, render.y, cell_size.x - 1, cell_size.y - 1, arcade.color.BLACK)
 
-            render = (Vector.Vector(x_off, -(self.render_radius + 1)) * cell_size) + State.state.screen_center
+            render = (Vector.Vector(x_off, -(inner_radius + 1)) * cell_size) + State.state.screen_center
             arcade.draw_rectangle_filled(render.x, render.y, cell_size.x - 1, cell_size.y - 1, arcade.color.BLACK)
 
-        for y_off in range(~ self.render_radius, self.render_radius + 2):
-            render = (Vector.Vector(self.render_radius + 1, y_off) * cell_size) + State.state.screen_center
+        for y_off in range(~ inner_radius, inner_radius + 2):
+            render = (Vector.Vector(inner_radius + 1, y_off) * cell_size) + State.state.screen_center
             arcade.draw_rectangle_filled(render.x, render.y, cell_size.x - 1, cell_size.y - 1, arcade.color.BLACK)
 
-            render = (Vector.Vector(-(self.render_radius + 1), y_off) * cell_size) + State.state.screen_center
+            render = (Vector.Vector(-(inner_radius + 1), y_off) * cell_size) + State.state.screen_center
             arcade.draw_rectangle_filled(render.x, render.y, cell_size.x - 1, cell_size.y - 1, arcade.color.BLACK)
-
