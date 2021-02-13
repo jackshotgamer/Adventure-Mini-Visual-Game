@@ -3,6 +3,7 @@ import Exploration
 import State
 import Tile
 import Vector
+import Player_Select
 
 
 class TestRender(Tile.Tile):
@@ -14,8 +15,8 @@ class TestRender(Tile.Tile):
 
 
 window = arcade.Window(resizable=True)
-window.show_view(Exploration.Explore())
 State.state.window = window
+window.show_view(Player_Select.PlayerSelect())
 State.state.grid.add(TestRender(Vector.Vector(1, 0)))
 
 arcade.run()

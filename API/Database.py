@@ -33,6 +33,7 @@ class PlayerData(Base):
     __tablename__ = 'player_an_data_a'
     id = Column(Integer, primary_key=True, autoincrement=True)
     character_name = Column(String(15), nullable=False)
+    character_pw = Column(String(50), nullable=False)
     player_x = Column(Integer, nullable=False, default=0)
     player_y = Column(Integer, nullable=False, default=0)
     hp = Column(Integer, nullable=False, default=100)
@@ -42,8 +43,8 @@ class PlayerData(Base):
     lvl = Column(Integer, nullable=False, default=0)
 
     @classmethod
-    def new(cls, name, player_x=0, player_y=0, hp=100, max_hp=120, gold=0, xp=0, lvl=0):
-        return PlayerData(character_name=name.lower(), player_x=player_x, player_y=player_y, hp=hp, max_hp=max_hp, gold=gold, xp=xp, lvl=lvl)
+    def new(cls, name, pw, player_x=0, player_y=0, hp=100, max_hp=120, gold=0, xp=0, lvl=0):
+        return PlayerData(character_name=name.lower(), character_pw=pw, player_x=player_x, player_y=player_y, hp=hp, max_hp=max_hp, gold=gold, xp=xp, lvl=lvl)
 
     def as_dict(self):
         return dict(
@@ -69,9 +70,14 @@ def get_player(session, name):
     return session.query(PlayerData).filter(PlayerData.character_name == name.lower()).one_or_none()
 
 
-def load_player(session, name):
+def load_player(session, name, pw):
     if player_exists(session, name):
         return get_player(session, name)
-    player_info = PlayerData.new(name=name)
+    player_info = PlayerData.new(name=name, pw=pw)
     session.add(player_info)
     return player_info
+
+
+def load_and_validate_player(session, name, pw):
+    player_info = load_player(session, name, pw)
+    return player_info.character_pw == pw, player_info
