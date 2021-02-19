@@ -59,6 +59,18 @@ class MovementAnimator(arcade.View):
             tile.on_render(tile_center, tile_center + (-(State.state.cell_size.x / 2), State.state.cell_size.y / 2), State.state.cell_size)
         arcade.draw_circle_filled(center.x, center.y, 25, arcade.color.AERO_BLUE)
         self.draw_edges(self.render_radius)
+        arcade.draw_text(f'Name: {State.state.player.name}', center.x - 250, center.y - 270, arcade.color.LIGHT_GRAY,
+                         font_size=12, font_name='arial')
+        arcade.draw_text(f'Hp: {State.state.player.hp}', center.x - 25, center.y - 270, arcade.color.LIGHT_GRAY,
+                         font_size=12, font_name='arial')
+        arcade.draw_text(f'Level: {State.state.player.lvl}', center.x + 170, center.y - 270, arcade.color.LIGHT_GRAY,
+                         font_size=12, font_name='arial')
+        arcade.draw_text(f'Gold: {State.state.player.gold}', center.x - 145, center.y + 250, arcade.color.LIGHT_GRAY,
+                         font_size=14, font_name='arial')
+        arcade.draw_text(f'xp: {State.state.player.xp}', center.x + 55, center.y + 250, arcade.color.LIGHT_GRAY,
+                         font_size=14, font_name='arial')
+        arcade.draw_text(f'Floor: {State.state.player.floor}', center.x, center.y - (State.state.cell_size.y * .37), arcade.color.LIGHT_GRAY,
+                         font_name='arial', font_size=12, anchor_x='center', anchor_y='center')
         arcade.draw_text(str(State.state.player.pos.tuple()), center.x, center.y + (State.state.cell_size.y * .37), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=12, anchor_x='center', anchor_y='center')
 

@@ -7,7 +7,7 @@ app = fastapi.FastAPI()
 @app.get('/save_data')
 def get_save_file(name: str, pw: str):
     with Database.managed_session() as session:
-        password_valid, player_data = Database.load_and_validate_player(session, name.lower(), pw)
+        password_valid, player_data = Database.load_and_validate_player(session, name, pw)
         if not password_valid:
             return dict(
                 error='Password Incorrect'
@@ -16,7 +16,7 @@ def get_save_file(name: str, pw: str):
 
 
 @app.post('/update')
-def update_save_file(name: str, pw: str, x: int = None, y: int = None, hp: int = None, gold: int = None, xp: int = None, lvl: int = None):
+def update_save_file(name: str, pw: str, x: int = None, y: int = None, hp: int = None, gold: int = None, xp: int = None, lvl: int = None, floor: int = None):
     with Database.managed_session() as session:
         if not Database.player_exists(session, name):
             return dict(

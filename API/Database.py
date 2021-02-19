@@ -1,6 +1,7 @@
 from sqlalchemy import orm, exists, create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from contextlib import contextmanager
+from sqlalchemy import func
 
 engine = create_engine('sqlite:///Player_Saves.sqlite')
 Base = declarative_base(bind=engine)
@@ -40,11 +41,12 @@ class PlayerData(Base):
     max_hp = Column(Integer, nullable=False, default=120)
     gold = Column(Integer, nullable=False, default=0)
     xp = Column(Integer, nullable=False, default=0)
-    lvl = Column(Integer, nullable=False, default=0)
+    lvl = Column(Integer, nullable=False, default=1)
+    floor = Column(Integer, nullable=False, default=1)
 
     @classmethod
-    def new(cls, name, pw, player_x=0, player_y=0, hp=100, max_hp=120, gold=0, xp=0, lvl=0):
-        return PlayerData(character_name=name.lower(), character_pw=pw, player_x=player_x, player_y=player_y, hp=hp, max_hp=max_hp, gold=gold, xp=xp, lvl=lvl)
+    def new(cls, name, pw, player_x=0, player_y=0, hp=100, max_hp=120, gold=0, xp=0, lvl=1, floor=1):
+        return PlayerData(character_name=name, character_pw=pw, player_x=player_x, player_y=player_y, hp=hp, max_hp=max_hp, gold=gold, xp=xp, lvl=lvl, floor=floor)
 
     def as_dict(self):
         return dict(
@@ -55,7 +57,8 @@ class PlayerData(Base):
             hp=self.hp,
             gold=self.gold,
             xp=self.xp,
-            lvl=self.lvl
+            lvl=self.lvl,
+            floor=self.floor
         )
 
 
@@ -63,11 +66,11 @@ init_tables()
 
 
 def player_exists(session, name):
-    return session.query(exists().where(PlayerData.character_name == name.lower())).scalar()
+    return session.query(exists().where(func.lower(PlayerData.character_name) == name.lower())).scalar()
 
 
 def get_player(session, name):
-    return session.query(PlayerData).filter(PlayerData.character_name == name.lower()).one_or_none()
+    return session.query(PlayerData).filter(func.lower(PlayerData.character_name) == name.lower()).one_or_none()
 
 
 def load_player(session, name, pw):

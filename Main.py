@@ -14,7 +14,7 @@ class TestRender(Tile.Tile):
         print(keycode)
 
 
-window = arcade.Window(resizable=True)
+window = arcade.Window(width=1000, height=800)
 State.state.window = window
 window.show_view(Player_Select.PlayerSelect())
 State.state.grid.add(TestRender(Vector.Vector(1, 0)))
