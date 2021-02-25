@@ -1,6 +1,7 @@
 import arcade
 import Vector
 import State
+import Sprites_
 
 
 class MovementAnimator(arcade.View):
@@ -45,34 +46,61 @@ class MovementAnimator(arcade.View):
         if self.current_steps > self.animation_steps:
             import Exploration
             State.state.window.show_view(Exploration.Explore())
+        Sprites_.update_backdrop()
 
     def on_draw(self):
+        import Sprites_
         arcade.start_render()
         center = State.state.screen_center
-        arcade.draw_rectangle_outline(center.x, center.y, 500, 500, arcade.color.DARK_GRAY)
+        if self.affected_tiles:
+            first_tile = self.affected_tiles[0][1:]
+        else:
+            first_tile = self.empty_tiles[0]
+        sprite_offset = \
+            Vector.Vector(
+                *arcade.lerp_vec(
+                    first_tile[0],
+                    first_tile[1],
+                    self.current_steps /
+                    self.animation_steps)
+            ) - first_tile[1]
+
+        for offset in State.state.generate_radius(3):
+            # noinspection PyUnboundLocalVariable
+            render_pos = (center + (State.state.cell_size * offset)) + sprite_offset
+            arcade.draw_texture_rectangle(render_pos.x, render_pos.y, 100, 100, Sprites_.forest_sprite)
+
+        arcade.draw_texture_rectangle(center.x, center.y, 99, 99, Sprites_.black_sprite, 0, 150)
+
         for start, end in self.empty_tiles:
             tile_center = Vector.Vector(*arcade.lerp_vec(start, end, self.current_steps / self.animation_steps))
-            arcade.draw_rectangle_outline(tile_center.x, tile_center.y, State.state.cell_size.x - 2, State.state.cell_size.y - 2, arcade.color.DARK_GRAY)
+            arcade.draw_rectangle_outline(tile_center.x, tile_center.y, State.state.cell_size.x - 2, State.state.cell_size.y - 2, (120, 120, 120))
+            # sprite_offset = tile_center - end
 
         for tile, start, end in self.affected_tiles:
             tile_center = Vector.Vector(*arcade.lerp_vec(start, end, self.current_steps / self.animation_steps))
             tile.on_render(tile_center, tile_center + (-(State.state.cell_size.x / 2), State.state.cell_size.y / 2), State.state.cell_size)
+            # sprite_offset = tile_center - end
+
         arcade.draw_circle_filled(center.x, center.y, 25, arcade.color.AERO_BLUE)
-        self.draw_edges(self.render_radius)
-        arcade.draw_text(f'Name: {State.state.player.name}', center.x - 250, center.y - 270, arcade.color.LIGHT_GRAY,
-                         font_size=12, font_name='arial')
+        arcade.draw_rectangle_outline(center.x, center.y, 500, 500, arcade.color.DARK_GRAY)
+        arcade.draw_rectangle_filled(center.x, center.y - 270, 500, 38, (0, 0, 0))
+        arcade.draw_rectangle_filled(center.x, center.y + 270, 500, 38, (0, 0, 0))
+        arcade.draw_text(f'Name: {State.state.player.name}', center.x - 225, center.y - 270, arcade.color.LIGHT_GRAY,
+                         font_size=11, font_name='arial')
         arcade.draw_text(f'Hp: {State.state.player.hp}', center.x - 25, center.y - 270, arcade.color.LIGHT_GRAY,
-                         font_size=12, font_name='arial')
+                         font_size=11, font_name='arial')
         arcade.draw_text(f'Level: {State.state.player.lvl}', center.x + 170, center.y - 270, arcade.color.LIGHT_GRAY,
-                         font_size=12, font_name='arial')
+                         font_size=11, font_name='arial')
         arcade.draw_text(f'Gold: {State.state.player.gold}', center.x - 145, center.y + 250, arcade.color.LIGHT_GRAY,
                          font_size=14, font_name='arial')
-        arcade.draw_text(f'xp: {State.state.player.xp}', center.x + 55, center.y + 250, arcade.color.LIGHT_GRAY,
+        arcade.draw_text(f'xp: {State.state.player.xp}', center.x + 65, center.y + 250, arcade.color.LIGHT_GRAY,
                          font_size=14, font_name='arial')
         arcade.draw_text(f'Floor: {State.state.player.floor}', center.x, center.y - (State.state.cell_size.y * .37), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=12, anchor_x='center', anchor_y='center')
         arcade.draw_text(str(State.state.player.pos.tuple()), center.x, center.y + (State.state.cell_size.y * .37), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=12, anchor_x='center', anchor_y='center')
+        Sprites_.draw_backdrop()
 
     @staticmethod
     def draw_edges(inner_radius):

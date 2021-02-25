@@ -14,15 +14,17 @@ class PlayButton(gui.UIFlatButton):
         self.player_select = player_select
 
     def on_click(self):
-        player_username = self.player_select.username.text
-        player_password = self.player_select.password.text
+        player_username = self.player_select.username.text.strip()
+        player_password = self.player_select.password.text.strip()
         if not (player_username and player_password):
             return
+
         json_ = requests.get(f'http://localhost:666/save_data?name={quote(player_username)}&pw={quote(player_password)}').json()
         print(json_)
         if not json_['error']:
             state_player = State.state.player
             state_player.name = json_['player_name']
+            State.state.pw = quote(player_password)
             state_player.hp = json_['hp']
             state_player.max_hp = json_['max_hp']
             state_player.pos = Vector.Vector(json_['x'], json_['y'])
@@ -31,6 +33,7 @@ class PlayButton(gui.UIFlatButton):
             state_player.lvl = json_['lvl']
             state_player.floor = json_['floor']
             state_player.meta_data.isplayer = True
+            state_player.meta_data.isguest = False
             print(state_player.__dict__)
             import Exploration
             self.ui_manager.purge_ui_elements()
@@ -39,12 +42,28 @@ class PlayButton(gui.UIFlatButton):
             self.player_select.incorrect_password_end = time.time() + 1.5
 
 
+class GuestButton(gui.UIFlatButton):
+    def __init__(self, ui_manager):
+        super().__init__('Play as Guest', State.state.screen_center.x, State.state.screen_center.y + 150, 250, 50)
+        self.ui_manager = ui_manager
+
+    def on_click(self):
+        state = State.state.player
+        state.name = 'Guest'
+        state.meta_data.isguest = True
+        state.pos = Vector.Vector(0, 0)
+        import Exploration
+        self.ui_manager.purge_ui_elements()
+        State.state.window.show_view(Exploration.Explore())
+
+
 class PlayerSelect(arcade.View):
     def __init__(self):
         super().__init__()
         self.ui_manager = gui.UIManager()
         self.ui_manager.purge_ui_elements()
         self.ui_manager.add_ui_element(PlayButton(self.ui_manager, self))
+        self.ui_manager.add_ui_element(GuestButton(self.ui_manager))
         self.username = gui.UIInputBox(State.state.screen_center.x, State.state.screen_center.y + 100, 300, 50)
         self.username.text_adapter = LimitText()
         self.password = gui.UIInputBox(State.state.screen_center.x, State.state.screen_center.y + 50, 300, 50)

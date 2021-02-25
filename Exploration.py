@@ -3,6 +3,7 @@ from Vector import Vector
 import State
 from arcade import key
 import Button_Functions
+import Sprites_
 import arcade.gui
 
 
@@ -15,6 +16,7 @@ class Explore(arcade.View):
 
     def on_update(self, delta_time: float):
         Button_Functions.reposition_button(self.ui_manager)
+        Sprites_.update_backdrop()
 
     key_offset = {
         key.W: (0, 1),
@@ -25,25 +27,13 @@ class Explore(arcade.View):
 
     def on_draw(self):
         arcade.start_render()
-        center_screen = Vector(self.window.width / 2, self.window.height / 2)
-        arcade.draw_circle_filled(center_screen.x, center_screen.y, 25, arcade.color.AERO_BLUE)
-        arcade.draw_rectangle_outline(center_screen.x, center_screen.y, 500, 500, arcade.color.DARK_GRAY, 2)
-        arcade.draw_text(f'Name: {State.state.player.name}', center_screen.x - 250, center_screen.y - 270, arcade.color.LIGHT_GRAY,
-                         font_size=12, font_name='arial')
-        arcade.draw_text(f'Hp: {State.state.player.hp}', center_screen.x - 25, center_screen.y - 270, arcade.color.LIGHT_GRAY,
-                         font_size=12, font_name='arial')
-        arcade.draw_text(f'Level: {State.state.player.lvl}', center_screen.x + 170, center_screen.y - 270, arcade.color.LIGHT_GRAY,
-                         font_size=12, font_name='arial')
-        arcade.draw_text(f'Gold: {State.state.player.gold}', center_screen.x - 145, center_screen.y + 250, arcade.color.LIGHT_GRAY,
-                         font_size=14, font_name='arial')
-        arcade.draw_text(f'xp: {State.state.player.xp}', center_screen.x + 55, center_screen.y + 250, arcade.color.LIGHT_GRAY,
-                         font_size=14, font_name='arial')
-        arcade.draw_text(f'Floor: {State.state.player.floor}', center_screen.x, center_screen.y - (State.state.cell_size.y * .37), arcade.color.LIGHT_GRAY,
-                         font_name='arial', font_size=12, anchor_x='center', anchor_y='center')
-        arcade.draw_text(str(State.state.player.pos.tuple()), center_screen.x, center_screen.y + (State.state.cell_size.y * .37), arcade.color.LIGHT_GRAY,
-                         font_name='arial', font_size=12, anchor_x='center', anchor_y='center')
-
+        center_screen = State.state.screen_center
         render_queue = []
+        for x_off, y_off in State.state.generate_radius(State.state.render_radius):
+            render_pos = Vector(center_screen.x + x_off * State.state.cell_size.x, center_screen.y + y_off * State.state.cell_size.y)
+            arcade.draw_texture_rectangle(render_pos.x, render_pos.y, 100, 100, Sprites_.forest_sprite)
+
+        arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y, 99, 99, Sprites_.black_sprite, 0, 150)
         for x_off, y_off in State.state.generate_radius(State.state.render_radius):
             real_grid_pos = State.state.player.pos + (x_off, y_off)
             render_pos = Vector(center_screen.x + x_off * State.state.cell_size.x, center_screen.y + y_off * State.state.cell_size.y)
@@ -51,10 +41,29 @@ class Explore(arcade.View):
             if tile := State.state.grid.get(*real_grid_pos):
                 render_queue.append((tile, render_pos, render_pos + (-(State.state.cell_size.x / 2), State.state.cell_size.y / 2), State.state.cell_size))
             else:
-                arcade.draw_rectangle_outline(render_pos.x, render_pos.y, State.state.cell_size.x - 2, State.state.cell_size.y - 2, arcade.color.DARK_GRAY)
+                arcade.draw_rectangle_outline(render_pos.x, render_pos.y, State.state.cell_size.x - 2, State.state.cell_size.y - 2, (120, 120, 120))
 
         for tile, *args in render_queue:
             tile.on_render(*args)
+
+        arcade.draw_rectangle_filled(center_screen.x, center_screen.y - 270, 500, 38, (0, 0, 0))
+        arcade.draw_circle_filled(center_screen.x, center_screen.y, 25, arcade.color.AERO_BLUE)
+        arcade.draw_rectangle_outline(center_screen.x, center_screen.y, 500, 500, arcade.color.DARK_GRAY, 2)
+        arcade.draw_text(f'Name: {State.state.player.name}', center_screen.x - 225, center_screen.y - 270, arcade.color.LIGHT_GRAY,
+                         font_size=11, font_name='arial')
+        arcade.draw_text(f'Hp: {State.state.player.hp}', center_screen.x - 25, center_screen.y - 270, arcade.color.LIGHT_GRAY,
+                         font_size=11, font_name='arial')
+        arcade.draw_text(f'Level: {State.state.player.lvl}', center_screen.x + 170, center_screen.y - 270, arcade.color.LIGHT_GRAY,
+                         font_size=11, font_name='arial')
+        arcade.draw_text(f'Gold: {State.state.player.gold}', center_screen.x - 145, center_screen.y + 250, arcade.color.LIGHT_GRAY,
+                         font_size=14, font_name='arial')
+        arcade.draw_text(f'xp: {State.state.player.xp}', center_screen.x + 65, center_screen.y + 250, arcade.color.LIGHT_GRAY,
+                         font_size=14, font_name='arial')
+        arcade.draw_text(f'Floor: {State.state.player.floor}', center_screen.x, center_screen.y - (State.state.cell_size.y * .37), arcade.color.LIGHT_GRAY,
+                         font_name='arial', font_size=12, anchor_x='center', anchor_y='center')
+        arcade.draw_text(str(State.state.player.pos.tuple()), center_screen.x, center_screen.y + (State.state.cell_size.y * .37), arcade.color.LIGHT_GRAY,
+                         font_name='arial', font_size=12, anchor_x='center', anchor_y='center')
+        Sprites_.draw_backdrop()
 
     def on_key_release(self, symbol, mods):
         if tile := State.state.grid.get(*State.state.player.pos):

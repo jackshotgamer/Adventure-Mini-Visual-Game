@@ -2,6 +2,7 @@ import HpEntity
 import Vector
 import Meta_Data
 import Grid
+import json
 
 
 class State:
@@ -11,6 +12,20 @@ class State:
         self.grid = Grid.Grid()
         self.cell_size = Vector.Vector(100, 100)
         self.render_radius = 2
+        self.pw = ''
+        self.texture_mapping = {}
+        self.load_textures()
+
+    def load_textures(self):
+        import os
+        if not os.path.exists('texture_list.json'):
+            self.save_textures()
+        with open('texture_list.json') as input_file:
+            self.texture_mapping = json.load(input_file)
+
+    def save_textures(self):
+        with open('texture_list.json', 'w') as output:
+            json.dump(self.texture_mapping, output)
 
     @property
     def screen_center(self):

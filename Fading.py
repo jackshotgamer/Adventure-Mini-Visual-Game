@@ -1,4 +1,3 @@
-from arcade import View
 import Exploration
 import Vector
 from arcade import load_texture
@@ -18,6 +17,7 @@ class Fading(Exploration.Explore):
         self.reset_pos = reset_pos
         self.current_frame = 0
         self.frame_count = 1
+        self.reversing = False
 
     def on_draw(self):
         super().on_draw()
@@ -25,6 +25,12 @@ class Fading(Exploration.Explore):
 
     def on_update(self, delta_time: float):
         self.frame_count += 1
-        if not self.frame_count % 4:
+        if not self.frame_count % 4 and not self.reversing:
             self.current_frame += 1
-            self.current_frame %= 32
+        elif not self.frame_count % 4 and self.reversing:
+            self.current_frame -= 1
+        if self.current_frame == len(CIRCLE_FADE_FRAMES) - 1:
+            self.reversing = True
+            State.state.player.pos = Vector.Vector(0, 0)
+        if self.current_frame == -1:
+            State.state.window.show_view(Exploration.Explore())

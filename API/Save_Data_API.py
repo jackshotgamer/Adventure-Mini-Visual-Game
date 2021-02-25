@@ -16,7 +16,7 @@ def get_save_file(name: str, pw: str):
 
 
 @app.post('/update')
-def update_save_file(name: str, pw: str, x: int = None, y: int = None, hp: int = None, gold: int = None, xp: int = None, lvl: int = None, floor: int = None):
+def update_save_file(name: str, pw: str, player_x: int = None, player_y: int = None, hp: int = None, gold: int = None, xp: int = None, lvl: int = None, floor: int = None):
     with Database.managed_session() as session:
         if not Database.player_exists(session, name):
             return dict(
