@@ -22,3 +22,9 @@ class Tile:
 
     def is_player_tile(self):
         return self.pos == State.state.player.pos
+
+    def on_render_foreground(self, center, top_left, cell_size):
+        pass
+
+    def on_update(self, delta_time):
+        pass

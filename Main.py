@@ -5,6 +5,7 @@ import Tile
 import Vector
 import Player_Select
 import Sprites
+import Home_Tile
 
 
 class TestRender(Tile.Tile):
@@ -16,6 +17,7 @@ class TestRender(Tile.Tile):
         print(keycode)
 
 
+State.state.grid.add(Home_Tile.HomeTile(Vector.Vector(0, 0)))
 window = arcade.Window(width=1000, height=800)
 State.state.window = window
 window.show_view(Player_Select.PlayerSelect())

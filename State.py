@@ -15,6 +15,8 @@ class State:
         self.pw = ''
         self.texture_mapping = {}
         self.load_textures()
+        self.is_moving = False
+        # Meta_Data.isme = True
 
     def load_textures(self):
         import os

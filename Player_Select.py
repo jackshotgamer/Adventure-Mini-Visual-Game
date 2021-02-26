@@ -32,8 +32,10 @@ class PlayButton(gui.UIFlatButton):
             state_player.xp = json_['xp']
             state_player.lvl = json_['lvl']
             state_player.floor = json_['floor']
-            state_player.meta_data.isplayer = True
-            state_player.meta_data.isguest = False
+            state_player.meta_data.is_player = True
+            state_player.meta_data.is_guest = False
+            state_player.meta_data.is_enemy = False
+            state_player.meta_data.is_me = False
             print(state_player.__dict__)
             import Exploration
             self.ui_manager.purge_ui_elements()
@@ -50,8 +52,17 @@ class GuestButton(gui.UIFlatButton):
     def on_click(self):
         state = State.state.player
         state.name = 'Guest'
-        state.meta_data.isguest = True
+        state.meta_data.is_player = False
+        state.meta_data.is_guest = True
+        state.meta_data.is_enemy = False
+        state.meta_data.is_me = False
         state.pos = Vector.Vector(0, 0)
+        state.max_hp = 120
+        state.hp = 100
+        state.gold = 0
+        state.xp = 0
+        state.lvl = 1
+        state.floor = 1
         import Exploration
         self.ui_manager.purge_ui_elements()
         State.state.window.show_view(Exploration.Explore())

@@ -7,7 +7,11 @@ from arcade import SpriteList
 
 
 forest_sprite = load_texture(Path('Sprites') / 'Forest_Tile_0.png')
-black_sprite = load_texture(Path('Sprites') / 'Black_Tile.png')
+black_sprite = load_texture(Path('Sprites') / 'Black_Square.png')
+black_circle_sprite = load_texture(Path('Sprites') / 'Black_Circle.png')
+black_circle_square_sprite = load_texture(Path('Sprites') / 'Black_Circle_Square.png')
+black_square_circle_square_sprite = load_texture(Path('Sprites') / 'Black_Square_Square_Circle.png')
+home_sprite = load_texture(Path('Sprites') / 'Home_Tile.png')
 
 BACKGROUND_FRAMES = [
     load_texture(Path('Background_Frames') / 'backdrop_1.png'),
@@ -34,7 +38,6 @@ def update_backdrop():
             reversing = True
         elif current_backdrop_frame <= 0:
             reversing = False
-        print(current_backdrop_frame)
         current_backdrop_frame += 1 if not reversing else -1
     if backdrop_frame_count > 20:
         backdrop_frame_count = 1

@@ -27,7 +27,7 @@ class Fading(Exploration.Explore):
         self.frame_count += 1
         if not self.frame_count % 4 and not self.reversing:
             self.current_frame += 1
-        elif not self.frame_count % 4 and self.reversing:
+        elif not self.frame_count % 5 and self.reversing:
             self.current_frame -= 1
         if self.current_frame == len(CIRCLE_FADE_FRAMES) - 1:
             self.reversing = True
