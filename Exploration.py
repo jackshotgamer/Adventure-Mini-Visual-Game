@@ -5,6 +5,7 @@ from arcade import key
 import Button_Functions
 import Sprites_
 import arcade.gui
+import random
 
 
 class Explore(arcade.View):
@@ -14,6 +15,12 @@ class Explore(arcade.View):
         self.ui_manager.purge_ui_elements()
         Button_Functions.register_ui_buttons(self.ui_manager)
         State.state.is_moving = False
+        if ((State.state.moves_since_texture_save > 2 and State.state.is_new_tile) or State.state.player.pos == (0, 0)) and not State.state.player.meta_data.isguest:
+            for offset in State.state.generate_radius(5):
+                State.state.tile_type_pos(*(offset + State.state.player.pos))
+            State.state.save_textures()
+            State.state.is_new_tile = False
+            State.state.moves_since_texture_save = 0
 
     def on_update(self, delta_time: float):
         Button_Functions.reposition_button(self.ui_manager)
@@ -37,8 +44,9 @@ class Explore(arcade.View):
         center_screen = State.state.screen_center
         render_queue = []
         for x_off, y_off in State.state.generate_radius(State.state.render_radius):
+            real_grid_pos = State.state.player.pos + (x_off, y_off)
             render_pos = Vector(center_screen.x + x_off * State.state.cell_size.x, center_screen.y + y_off * State.state.cell_size.y)
-            arcade.draw_texture_rectangle(render_pos.x, render_pos.y, 100, 100, Sprites_.forest_sprite)
+            arcade.draw_texture_rectangle(render_pos.x, render_pos.y, 100, 100, State.state.tile_type_pos(*real_grid_pos))
 
         for x_off, y_off in State.state.generate_radius(State.state.render_radius):
             real_grid_pos = State.state.player.pos + (x_off, y_off)
@@ -83,6 +91,7 @@ class Explore(arcade.View):
 
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol in self.key_offset:
+            State.state.moves_since_texture_save += 1
             offset = Vector(*self.key_offset[symbol])
             prior_player_pos = State.state.player.pos
             new_player_pos = prior_player_pos + offset

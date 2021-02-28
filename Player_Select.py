@@ -5,6 +5,7 @@ import State
 import Vector
 import requests
 import time
+import sys
 
 
 class PlayButton(gui.UIFlatButton):
@@ -32,13 +33,14 @@ class PlayButton(gui.UIFlatButton):
             state_player.xp = json_['xp']
             state_player.lvl = json_['lvl']
             state_player.floor = json_['floor']
-            state_player.meta_data.is_player = True
-            state_player.meta_data.is_guest = False
-            state_player.meta_data.is_enemy = False
-            state_player.meta_data.is_me = False
+            state_player.meta_data.isplayer = True
+            state_player.meta_data.isguest = False
+            state_player.meta_data.isenemy = False
+            state_player.meta_data.isme = False
             print(state_player.__dict__)
             import Exploration
             self.ui_manager.purge_ui_elements()
+            State.state.load_textures()
             State.state.window.show_view(Exploration.Explore())
         else:
             self.player_select.incorrect_password_end = time.time() + 1.5
@@ -52,10 +54,10 @@ class GuestButton(gui.UIFlatButton):
     def on_click(self):
         state = State.state.player
         state.name = 'Guest'
-        state.meta_data.is_player = False
-        state.meta_data.is_guest = True
-        state.meta_data.is_enemy = False
-        state.meta_data.is_me = False
+        state.meta_data.isplayer = False
+        state.meta_data.isguest = True
+        state.meta_data.isenemy = False
+        state.meta_data.isme = False
         state.pos = Vector.Vector(0, 0)
         state.max_hp = 120
         state.hp = 100
@@ -68,12 +70,22 @@ class GuestButton(gui.UIFlatButton):
         State.state.window.show_view(Exploration.Explore())
 
 
+class ExitButton(gui.UIFlatButton):
+    def __init__(self, ui_manager):
+        super().__init__('Quit', State.state.screen_center.x, State.state.screen_center.y - 51, 100, 50)
+        self.ui_manager = ui_manager
+
+    def on_click(self):
+        sys.exit()
+
+
 class PlayerSelect(arcade.View):
     def __init__(self):
         super().__init__()
         self.ui_manager = gui.UIManager()
         self.ui_manager.purge_ui_elements()
         self.ui_manager.add_ui_element(PlayButton(self.ui_manager, self))
+        self.ui_manager.add_ui_element(ExitButton(self.ui_manager))
         self.ui_manager.add_ui_element(GuestButton(self.ui_manager))
         self.username = gui.UIInputBox(State.state.screen_center.x, State.state.screen_center.y + 100, 300, 50)
         self.username.text_adapter = LimitText()

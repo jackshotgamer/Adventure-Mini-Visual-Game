@@ -5,4 +5,4 @@ class MetaData:
         self.isplayer = is_player
         self.isguest = is_guest
         self.isenemy = is_enemy
-        self.isme = is_me
+        self.is_me = is_me

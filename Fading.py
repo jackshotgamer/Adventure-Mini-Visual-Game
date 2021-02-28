@@ -32,5 +32,6 @@ class Fading(Exploration.Explore):
         if self.current_frame == len(CIRCLE_FADE_FRAMES) - 1:
             self.reversing = True
             State.state.player.pos = Vector.Vector(0, 0)
+            State.state.texture_mapping = {}
         if self.current_frame == -1:
             State.state.window.show_view(Exploration.Explore())

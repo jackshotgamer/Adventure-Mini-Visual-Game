@@ -1,5 +1,5 @@
 import arcade
-from arcade.gui import UIFlatButton, UIManager
+from arcade.gui import UIFlatButton, UIManager, UILabel
 import State
 import Player_Select
 import Exploration
@@ -26,12 +26,15 @@ def reposition_button(uimanager: UIManager):
 
 class LogOutButton(UIFlatButton):
     def __init__(self, uimanager: UIManager):
-        super().__init__('Log Out', (State.state.screen_center.y + 150) + (State.state.cell_size.y - 24), State.state.screen_center.x + 250 + State.state.cell_size.x, 200, 50)
+        super().__init__('Log Out', (State.state.screen_center.x + 150) + (State.state.cell_size.x - 24), State.state.screen_center.y + 250 + State.state.cell_size.y, 200, 50)
         self.ui_manager = uimanager
 
     def on_click(self):
         self.ui_manager.purge_ui_elements()
-        State.state.window.show_view(Player_Select.PlayerSelect())
+        # State.state.texture_mapping = {}
+        # State.state.window.show_view(Player_Select.PlayerSelect())
+        import Log_Out
+        State.state.window.show_view(Log_Out.LogOutView())
 
 
 class GoHomeButton(UIFlatButton):

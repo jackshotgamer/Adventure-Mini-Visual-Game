@@ -4,14 +4,35 @@ from arcade import load_texture, Sprite
 from pathlib import Path
 import State
 from arcade import SpriteList
+import random
 
 
 forest_sprite = load_texture(Path('Sprites') / 'Forest_Tile_0.png')
+plains_sprite = load_texture(Path('Sprites') / 'Plains_Tile_0.png')
+village_sprite = load_texture(Path('Sprites') / 'Village_Tile_1.png')
+home_sprite = load_texture(Path('Sprites') / 'Home_Tile.png')
 black_sprite = load_texture(Path('Sprites') / 'Black_Square.png')
 black_circle_sprite = load_texture(Path('Sprites') / 'Black_Circle.png')
 black_circle_square_sprite = load_texture(Path('Sprites') / 'Black_Circle_Square.png')
 black_square_circle_square_sprite = load_texture(Path('Sprites') / 'Black_Square_Square_Circle.png')
-home_sprite = load_texture(Path('Sprites') / 'Home_Tile.png')
+
+# 0 = Plains
+# 1 = Forest
+# 4 = Village
+# 9 = House
+
+# 2 = Mountain
+# 3 = Desert
+# 5 = Taiga
+# 6 = Jungle
+# 7 = Arctic
+# 8 = Cave
+
+sprite_alias = {
+    '0': plains_sprite,
+    '1': forest_sprite,
+    '4': village_sprite
+}
 
 BACKGROUND_FRAMES = [
     load_texture(Path('Background_Frames') / 'backdrop_1.png'),
@@ -33,7 +54,7 @@ def update_backdrop():
     global backdrop_frame_count
     global reversing
     backdrop_frame_count += 1
-    if not backdrop_frame_count % 20:
+    if not backdrop_frame_count % 15:
         if current_backdrop_frame >= len(BACKGROUND_FRAMES) - 1:
             reversing = True
         elif current_backdrop_frame <= 0:

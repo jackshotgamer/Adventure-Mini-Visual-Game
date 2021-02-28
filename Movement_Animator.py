@@ -68,8 +68,9 @@ class MovementAnimator(arcade.View):
 
         for offset in State.state.generate_radius(3):
             # noinspection PyUnboundLocalVariable
+            real_grid_pos = State.state.player.pos + offset
             render_pos = (center + (State.state.cell_size * offset)) + sprite_offset
-            arcade.draw_texture_rectangle(render_pos.x, render_pos.y, 100, 100, Sprites_.forest_sprite)
+            arcade.draw_texture_rectangle(render_pos.x, render_pos.y, 100, 100, State.state.tile_type_pos(*real_grid_pos))
 
         for tile, start, end in self.affected_tiles:
             tile_center = Vector.Vector(*arcade.lerp_vec(start, end, self.current_steps / self.animation_steps))
