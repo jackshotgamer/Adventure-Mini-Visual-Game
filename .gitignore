@@ -3,3 +3,4 @@ venv/
 __pycache__/
 Player_Saves.sqlite/
 *.json
+Textures/

@@ -5,9 +5,12 @@ import Grid
 import json
 import random
 import Sprites_
+import pathlib
 
 
 class State:
+    Textures_folder = pathlib.Path('Textures')
+
     def __init__(self):
         self.player = HpEntity.HpEntity('', Vector.Vector(0, 0), 120, 100, 0, 0, 1, 1, Meta_Data.MetaData(is_player=True))
         self.window = None
@@ -31,15 +34,21 @@ class State:
             self.is_new_tile = True
         return Sprites_.sprite_alias[self.texture_mapping[xy]]
 
+    def ensure_textures_folder(self):
+        if not self.Textures_folder.exists():
+            self.Textures_folder.mkdir()
+
     def load_textures(self):
         import os
-        if not os.path.exists(f'{self.player.name}_texture_list.json'):
+        self.ensure_textures_folder()
+        if not os.path.exists(self.Textures_folder/f'{self.player.name}_texture_list.json'):
             self.save_textures()
-        with open(f'{self.player.name}_texture_list.json') as input_file:
+        with open(self.Textures_folder/f'{self.player.name}_texture_list.json') as input_file:
             self.texture_mapping = json.load(input_file)
 
     def save_textures(self):
-        with open(f'{self.player.name}_texture_list.json', 'w') as output:
+        self.ensure_textures_folder()
+        with open(self.Textures_folder/f'{self.player.name}_texture_list.json', 'w') as output:
             json.dump(self.texture_mapping, output)
 
     @property
