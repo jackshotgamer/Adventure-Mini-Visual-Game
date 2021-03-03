@@ -1,3 +1,5 @@
+import time
+
 import arcade
 import Vector
 import State
@@ -43,11 +45,14 @@ class MovementAnimator(arcade.View):
         ]
 
     def update(self, delta_time: float):
+        import Exploration
         self.current_steps += 1
         if self.current_steps > self.animation_steps:
-            import Exploration
             State.state.window.show_view(Exploration.Explore())
         Sprites_.update_backdrop()
+        if Exploration.Explore.last_update == 0 or time.time() - Exploration.Explore.last_update > 0.5:
+            Exploration.Explore.fps = 1 / delta_time
+            Exploration.Explore.last_update = time.time()
 
     def on_draw(self):
         import Sprites_
@@ -105,6 +110,9 @@ class MovementAnimator(arcade.View):
         arcade.draw_text(str(State.state.player.pos.tuple()), center.x, center.y + (State.state.cell_size.y * .37), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=12, anchor_x='center', anchor_y='center')
         Sprites_.draw_backdrop()
+        import Exploration
+        arcade.draw_text(f'FPS = {Exploration.Explore.fps:.1f}', 2, self.window.height - 22, arcade.color.GREEN,
+                         font_name='arial', font_size=14)
         for tile, start, end in self.affected_tiles:
             tile_center = Vector.Vector(*arcade.lerp_vec(start, end, self.current_steps / self.animation_steps))
             tile.on_render_foreground(tile_center, tile_center + (-(State.state.cell_size.x / 2), State.state.cell_size.y / 2), State.state.cell_size)

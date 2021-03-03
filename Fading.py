@@ -1,8 +1,11 @@
-import Exploration
-import Vector
-from arcade import load_texture
 from pathlib import Path
+
+from arcade import load_texture
+
+import Exploration
 import State
+import Vector
+import arcade.gui
 
 CIRCLE_FADE_FRAMES = [
     # <-- is apparently called an "Octothorp", but anyways    \/ this can be typed {i:0>2}, bruh
@@ -33,5 +36,6 @@ class Fading(Exploration.Explore):
             self.reversing = True
             State.state.player.pos = Vector.Vector(0, 0)
             State.state.texture_mapping = {}
+            State.state.save_textures()
         if self.current_frame == -1:
             State.state.window.show_view(Exploration.Explore())

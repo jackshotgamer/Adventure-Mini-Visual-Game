@@ -1,21 +1,25 @@
 import arcade
-from Vector import Vector
-import State
+import arcade.gui
 from arcade import key
+
 import Button_Functions
 import Sprites_
-import arcade.gui
-import random
+import State
+import time
+from Vector import Vector
 
 
 class Explore(arcade.View):
+    fps = 0
+    last_update = 0
+
     def __init__(self):
         super().__init__()
         self.ui_manager = arcade.gui.UIManager()
         self.ui_manager.purge_ui_elements()
         Button_Functions.register_ui_buttons(self.ui_manager)
         State.state.is_moving = False
-        if ((State.state.moves_since_texture_save > 2 and State.state.is_new_tile) or State.state.player.pos == (0, 0)) and not State.state.player.meta_data.isguest:
+        if ((State.state.moves_since_texture_save > 2 and State.state.is_new_tile) or State.state.player.pos == (0, 0)) and not State.state.player.meta_data.is_guest:
             for offset in State.state.generate_radius(5):
                 State.state.tile_type_pos(*(offset + State.state.player.pos))
             State.state.save_textures()
@@ -25,6 +29,9 @@ class Explore(arcade.View):
     def on_update(self, delta_time: float):
         Button_Functions.reposition_button(self.ui_manager)
         Sprites_.update_backdrop()
+        if Explore.last_update == 0 or time.time() - Explore.last_update > 0.5:
+            Explore.fps = 1 / delta_time
+            Explore.last_update = time.time()
 
         for x_off, y_off in State.state.generate_radius(State.state.render_radius):
             real_grid_pos = State.state.player.pos + (x_off, y_off)
@@ -82,6 +89,9 @@ class Explore(arcade.View):
         arcade.draw_text(str(State.state.player.pos.tuple()), center_screen.x, center_screen.y + (State.state.cell_size.y * .37), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=12, anchor_x='center', anchor_y='center')
         Sprites_.draw_backdrop()
+
+        arcade.draw_text(f'FPS = {self.fps:.1f}', 2, self.window.height - 22, arcade.color.GREEN,
+                         font_name='arial', font_size=14)
         for tile, *args in render_queue:
             tile.on_render_foreground(*args)
 

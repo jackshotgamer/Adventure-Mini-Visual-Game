@@ -1,11 +1,9 @@
-from arcade import View
-import Exploration
-import Vector
 import arcade
-from pathlib import Path
-import State
-import requests
+from arcade import View
+
+import Exploration
 import Networking
+import State
 
 
 class Saving(View):

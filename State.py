@@ -1,11 +1,12 @@
-import HpEntity
-import Vector
-import Meta_Data
-import Grid
 import json
-import random
-import Sprites_
 import pathlib
+import random
+
+import Grid
+import HpEntity
+import Meta_Data
+import Sprites_
+import Vector
 
 
 class State:
@@ -23,7 +24,7 @@ class State:
         self.is_new_tile = False
         self.is_moving = False
         self.moves_since_texture_save = 0
-        # Meta_Data.isme = True
+        # Meta_Data.is_me = True
 
     def tile_type_pos(self, x, y):
         xy = f'{int(x)} {int(y)}'

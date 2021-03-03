@@ -38,3 +38,6 @@
   * Buying full heal
 * Damage Function
 * Giving Gold
+
+[X] To do
+* FPS counter

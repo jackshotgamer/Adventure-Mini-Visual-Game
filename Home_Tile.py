@@ -10,7 +10,6 @@ class HomeTile(Tile.Tile):
     def __init__(self, pos):
         super().__init__(pos)
         self.current_opacity = 0
-        State.state.player.meta_data.is_me = True
 
     @property
     def heal_cost(self):
@@ -23,9 +22,9 @@ class HomeTile(Tile.Tile):
         if State.state.player.hp < State.state.player.max_hp and State.state.player.pos == self.pos:
             if State.state.is_moving:
                 return
-            arcade.draw_rectangle_filled(center.x, center.y, cell_size.x * 1.8, cell_size.y * 0.45, (0, 0, 0, self.current_opacity))
+            arcade.draw_rectangle_filled(center.x, center.y, cell_size.x * 2, cell_size.y * 0.45, (0, 0, 0, self.current_opacity))
             if State.state.player.gold >= self.heal_cost:
-                arcade.draw_text(f'Press B to heal to {State.state.player.max_hp} Hit Points\n        This will cost {self.heal_cost} Gold', center.x, center.y, (255, 215, 0, 220),
+                arcade.draw_text(f'Press E to heal to {State.state.player.max_hp} Hit Points\n        This will cost {self.heal_cost} Gold', center.x, center.y, (255, 215, 0, 220),
                                  12, anchor_x='center', anchor_y='center')
             else:
                 arcade.draw_text(f'You cannot afford a full heal!\n      You need {self.heal_cost - State.state.player.gold} more gold.\n          Come back later!', center.x, center.y, (255, 69, 0, 220),
@@ -39,7 +38,7 @@ class HomeTile(Tile.Tile):
 
     def key_down(self, keycode, mods):
         if State.state.player.hp < State.state.player.max_hp:
-            if keycode == arcade.key.B:
+            if keycode == arcade.key.E:
                 if State.state.player.gold >= self.heal_cost:
                     State.state.player.gold -= self.heal_cost
                     State.state.player.hp = State.state.player.max_hp

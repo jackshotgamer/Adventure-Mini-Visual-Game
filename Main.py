@@ -1,11 +1,10 @@
 import arcade
-import Exploration
 import State
 import Tile
 import Vector
 import Player_Select
-import Sprites
 import Home_Tile
+import Loot_Functions
 
 
 class TestRender(Tile.Tile):
@@ -21,6 +20,8 @@ State.state.grid.add(Home_Tile.HomeTile(Vector.Vector(0, 0)))
 window = arcade.Window(width=1000, height=800)
 State.state.window = window
 window.show_view(Player_Select.PlayerSelect())
+State.state.player.meta_data.is_me = True
 State.state.grid.add(TestRender(Vector.Vector(1, 0)))
+State.state.grid.add(Loot_Functions.LootTile(Vector.Vector(-1, 0)))
 
 arcade.run()
