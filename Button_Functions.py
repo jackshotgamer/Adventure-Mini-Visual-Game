@@ -1,9 +1,14 @@
 from arcade.gui import UIFlatButton, UIManager
 
 import State
+import Loot_Functions
+import Exploration
+import Vector
 
 
 def register_ui_buttons(uimanager: UIManager):
+    if State.state.preoccupied:
+        return
     uimanager.add_ui_element(GoHomeButton(uimanager))
     uimanager.add_ui_element(LogOutButton(uimanager))
     if not State.state.player.meta_data.is_guest:
@@ -11,6 +16,8 @@ def register_ui_buttons(uimanager: UIManager):
 
 
 def reposition_button(uimanager: UIManager):
+    if State.state.preoccupied:
+        return
     # noinspection PyProtectedMember
     for element in uimanager._ui_elements:
         if isinstance(element, LogOutButton):
@@ -40,9 +47,11 @@ class GoHomeButton(UIFlatButton):
         self.ui_manager = uimanager
 
     def on_click(self):
+        if State.state.preoccupied:
+            return
         import Fading
-        State.state.window.show_view(Fading.Fading())
         self.ui_manager.purge_ui_elements()
+        State.state.window.show_view(Fading.Fading(Exploration.Explore, 4, 5, should_reverse=True, should_freeze=True, should_reload_textures=True, only_reverse=False, reset_pos=Vector.Vector(0, 0)))
 
 
 class SaveButton(UIFlatButton):
@@ -51,6 +60,8 @@ class SaveButton(UIFlatButton):
         self.ui_manager = uimanager
 
     def on_click(self):
+        if State.state.preoccupied:
+            return
         import Saving
         self.ui_manager.purge_ui_elements()
         State.state.window.show_view(Saving.Saving())

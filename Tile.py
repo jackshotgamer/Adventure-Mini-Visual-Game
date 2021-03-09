@@ -28,3 +28,9 @@ class Tile:
 
     def on_update(self, delta_time):
         pass
+
+    def can_player_move(self):
+        if self.pos == self.pos:
+            return True
+        else:
+            print('WHAT\nWARNING: Computer have become sentient, this is not a drill, i repeat, this is not a drill!')

@@ -3,9 +3,13 @@ import arcade.gui
 from arcade import key
 
 import Button_Functions
+import Fading
+import Purgatory_Screen
 import Sprites_
 import State
 import time
+import random
+import Loot_Functions
 from Vector import Vector
 
 
@@ -16,8 +20,9 @@ class Explore(arcade.View):
     def __init__(self):
         super().__init__()
         self.ui_manager = arcade.gui.UIManager()
-        self.ui_manager.purge_ui_elements()
-        Button_Functions.register_ui_buttons(self.ui_manager)
+        if not State.state.preoccupied:
+            self.ui_manager.purge_ui_elements()
+            Button_Functions.register_ui_buttons(self.ui_manager)
         State.state.is_moving = False
         if ((State.state.moves_since_texture_save > 2 and State.state.is_new_tile) or State.state.player.pos == (0, 0)) and not State.state.player.meta_data.is_guest:
             for offset in State.state.generate_radius(5):
@@ -26,7 +31,9 @@ class Explore(arcade.View):
             State.state.is_new_tile = False
             State.state.moves_since_texture_save = 0
 
-    def on_update(self, delta_time: float):
+    def update(self, delta_time: float):
+        if State.state.player.hp <= 0:
+            State.state.window.show_view(Fading.Fading(Purgatory_Screen.PurgatoryScreen, 7, 4, should_reverse=False, should_freeze=True, should_reload_textures=True, reset_pos=Vector(0, 0)))
         Button_Functions.reposition_button(self.ui_manager)
         Sprites_.update_backdrop()
         if Explore.last_update == 0 or time.time() - Explore.last_update > 0.5:
@@ -101,19 +108,29 @@ class Explore(arcade.View):
 
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol in self.key_offset:
+            if State.state.preoccupied:
+                return
             State.state.moves_since_texture_save += 1
             offset = Vector(*self.key_offset[symbol])
             prior_player_pos = State.state.player.pos
             new_player_pos = prior_player_pos + offset
 
+            if tile := State.state.grid.get(*prior_player_pos):
+                if not tile.can_player_move():
+                    return
+                tile.on_exit()
+            if tile := State.state.grid.get(*new_player_pos):
+                tile.on_enter()
+
             from Movement_Animator import MovementAnimator
             State.state.window.show_view(MovementAnimator(prior_player_pos, new_player_pos, 13))
 
             State.state.player.pos = new_player_pos
-            if tile := State.state.grid.get(*prior_player_pos):
-                tile.on_exit()
-            if tile := State.state.grid.get(*new_player_pos):
-                tile.on_enter()
+
+            if not State.state.grid.get(new_player_pos.x, new_player_pos.y) and random.random() < 0.02 and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in {'1', '2'}:
+                loot = Loot_Functions.LootTile(new_player_pos)
+                State.state.grid.add(loot)
+
         else:
             if tile := State.state.grid.get(*State.state.player.pos):
                 tile.key_down(symbol, modifiers)

@@ -48,6 +48,7 @@ class MovementAnimator(arcade.View):
         import Exploration
         self.current_steps += 1
         if self.current_steps > self.animation_steps:
+            State.state.is_moving = False
             State.state.window.show_view(Exploration.Explore())
         Sprites_.update_backdrop()
         if Exploration.Explore.last_update == 0 or time.time() - Exploration.Explore.last_update > 0.5:

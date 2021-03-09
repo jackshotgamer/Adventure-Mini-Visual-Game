@@ -7,13 +7,15 @@ import HpEntity
 import Meta_Data
 import Sprites_
 import Vector
+import Loot_Functions
+import Fading
 
 
 class State:
     Textures_folder = pathlib.Path('Textures')
 
     def __init__(self):
-        self.player = HpEntity.HpEntity('', Vector.Vector(0, 0), 120, 100, 0, 0, 1, 1, Meta_Data.MetaData(is_player=True))
+        self.player = HpEntity.HpEntity('', Vector.Vector(0, 0), 220, 200, 0, 0, 1, 1, Meta_Data.MetaData(is_player=True))
         self.window = None
         self.grid = Grid.Grid()
         self.cell_size = Vector.Vector(100, 100)
@@ -24,13 +26,14 @@ class State:
         self.is_new_tile = False
         self.is_moving = False
         self.moves_since_texture_save = 0
+        self.preoccupied = False
         # Meta_Data.is_me = True
 
     def tile_type_pos(self, x, y):
         xy = f'{int(x)} {int(y)}'
         if xy not in self.texture_mapping:
-            sprite_textures = random.choices(tuple(Sprites_.sprite_alias), k=1, weights=(45, 35, 1))
-            # 25, 20, 15, 10, 5, 3,
+            sprite_textures = random.choices(tuple(Sprites_.sprite_alias), k=1, weights=(45, 35, 15, 1))
+            # 20, 15, 10, 5, 3,
             self.texture_mapping[xy] = random.choice(sprite_textures)
             self.is_new_tile = True
         return Sprites_.sprite_alias[self.texture_mapping[xy]]

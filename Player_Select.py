@@ -8,7 +8,7 @@ import time
 import sys
 
 
-class PlayButton(gui.UIFlatButton):
+class EnterButton(gui.UIFlatButton):
     def __init__(self, ui_manager, player_select):
         super().__init__('Enter', State.state.screen_center.x, State.state.screen_center.y, 250, 50)
         self.ui_manager = ui_manager
@@ -47,7 +47,7 @@ class PlayButton(gui.UIFlatButton):
 
 class GuestButton(gui.UIFlatButton):
     def __init__(self, ui_manager):
-        super().__init__('Play as Guest', State.state.screen_center.x, State.state.screen_center.y + 150, 250, 50)
+        super().__init__('Login as Guest', State.state.screen_center.x, State.state.screen_center.y + 150, 250, 50)
         self.ui_manager = ui_manager
 
     def on_click(self):
@@ -82,7 +82,7 @@ class PlayerSelect(arcade.View):
         super().__init__()
         self.ui_manager = gui.UIManager()
         self.ui_manager.purge_ui_elements()
-        self.ui_manager.add_ui_element(PlayButton(self.ui_manager, self))
+        self.ui_manager.add_ui_element(EnterButton(self.ui_manager, self))
         self.ui_manager.add_ui_element(ExitButton(self.ui_manager))
         self.ui_manager.add_ui_element(GuestButton(self.ui_manager))
         self.username = gui.UIInputBox(State.state.screen_center.x, State.state.screen_center.y + 100, 300, 50)

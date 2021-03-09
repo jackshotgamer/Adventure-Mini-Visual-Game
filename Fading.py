@@ -1,11 +1,10 @@
 from pathlib import Path
 
-from arcade import load_texture
+from arcade import load_texture, gui
 
 import Exploration
 import State
 import Vector
-import arcade.gui
 
 CIRCLE_FADE_FRAMES = [
     # <-- is apparently called an "Octothorp", but anyways    \/ this can be typed {i:0>2}, bruh
@@ -15,27 +14,54 @@ CIRCLE_FADE_FRAMES = [
 
 
 class Fading(Exploration.Explore):
-    def __init__(self, reset_pos: Vector.Vector = None):
+    def __init__(self, reset_screen_func, first_interval: int, second_interval: int = -1, should_reverse: bool = False, should_freeze: bool = False, only_reverse: bool = False,
+                 should_reload_textures: bool = False,
+                 reset_pos: Vector.Vector = None):
+        State.state.preoccupied = True
         super().__init__()
+        self.moving = True
         self.reset_pos = reset_pos
         self.current_frame = 0
         self.frame_count = 1
         self.reversing = False
+        self.ui_manager = gui.UIManager()
+        self.ui_manager.purge_ui_elements()
+        self.reset_screen_func = reset_screen_func
+        self.first_interval = first_interval
+        self.second_interval = second_interval
+        self.should_reverse = should_reverse
+        self.should_freeze = should_freeze
+        self.should_reload_textures = should_reload_textures
+        if only_reverse:
+            self.should_reverse = True
+            self.reversing = True
+            self.current_frame = len(CIRCLE_FADE_FRAMES) - 1
 
     def on_draw(self):
         super().on_draw()
         CIRCLE_FADE_FRAMES[self.current_frame].draw_scaled(*State.state.screen_center)
 
-    def on_update(self, delta_time: float):
+    def update(self, delta_time: float):
         self.frame_count += 1
-        if not self.frame_count % 4 and not self.reversing:
+        if not self.frame_count % self.first_interval and not self.reversing:
             self.current_frame += 1
-        elif not self.frame_count % 5 and self.reversing:
+        if not self.frame_count % (self.second_interval if self.second_interval != -1 else self.first_interval) and self.reversing and self.should_reverse:
             self.current_frame -= 1
         if self.current_frame == len(CIRCLE_FADE_FRAMES) - 1:
-            self.reversing = True
-            State.state.player.pos = Vector.Vector(0, 0)
-            State.state.texture_mapping = {}
-            State.state.save_textures()
+            if self.should_reverse:
+                self.reversing = True
+            else:
+                self.moving = False
+                State.state.preoccupied = False
+                State.state.window.show_view(self.reset_screen_func())
+            if self.reset_pos is not None:
+                State.state.player.pos = Vector.Vector(*self.reset_pos)
+            if self.should_reload_textures:
+                State.state.texture_mapping = {}
         if self.current_frame == -1:
-            State.state.window.show_view(Exploration.Explore())
+            self.moving = False
+            State.state.preoccupied = False
+            State.state.window.show_view(self.reset_screen_func())
+
+    def on_key_press(self, symbol: int, modifiers: int):
+        return
