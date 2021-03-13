@@ -62,4 +62,8 @@
   * Daggers can be combined if you have two daggers
     * When enemy is below 10% health, either: higher crit chance or ignore defense
   * Mix and matching is encouraged by different stat bonuses per combo of gear
+  * Stats
+    * Speed
+    * Attack
+    * Defence
   

@@ -1,10 +1,6 @@
-import Vector
-from arcade import load_texture, Sprite
+from arcade import load_texture
 from pathlib import Path
-import State
-from arcade import SpriteList
-import random
-
+from W_Main_File.Essentials import State
 
 plains_sprite = load_texture(Path('Sprites') / 'Plains_Tile_0.png')
 forest_sprite = load_texture(Path('Sprites') / 'Forest_Tile_2.0.png')
@@ -13,11 +9,15 @@ village_sprite = load_texture(Path('Sprites') / 'Village_Tile_1.png')
 home_sprite = load_texture(Path('Sprites') / 'Home_Tile.png')
 chest_sprite = load_texture(Path('Sprites') / 'Chest_0.png')
 chest_body_sprite = load_texture(Path('Sprites') / 'Chest_Body_0.png')
-stick_sprite = load_texture(Path('Sprites') / 'Stick_Weapon.png')
-rusty_knife_sprite = load_texture(Path('Sprites') / 'Rusty_Knife_0.png')
-# temp_1 = load_texture(Path('Sprites') / '')
-# temp_2 = load_texture(Path('Sprites') / '')
-# temp_3 = load_texture(Path('Sprites') / '')
+stick_sprite = load_texture(Path('Sprites') / 'Stick_Weapon_1.png')
+rusty_knife_sprite = load_texture(Path('Sprites') / 'Rusty_Knife_1.png')
+blank_button_dark = load_texture(Path('Sprites') / 'Button_Square_(No Decor)_0Dark.png')
+blank_button_light = load_texture(Path('Sprites') / 'Button_Square_(No Decor)_1Light.png')
+blank_button_light_middle = load_texture(Path('Sprites') / 'Button_Square_(No Decor)_2LightMiddle.png')
+# temp_2 = load_texture(Path('Sprites') / '.png')
+# temp_3 = load_texture(Path('Sprites') / '.png')
+# temp_4 = load_texture(Path('Sprites') / '.png')
+# temp_5 = load_texture(Path('Sprites') / '.png')
 black_sprite = load_texture(Path('Sprites') / 'Black_Square.png')
 black_circle_sprite = load_texture(Path('Sprites') / 'Black_Circle.png')
 black_circle_square_sprite = load_texture(Path('Sprites') / 'Black_Circle_Square.png')

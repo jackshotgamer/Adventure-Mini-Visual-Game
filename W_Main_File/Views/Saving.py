@@ -1,16 +1,16 @@
 import arcade
 from arcade import View
 
-import Exploration
-import Networking
-import State
+from W_Main_File.Utilities import Networking
+from W_Main_File.Essentials import State
 
 
 class Saving(View):
-    def __init__(self):
+    def __init__(self, saving_screen_func):
         super().__init__()
         self.frame_count = 1
         self.saved = False
+        self.saving_screen_func = saving_screen_func
 
     def on_draw(self):
         arcade.start_render()
@@ -23,4 +23,4 @@ class Saving(View):
             Networking.save()
             self.saved = True
         if self.frame_count >= 15 and self.saved:
-            State.state.window.show_view(Exploration.Explore())
+            State.state.window.show_view(self.saving_screen_func())

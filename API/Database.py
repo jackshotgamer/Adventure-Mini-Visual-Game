@@ -37,15 +37,15 @@ class PlayerData(Base):
     character_pw = Column(String(50), nullable=False)
     player_x = Column(Integer, nullable=False, default=0)
     player_y = Column(Integer, nullable=False, default=0)
-    hp = Column(Integer, nullable=False, default=100)
-    max_hp = Column(Integer, nullable=False, default=120)
+    hp = Column(Integer, nullable=False, default=200)
+    max_hp = Column(Integer, nullable=False, default=220)
     gold = Column(Integer, nullable=False, default=0)
     xp = Column(Integer, nullable=False, default=0)
     lvl = Column(Integer, nullable=False, default=1)
     floor = Column(Integer, nullable=False, default=1)
 
     @classmethod
-    def new(cls, name, pw, player_x=0, player_y=0, hp=100, max_hp=120, gold=0, xp=0, lvl=1, floor=1):
+    def new(cls, name, pw, player_x=0, player_y=0, hp=200, max_hp=220, gold=0, xp=0, lvl=1, floor=1):
         return PlayerData(character_name=name, character_pw=pw, player_x=player_x, player_y=player_y, hp=hp, max_hp=max_hp, gold=gold, xp=xp, lvl=lvl, floor=floor)
 
     def as_dict(self):

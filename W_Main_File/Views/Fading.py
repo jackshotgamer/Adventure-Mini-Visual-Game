@@ -1,10 +1,10 @@
 from pathlib import Path
 
-from arcade import load_texture, gui
+from arcade import load_texture, gui, View
+import arcade
 
-import Exploration
-import State
-import Vector
+from W_Main_File.Essentials import State
+from W_Main_File.Utilities import Vector
 
 CIRCLE_FADE_FRAMES = [
     # <-- is apparently called an "Octothorp", but anyways    \/ this can be typed {i:0>2}, bruh
@@ -13,12 +13,14 @@ CIRCLE_FADE_FRAMES = [
 ]
 
 
-class Fading(Exploration.Explore):
+class Fading(View):
     def __init__(self, reset_screen_func, first_interval: int, second_interval: int = -1, should_reverse: bool = False, should_freeze: bool = False, only_reverse: bool = False,
                  should_reload_textures: bool = False,
                  reset_pos: Vector.Vector = None):
+        from W_Main_File.Views import Exploration
         State.state.preoccupied = True
         super().__init__()
+        self.explore = Exploration.Explore()
         self.moving = True
         self.reset_pos = reset_pos
         self.current_frame = 0
@@ -38,7 +40,8 @@ class Fading(Exploration.Explore):
             self.current_frame = len(CIRCLE_FADE_FRAMES) - 1
 
     def on_draw(self):
-        super().on_draw()
+        arcade.start_render()
+        self.explore.on_draw()
         CIRCLE_FADE_FRAMES[self.current_frame].draw_scaled(*State.state.screen_center)
 
     def update(self, delta_time: float):

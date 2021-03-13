@@ -1,9 +1,9 @@
 import time
 
 import arcade
-import Vector
-import State
-import Sprites_
+from W_Main_File.Utilities import Vector
+from W_Main_File.Essentials import State
+from W_Main_File.Data import Sprites_
 
 
 class MovementAnimator(arcade.View):
@@ -45,7 +45,7 @@ class MovementAnimator(arcade.View):
         ]
 
     def update(self, delta_time: float):
-        import Exploration
+        from W_Main_File.Views import Exploration
         self.current_steps += 1
         if self.current_steps > self.animation_steps:
             State.state.is_moving = False
@@ -56,7 +56,6 @@ class MovementAnimator(arcade.View):
             Exploration.Explore.last_update = time.time()
 
     def on_draw(self):
-        import Sprites_
         arcade.start_render()
         center = State.state.screen_center
         if self.affected_tiles:
@@ -98,7 +97,7 @@ class MovementAnimator(arcade.View):
         arcade.draw_rectangle_filled(center.x, center.y + 270, 500, 38, (0, 0, 0))
         arcade.draw_text(f'Name: {State.state.player.name}', center.x - 225, center.y - 270, arcade.color.LIGHT_GRAY,
                          font_size=11, font_name='arial')
-        arcade.draw_text(f'Hp: {int(State.state.player.hp)}', center.x - 25, center.y - 270, arcade.color.LIGHT_GRAY,
+        arcade.draw_text(f'Hp: {int(State.state.player.hp)} / {int(State.state.player.max_hp)}', center.x - 25, center.y - 270, arcade.color.LIGHT_GRAY,
                          font_size=11, font_name='arial')
         arcade.draw_text(f'Level: {int(State.state.player.lvl)}', center.x + 170, center.y - 270, arcade.color.LIGHT_GRAY,
                          font_size=11, font_name='arial')
@@ -111,7 +110,7 @@ class MovementAnimator(arcade.View):
         arcade.draw_text(str(State.state.player.pos.tuple()), center.x, center.y + (State.state.cell_size.y * .37), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=12, anchor_x='center', anchor_y='center')
         Sprites_.draw_backdrop()
-        import Exploration
+        from W_Main_File.Views import Exploration
         arcade.draw_text(f'FPS = {Exploration.Explore.fps:.1f}', 2, self.window.height - 22, arcade.color.GREEN,
                          font_name='arial', font_size=14)
         for tile, start, end in self.affected_tiles:

@@ -1,22 +1,44 @@
 import arcade
 from arcade import gui
 from urllib.parse import quote
-import State
-import Vector
+
+from W_Main_File.Essentials import State, Button_Sprite_Manager
+from W_Main_File.Utilities import Vector
 import requests
 import time
 import sys
 
 
-class EnterButton(gui.UIFlatButton):
-    def __init__(self, ui_manager, player_select):
-        super().__init__('Enter', State.state.screen_center.x, State.state.screen_center.y, 250, 50)
-        self.ui_manager = ui_manager
-        self.player_select = player_select
+class PlayerSelect(arcade.View):
+    def __init__(self):
+        super().__init__()
+        self.ui_manager = gui.UIManager()
+        self.ui_manager.purge_ui_elements()
+        self.username = gui.UIInputBox(State.state.screen_center.x, State.state.screen_center.y + 100, 300, 50)
+        self.username.text_adapter = LimitText()
+        self.password = gui.UIInputBox(State.state.screen_center.x, State.state.screen_center.y + 50, 300, 50)
+        self.password.text_adapter = LimitText()
+        self.ui_manager.add_ui_element(self.username)
+        self.ui_manager.add_ui_element(self.password)
+        self.incorrect_password_end = 0
+        self.button_manager = Button_Sprite_Manager.ButtonManager()
+        self.button_manager.append('Guest', 'Login as Guest', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y + 150), Vector.Vector(250, 50), on_click=self.guest_button)
+        self.button_manager.append('Enter', 'Enter', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y), Vector.Vector(250, 50), on_click=self.enter_button)
+        self.button_manager.append('Quit', 'Quit', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y - 50), Vector.Vector(100, 50), on_click=self.exit_button)
+        # self.button_manager.append('Dummy', 'You are a Dummy\n if you click\n this button!', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y + 250), Vector.Vector(250, 100))
 
-    def on_click(self):
-        player_username = self.player_select.username.text.strip()
-        player_password = self.player_select.password.text.strip()
+    def on_mouse_motion(self, x: float, y: float, dx: float, dy: float):
+        self.button_manager.check_hovered(x, y)
+
+    def on_mouse_press(self, x: float, y: float, button: int, modifiers: int):
+        self.button_manager.on_click_check(x, y)
+
+    def on_mouse_release(self, x: float, y: float, button: int, modifiers: int):
+        self.button_manager.on_click_release()
+
+    def enter_button(self):
+        player_username = self.username.text.strip()
+        player_password = self.password.text.strip()
         if not (player_username and player_password):
             return
 
@@ -37,61 +59,32 @@ class EnterButton(gui.UIFlatButton):
             state_player.meta_data.is_guest = False
             state_player.meta_data.is_enemy = False
             print(state_player.__dict__)
-            import Exploration
+            from W_Main_File.Views import Exploration
             self.ui_manager.purge_ui_elements()
             State.state.load_textures()
             State.state.window.show_view(Exploration.Explore())
         else:
-            self.player_select.incorrect_password_end = time.time() + 1.5
+            self.incorrect_password_end = time.time() + 1.5
 
+    def exit_button(self):
+        sys.exit()
 
-class GuestButton(gui.UIFlatButton):
-    def __init__(self, ui_manager):
-        super().__init__('Login as Guest', State.state.screen_center.x, State.state.screen_center.y + 150, 250, 50)
-        self.ui_manager = ui_manager
-
-    def on_click(self):
+    def guest_button(self):
         state = State.state.player
         state.name = 'Guest'
         state.meta_data.is_player = False
         state.meta_data.is_guest = True
         state.meta_data.is_enemy = False
         state.pos = Vector.Vector(0, 0)
-        state.max_hp = 120
-        state.hp = 100
+        state.max_hp = 220
+        state.hp = 200
         state.gold = 0
         state.xp = 0
         state.lvl = 1
         state.floor = 1
-        import Exploration
+        from W_Main_File.Views import Exploration
         self.ui_manager.purge_ui_elements()
         State.state.window.show_view(Exploration.Explore())
-
-
-class ExitButton(gui.UIFlatButton):
-    def __init__(self, ui_manager):
-        super().__init__('Quit', State.state.screen_center.x, State.state.screen_center.y - 51, 100, 50)
-        self.ui_manager = ui_manager
-
-    def on_click(self):
-        sys.exit()
-
-
-class PlayerSelect(arcade.View):
-    def __init__(self):
-        super().__init__()
-        self.ui_manager = gui.UIManager()
-        self.ui_manager.purge_ui_elements()
-        self.ui_manager.add_ui_element(EnterButton(self.ui_manager, self))
-        self.ui_manager.add_ui_element(ExitButton(self.ui_manager))
-        self.ui_manager.add_ui_element(GuestButton(self.ui_manager))
-        self.username = gui.UIInputBox(State.state.screen_center.x, State.state.screen_center.y + 100, 300, 50)
-        self.username.text_adapter = LimitText()
-        self.password = gui.UIInputBox(State.state.screen_center.x, State.state.screen_center.y + 50, 300, 50)
-        self.password.text_adapter = LimitText()
-        self.ui_manager.add_ui_element(self.username)
-        self.ui_manager.add_ui_element(self.password)
-        self.incorrect_password_end = 0
 
     def on_draw(self):
         arcade.start_render()
@@ -100,6 +93,7 @@ class PlayerSelect(arcade.View):
                          font_name='arial', font_size=20, anchor_x='center', anchor_y='center')
         arcade.draw_text('PASSWORD:', center_screen.x - self.password.width + 43, self.password.center_y, arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=20, anchor_x='center', anchor_y='center')
+        self.button_manager.render()
         if self.incorrect_password_end > time.time():
             arcade.draw_text('Incorrect Password', State.state.screen_center.x, State.state.screen_center.y - 50, arcade.color.RED, font_name='arial', font_size=20, anchor_x='center', anchor_y='center')
 

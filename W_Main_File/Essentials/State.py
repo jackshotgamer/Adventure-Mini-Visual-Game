@@ -2,13 +2,8 @@ import json
 import pathlib
 import random
 
-import Grid
-import HpEntity
-import Meta_Data
-import Sprites_
-import Vector
-import Loot_Functions
-import Fading
+from W_Main_File.Data import HpEntity, Grid, Sprites_, Meta_Data
+from W_Main_File.Utilities import Vector
 
 
 class State:

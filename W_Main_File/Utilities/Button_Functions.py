@@ -1,9 +1,8 @@
 from arcade.gui import UIFlatButton, UIManager
 
-import State
-import Loot_Functions
-import Exploration
-import Vector
+from W_Main_File.Essentials import State
+from W_Main_File.Utilities import Vector
+from W_Main_File.Views import Player_Select, Exploration, Fading, Log_Out
 
 
 def register_ui_buttons(uimanager: UIManager):
@@ -29,16 +28,23 @@ def reposition_button(uimanager: UIManager):
 
 
 class LogOutButton(UIFlatButton):
-    def __init__(self, uimanager: UIManager):
+    def __init__(self, uimanager: UIManager, show_confirm_screen: bool = True):
         super().__init__('Log Out', (State.state.screen_center.y + 150) + (State.state.cell_size.y - 24), State.state.screen_center.x + 250 + State.state.cell_size.x, 200, 50)
         self.ui_manager = uimanager
+        self.show_confirm_screen = show_confirm_screen
 
     def on_click(self):
         self.ui_manager.purge_ui_elements()
         # State.state.texture_mapping = {}
         # State.state.window.show_view(Player_Select.PlayerSelect())
-        import Log_Out
-        State.state.window.show_view(Log_Out.LogOutView())
+        State.state.window.show_view(Log_Out.LogOutView(on_deny_func=self.deny_fun, on_confirm_func=self.confirm_func, show_confirmation_screen=self.show_confirm_screen))
+
+    def deny_fun(self):
+        State.state.window.show_view(Exploration.Explore())
+
+    def confirm_func(self):
+        State.state.texture_mapping = {}
+        State.state.window.show_view(Player_Select.PlayerSelect())
 
 
 class GoHomeButton(UIFlatButton):
@@ -49,19 +55,18 @@ class GoHomeButton(UIFlatButton):
     def on_click(self):
         if State.state.preoccupied:
             return
-        import Fading
         self.ui_manager.purge_ui_elements()
         State.state.window.show_view(Fading.Fading(Exploration.Explore, 4, 5, should_reverse=True, should_freeze=True, should_reload_textures=True, only_reverse=False, reset_pos=Vector.Vector(0, 0)))
 
 
 class SaveButton(UIFlatButton):
     def __init__(self, uimanager: UIManager):
-        super().__init__('Save Data', State.state.screen_center.y + (State.state.cell_size.y - 24), State.state.screen_center.x + 250 + State.state.cell_size.x, 200, 50)
+        super().__init__('Save Character_Data_Files', State.state.screen_center.y + (State.state.cell_size.y - 24), State.state.screen_center.x + 250 + State.state.cell_size.x, 200, 50)
         self.ui_manager = uimanager
 
     def on_click(self):
         if State.state.preoccupied:
             return
-        import Saving
+        from W_Main_File.Views import Saving
         self.ui_manager.purge_ui_elements()
-        State.state.window.show_view(Saving.Saving())
+        State.state.window.show_view(Saving.Saving(Exploration.Explore))

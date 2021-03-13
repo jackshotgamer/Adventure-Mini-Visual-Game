@@ -1,9 +1,6 @@
-import Exploration
-import Vector
-import State
-import Tile
+from W_Main_File.Essentials import State
+from W_Main_File.Data import Tile, Sprites_
 import arcade
-import Sprites_
 
 
 class HomeTile(Tile.Tile):
@@ -42,7 +39,7 @@ class HomeTile(Tile.Tile):
                 if State.state.player.gold >= self.heal_cost:
                     State.state.player.gold -= self.heal_cost
                     State.state.player.hp = State.state.player.max_hp
-            elif keycode == arcade.MOUSE_BUTTON_RIGHT and State.state.player.meta_data.is_me:
-                State.state.player.gold += 1
+            elif keycode == arcade.key.G and State.state.player.meta_data.is_me:
+                State.state.player.gold += self.heal_cost
         elif keycode == arcade.key.H and State.state.player.meta_data.is_me:
-            State.state.player.hp -= 25
+            State.state.player.hp //= 2

@@ -2,16 +2,14 @@ import arcade
 import arcade.gui
 from arcade import key
 
-import Button_Functions
-import Fading
-import Purgatory_Screen
-import Sprites_
-import State
+from W_Main_File.Utilities import Button_Functions
+from W_Main_File.Views import Purgatory_Screen
+from W_Main_File.Data import Sprites_
+from W_Main_File.Essentials import State
 import time
 import random
-import Loot_Functions
-from Vector import Vector
-
+from W_Main_File.Tiles import Loot_Functions
+from W_Main_File.Utilities.Vector import Vector
 
 class Explore(arcade.View):
     fps = 0
@@ -32,8 +30,10 @@ class Explore(arcade.View):
             State.state.moves_since_texture_save = 0
 
     def update(self, delta_time: float):
+        from W_Main_File.Views import Fading
         if State.state.player.hp <= 0:
-            State.state.window.show_view(Fading.Fading(Purgatory_Screen.PurgatoryScreen, 7, 4, should_reverse=False, should_freeze=True, should_reload_textures=True, reset_pos=Vector(0, 0)))
+            State.state.window.show_view(Fading.Fading((lambda: Purgatory_Screen.PurgatoryScreen('You Died')), 7, 4, should_reverse=False,
+                                                       should_freeze=True, should_reload_textures=True, reset_pos=Vector(0, 0)))
         Button_Functions.reposition_button(self.ui_manager)
         Sprites_.update_backdrop()
         if Explore.last_update == 0 or time.time() - Explore.last_update > 0.5:
@@ -83,7 +83,7 @@ class Explore(arcade.View):
         arcade.draw_rectangle_outline(center_screen.x, center_screen.y, 500, 500, arcade.color.DARK_GRAY, 2)
         arcade.draw_text(f'Name: {State.state.player.name}', center_screen.x - 225, center_screen.y - 270, arcade.color.LIGHT_GRAY,
                          font_size=11, font_name='arial')
-        arcade.draw_text(f'Hp: {int(State.state.player.hp)}', center_screen.x - 25, center_screen.y - 270, arcade.color.LIGHT_GRAY,
+        arcade.draw_text(f'Hp: {int(State.state.player.hp)} / {int(State.state.player.max_hp)}', center_screen.x - 25, center_screen.y - 270, arcade.color.LIGHT_GRAY,
                          font_size=11, font_name='arial')
         arcade.draw_text(f'Level: {int(State.state.player.lvl)}', center_screen.x + 170, center_screen.y - 270, arcade.color.LIGHT_GRAY,
                          font_size=11, font_name='arial')
@@ -107,6 +107,8 @@ class Explore(arcade.View):
             tile.key_up(symbol, mods)
 
     def on_key_press(self, symbol: int, modifiers: int):
+        if symbol == arcade.key.B:
+            State.state.player.hp -= 200
         if symbol in self.key_offset:
             if State.state.preoccupied:
                 return
@@ -122,7 +124,7 @@ class Explore(arcade.View):
             if tile := State.state.grid.get(*new_player_pos):
                 tile.on_enter()
 
-            from Movement_Animator import MovementAnimator
+            from W_Main_File.Views.Movement_Animator import MovementAnimator
             State.state.window.show_view(MovementAnimator(prior_player_pos, new_player_pos, 13))
 
             State.state.player.pos = new_player_pos

@@ -1,10 +1,9 @@
 import arcade
-import State
-import Tile
-import Vector
-import Player_Select
-import Home_Tile
-import Loot_Functions
+from W_Main_File.Essentials import State
+from W_Main_File.Data import Tile
+from W_Main_File.Utilities import Vector
+from W_Main_File.Views import Player_Select
+from W_Main_File.Tiles import Home_Tile, Loot_Functions
 
 
 class TestRender(Tile.Tile):
@@ -24,4 +23,5 @@ State.state.player.meta_data.is_me = True
 State.state.grid.add(TestRender(Vector.Vector(1, 0)))
 State.state.grid.add(Loot_Functions.LootTile(Vector.Vector(-1, 0)))
 
-arcade.run()
+if __name__ == '__main__':
+    arcade.run()

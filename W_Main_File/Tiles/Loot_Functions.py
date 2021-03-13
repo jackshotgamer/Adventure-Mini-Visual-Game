@@ -1,12 +1,10 @@
 from typing import Tuple
 import collections
-import Vector
-import State
-import Tile
+from W_Main_File.Utilities import Vector
+from W_Main_File.Essentials import State
+from W_Main_File.Data import Tile, Sprites_
 import arcade
-import Sprites_
 import random
-import Grid
 
 
 def is_opening_chest():
@@ -62,7 +60,7 @@ class LootTile(Tile.Tile):
                 arcade.draw_texture_rectangle(State.state.screen_center.x, (State.state.screen_center.y - (State.state.cell_size.y * 2)), 100, 100, Sprites_.CHEST_OPENING_FRAMES[self.frame_step])
                 if self.opened:
                     chest_body = Vector.Vector(State.state.screen_center.x, (State.state.screen_center.y - (State.state.cell_size.y * 2)))
-                    arcade.draw_texture_rectangle(chest_body.x, chest_body.y + self.weapon_sprite_pos.y, 100, 100, self.loot_result_dict[self.loot_result])
+                    arcade.draw_texture_rectangle(chest_body.x, chest_body.y + self.weapon_sprite_pos.y, 50, 50, self.loot_result_dict[self.loot_result])
                     arcade.draw_texture_rectangle(chest_body.x, chest_body.y, 100, 100, Sprites_.chest_body_sprite)
 
     def can_player_move(self):
