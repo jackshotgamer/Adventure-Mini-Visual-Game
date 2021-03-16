@@ -1,72 +1,54 @@
+from functools import partial
+
+import arcade
 from arcade.gui import UIFlatButton, UIManager
 
 from W_Main_File.Essentials import State
 from W_Main_File.Utilities import Vector
-from W_Main_File.Views import Player_Select, Exploration, Fading, Log_Out
+from W_Main_File.Views import Player_Select, Exploration, Fading, Log_Out, Event_Base
 
 
-def register_ui_buttons(uimanager: UIManager):
+def register_custom_exploration_buttons(button_manager, ui_manager):
     if State.state.preoccupied:
         return
-    uimanager.add_ui_element(GoHomeButton(uimanager))
-    uimanager.add_ui_element(LogOutButton(uimanager))
+    button_manager.append('Home', 'Go Home', Vector.Vector(State.state.screen_center.x + 250 + State.state.cell_size.x, (State.state.screen_center.y + 50) + (State.state.cell_size.y - 24)),
+                          Vector.Vector(200, 50), on_click=go_home_button)
+    button_manager.append('Log Out', 'Log Out',
+                          Vector.Vector(State.state.screen_center.x + 250 + State.state.cell_size.x, (State.state.screen_center.y + 150) + (State.state.cell_size.y - 24)),
+                          Vector.Vector(200, 50), on_click=lambda: log_out_button(True, ui_manager))
     if not State.state.player.meta_data.is_guest:
-        uimanager.add_ui_element(SaveButton(uimanager))
+        button_manager.append('Save Data', 'Save Data',
+                              Vector.Vector(State.state.screen_center.x + 250 + State.state.cell_size.x, (State.state.screen_center.y - 50) + (State.state.cell_size.y - 24)),
+                              Vector.Vector(200, 50), on_click=save_button)
 
 
-def reposition_button(uimanager: UIManager):
+def go_home_button():
     if State.state.preoccupied:
         return
-    # noinspection PyProtectedMember
-    for element in uimanager._ui_elements:
-        if isinstance(element, LogOutButton):
-            element.center_y, element.center_x = (State.state.screen_center.y + 150) + (State.state.cell_size.y - 24), State.state.screen_center.x + 250 + State.state.cell_size.x
-        elif isinstance(element, GoHomeButton):
-            element.center_y, element.center_x = (State.state.screen_center.y + 50) + (State.state.cell_size.y - 24), State.state.screen_center.x + 250 + State.state.cell_size.x
-        elif isinstance(element, SaveButton):
-            element.center_y, element.center_x = (State.state.screen_center.y - 50) + (State.state.cell_size.y - 24), State.state.screen_center.x + 250 + State.state.cell_size.x
+    State.state.window.show_view(Fading.Fading(Exploration.Explore, 4, 5, should_reverse=True, should_freeze=True, should_reload_textures=True, only_reverse=False, reset_pos=Vector.Vector(0, 0)))
 
 
-class LogOutButton(UIFlatButton):
-    def __init__(self, uimanager: UIManager, show_confirm_screen: bool = True):
-        super().__init__('Log Out', (State.state.screen_center.y + 150) + (State.state.cell_size.y - 24), State.state.screen_center.x + 250 + State.state.cell_size.x, 200, 50)
-        self.ui_manager = uimanager
-        self.show_confirm_screen = show_confirm_screen
-
-    def on_click(self):
-        self.ui_manager.purge_ui_elements()
-        # State.state.texture_mapping = {}
-        # State.state.window.show_view(Player_Select.PlayerSelect())
-        State.state.window.show_view(Log_Out.LogOutView(on_deny_func=self.deny_fun, on_confirm_func=self.confirm_func, show_confirmation_screen=self.show_confirm_screen))
-
-    def deny_fun(self):
-        State.state.window.show_view(Exploration.Explore())
-
-    def confirm_func(self):
-        State.state.texture_mapping = {}
-        State.state.window.show_view(Player_Select.PlayerSelect())
+def log_out_button(show_confirm_screen, ui_manager):
+    State.state.window.show_view(Log_Out.LogOutView(on_deny_func=lambda: deny_funct(ui_manager), on_confirm_func=lambda: confirm_funct(ui_manager), show_confirmation_screen=show_confirm_screen))
 
 
-class GoHomeButton(UIFlatButton):
-    def __init__(self, uimanager: UIManager):
-        super().__init__('Go Home', State.state.screen_center.y + 50 + (State.state.cell_size.y - 24), State.state.screen_center.x + 250 + State.state.cell_size.x, 200, 50)
-        self.ui_manager = uimanager
-
-    def on_click(self):
-        if State.state.preoccupied:
-            return
-        self.ui_manager.purge_ui_elements()
-        State.state.window.show_view(Fading.Fading(Exploration.Explore, 4, 5, should_reverse=True, should_freeze=True, should_reload_textures=True, only_reverse=False, reset_pos=Vector.Vector(0, 0)))
+def save_button():
+    if State.state.preoccupied:
+        return
+    from W_Main_File.Views import Saving
+    State.state.window.show_view(Saving.Saving(Exploration.Explore))
 
 
-class SaveButton(UIFlatButton):
-    def __init__(self, uimanager: UIManager):
-        super().__init__('Save Character_Data_Files', State.state.screen_center.y + (State.state.cell_size.y - 24), State.state.screen_center.x + 250 + State.state.cell_size.x, 200, 50)
-        self.ui_manager = uimanager
+def confirm_funct(ui_manager: UIManager):
+    # noinspection PyPackages
+    from ..Views import Player_Select
+    ui_manager.purge_ui_elements()
+    State.state.window.show_view(Player_Select.PlayerSelect())
 
-    def on_click(self):
-        if State.state.preoccupied:
-            return
-        from W_Main_File.Views import Saving
-        self.ui_manager.purge_ui_elements()
-        State.state.window.show_view(Saving.Saving(Exploration.Explore))
+
+def deny_funct(ui_manager: UIManager):
+    # noinspection PyPackages
+    from ..Views import Exploration
+    ui_manager.purge_ui_elements()
+    State.state.load_textures()
+    State.state.window.show_view(Exploration.Explore())

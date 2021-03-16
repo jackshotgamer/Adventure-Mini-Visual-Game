@@ -1,19 +1,22 @@
 import time
 
-import arcade
-from W_Main_File.Utilities import Vector
+import arcade, arcade.gui
+from W_Main_File.Utilities import Vector, Button_Functions
 from W_Main_File.Essentials import State
 from W_Main_File.Data import Sprites_
+from W_Main_File.Views import Event_Base
 
 
-class MovementAnimator(arcade.View):
+class MovementAnimator(Event_Base.EventBase):
     def __init__(self, grid_start, grid_end, animation_steps):
         super().__init__()
+        self.ui_manager = arcade.gui.UIManager()
         self.render_radius = State.state.render_radius
         self.grid_start = grid_start
         self.grid_end = grid_end
         self.animation_steps = animation_steps
         self.current_steps = 0
+        Button_Functions.register_custom_exploration_buttons(self.button_manager, self.ui_manager)
         self.tile_render_offset = Vector.Vector(0, 0)
         self.affected_tiles = self.get_affected_tiles()
         self.empty_tiles = self.get_empty_tiles()
@@ -116,6 +119,7 @@ class MovementAnimator(arcade.View):
         for tile, start, end in self.affected_tiles:
             tile_center = Vector.Vector(*arcade.lerp_vec(start, end, self.current_steps / self.animation_steps))
             tile.on_render_foreground(tile_center, tile_center + (-(State.state.cell_size.x / 2), State.state.cell_size.y / 2), State.state.cell_size)
+        self.button_manager.render()
 
     @staticmethod
     def draw_edges(inner_radius):

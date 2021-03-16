@@ -7,9 +7,11 @@ from W_Main_File.Utilities import Vector
 import requests
 import time
 import sys
+# noinspection PyPackages
+from . import Event_Base
 
 
-class PlayerSelect(arcade.View):
+class PlayerSelect(Event_Base.EventBase):
     def __init__(self):
         super().__init__()
         self.ui_manager = gui.UIManager()
@@ -21,20 +23,10 @@ class PlayerSelect(arcade.View):
         self.ui_manager.add_ui_element(self.username)
         self.ui_manager.add_ui_element(self.password)
         self.incorrect_password_end = 0
-        self.button_manager = Button_Sprite_Manager.ButtonManager()
         self.button_manager.append('Guest', 'Login as Guest', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y + 150), Vector.Vector(250, 50), on_click=self.guest_button)
         self.button_manager.append('Enter', 'Enter', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y), Vector.Vector(250, 50), on_click=self.enter_button)
         self.button_manager.append('Quit', 'Quit', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y - 50), Vector.Vector(100, 50), on_click=self.exit_button)
         # self.button_manager.append('Dummy', 'You are a Dummy\n if you click\n this button!', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y + 250), Vector.Vector(250, 100))
-
-    def on_mouse_motion(self, x: float, y: float, dx: float, dy: float):
-        self.button_manager.check_hovered(x, y)
-
-    def on_mouse_press(self, x: float, y: float, button: int, modifiers: int):
-        self.button_manager.on_click_check(x, y)
-
-    def on_mouse_release(self, x: float, y: float, button: int, modifiers: int):
-        self.button_manager.on_click_release()
 
     def enter_button(self):
         player_username = self.username.text.strip()
@@ -87,13 +79,12 @@ class PlayerSelect(arcade.View):
         State.state.window.show_view(Exploration.Explore())
 
     def on_draw(self):
-        arcade.start_render()
+        super().on_draw()
         center_screen = Vector.Vector(self.window.width / 2, self.window.height / 2)
         arcade.draw_text('USERNAME:', center_screen.x - self.username.width + 45, self.username.center_y, arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=20, anchor_x='center', anchor_y='center')
         arcade.draw_text('PASSWORD:', center_screen.x - self.password.width + 43, self.password.center_y, arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=20, anchor_x='center', anchor_y='center')
-        self.button_manager.render()
         if self.incorrect_password_end > time.time():
             arcade.draw_text('Incorrect Password', State.state.screen_center.x, State.state.screen_center.y - 50, arcade.color.RED, font_name='arial', font_size=20, anchor_x='center', anchor_y='center')
 

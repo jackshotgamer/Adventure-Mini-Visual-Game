@@ -3,7 +3,7 @@ import arcade.gui
 from arcade import key
 
 from W_Main_File.Utilities import Button_Functions
-from W_Main_File.Views import Purgatory_Screen
+from W_Main_File.Views import Purgatory_Screen, Event_Base
 from W_Main_File.Data import Sprites_
 from W_Main_File.Essentials import State
 import time
@@ -11,7 +11,8 @@ import random
 from W_Main_File.Tiles import Loot_Functions
 from W_Main_File.Utilities.Vector import Vector
 
-class Explore(arcade.View):
+
+class Explore(Event_Base.EventBase):
     fps = 0
     last_update = 0
 
@@ -20,7 +21,7 @@ class Explore(arcade.View):
         self.ui_manager = arcade.gui.UIManager()
         if not State.state.preoccupied:
             self.ui_manager.purge_ui_elements()
-            Button_Functions.register_ui_buttons(self.ui_manager)
+            Button_Functions.register_custom_exploration_buttons(self.button_manager, self.ui_manager)
         State.state.is_moving = False
         if ((State.state.moves_since_texture_save > 2 and State.state.is_new_tile) or State.state.player.pos == (0, 0)) and not State.state.player.meta_data.is_guest:
             for offset in State.state.generate_radius(5):
@@ -34,7 +35,6 @@ class Explore(arcade.View):
         if State.state.player.hp <= 0:
             State.state.window.show_view(Fading.Fading((lambda: Purgatory_Screen.PurgatoryScreen('You Died')), 7, 4, should_reverse=False,
                                                        should_freeze=True, should_reload_textures=True, reset_pos=Vector(0, 0)))
-        Button_Functions.reposition_button(self.ui_manager)
         Sprites_.update_backdrop()
         if Explore.last_update == 0 or time.time() - Explore.last_update > 0.5:
             Explore.fps = 1 / delta_time
@@ -96,11 +96,11 @@ class Explore(arcade.View):
         arcade.draw_text(str(State.state.player.pos.tuple()), center_screen.x, center_screen.y + (State.state.cell_size.y * .37), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=12, anchor_x='center', anchor_y='center')
         Sprites_.draw_backdrop()
-
         arcade.draw_text(f'FPS = {self.fps:.1f}', 2, self.window.height - 22, arcade.color.GREEN,
                          font_name='arial', font_size=14)
         for tile, *args in render_queue:
             tile.on_render_foreground(*args)
+        self.button_manager.render()
 
     def on_key_release(self, symbol, mods):
         if tile := State.state.grid.get(*State.state.player.pos):

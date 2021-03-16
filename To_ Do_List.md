@@ -50,7 +50,6 @@
 * Trapdoor Tile
 * Shop Tile
 * Seeds
-* Compression
 * Make our own Button System
 * Multiple Character's per Account
 * Damage and Defense
