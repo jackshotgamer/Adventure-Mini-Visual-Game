@@ -16,13 +16,14 @@ CIRCLE_FADE_FRAMES = [
 class Fading(View):
     def __init__(self, reset_screen_func, first_interval: int, second_interval: int = -1, should_reverse: bool = False, should_freeze: bool = False, only_reverse: bool = False,
                  should_reload_textures: bool = False,
-                 reset_pos: Vector.Vector = None):
+                 reset_pos: Vector.Vector = None, reset_floor: int = None):
         from W_Main_File.Views import Exploration
         State.state.preoccupied = True
         super().__init__()
         self.explore = Exploration.Explore()
         self.moving = True
         self.reset_pos = reset_pos
+        self.reset_floor = reset_floor
         self.current_frame = 0
         self.frame_count = 1
         self.reversing = False
@@ -59,6 +60,8 @@ class Fading(View):
                 State.state.window.show_view(self.reset_screen_func())
             if self.reset_pos is not None:
                 State.state.player.pos = Vector.Vector(*self.reset_pos)
+            if self.reset_floor is not None:
+                State.state.player.floor = self.reset_floor
             if self.should_reload_textures:
                 State.state.texture_mapping = {}
         if self.current_frame == -1:

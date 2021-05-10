@@ -62,7 +62,7 @@ class MovementAnimator(Event_Base.EventBase):
         arcade.start_render()
         center = State.state.screen_center
         if self.affected_tiles:
-            first_tile = self.affected_tiles[0][1:]
+            first_tile = self.affected_tiles[0][1:]  # [start:stop:step]
         else:
             first_tile = self.empty_tiles[0]
         sprite_offset = \

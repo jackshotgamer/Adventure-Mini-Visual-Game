@@ -100,7 +100,7 @@ class LootTile(Tile.Tile):
         self.waiting = 0
         self.loot_result = ''
 
-    def key_down(self, keycode, mods):
+    def key_up(self, keycode, mods):
         if self.opening:
             return
         if keycode == arcade.key.E and not self.looted:

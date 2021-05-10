@@ -29,22 +29,29 @@ class Explore(Event_Base.EventBase):
             State.state.save_textures()
             State.state.is_new_tile = False
             State.state.moves_since_texture_save = 0
+        self.should_transition_to_animation = [False, 0, 0, lambda: None]
 
     def update(self, delta_time: float):
         from W_Main_File.Views import Fading
         if State.state.player.hp <= 0:
             State.state.window.show_view(Fading.Fading((lambda: Purgatory_Screen.PurgatoryScreen('You Died')), 7, 4, should_reverse=False,
                                                        should_freeze=True, should_reload_textures=True, reset_pos=Vector(0, 0)))
-        Sprites_.update_backdrop()
-        if Explore.last_update == 0 or time.time() - Explore.last_update > 0.5:
-            Explore.fps = 1 / delta_time
-            Explore.last_update = time.time()
+        if self.should_transition_to_animation[0]:
+            from W_Main_File.Views.Movement_Animator import MovementAnimator
+            State.state.window.show_view(MovementAnimator(self.should_transition_to_animation[1], self.should_transition_to_animation[2], 13))
+            self.should_transition_to_animation[0] = False
+            self.should_transition_to_animation[3]()
+        else:
+            Sprites_.update_backdrop()
+            if Explore.last_update == 0 or time.time() - Explore.last_update > 0.5:
+                Explore.fps = 1 / delta_time
+                Explore.last_update = time.time()
 
-        for x_off, y_off in State.state.generate_radius(State.state.render_radius):
-            real_grid_pos = State.state.player.pos + (x_off, y_off)
+            for x_off, y_off in State.state.generate_radius(State.state.render_radius):
+                real_grid_pos = State.state.player.pos + (x_off, y_off)
 
-            if tile := State.state.grid.get(*real_grid_pos):
-                tile.on_update(delta_time)
+                if tile := State.state.grid.get(*real_grid_pos):
+                    tile.on_update(delta_time)
 
     key_offset = {
         key.W: (0, 1),
@@ -124,14 +131,16 @@ class Explore(Event_Base.EventBase):
             if tile := State.state.grid.get(*new_player_pos):
                 tile.on_enter()
 
-            from W_Main_File.Views.Movement_Animator import MovementAnimator
-            State.state.window.show_view(MovementAnimator(prior_player_pos, new_player_pos, 13))
+            def after_update():
+                State.state.player.pos = new_player_pos
 
-            State.state.player.pos = new_player_pos
+                if not State.state.grid.get(new_player_pos.x, new_player_pos.y) and random.random() < 0.02 and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in {'1', '2'}:
+                    loot = Loot_Functions.LootTile(new_player_pos)
+                    State.state.grid.add(loot)
+                elif not State.state.grid.get(new_player_pos.x, new_player_pos.y) and random.random() < 0.02 and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in {'1', '2'}:
+                    pass
 
-            if not State.state.grid.get(new_player_pos.x, new_player_pos.y) and random.random() < 0.02 and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in {'1', '2'}:
-                loot = Loot_Functions.LootTile(new_player_pos)
-                State.state.grid.add(loot)
+            self.should_transition_to_animation = [True, prior_player_pos, new_player_pos, after_update]
 
         else:
             if tile := State.state.grid.get(*State.state.player.pos):

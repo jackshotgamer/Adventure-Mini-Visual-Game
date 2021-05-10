@@ -10,51 +10,15 @@ from arcade import gui
 import arcade
 
 
-class PlayButton(arcade.gui.UIFlatButton):
-    def __init__(self, uimanager: arcade.gui.UIManager):
-        super().__init__('Play Game', State.state.screen_center.x, State.state.screen_center.y + 75, 250, 50)
-        self.ui_manager = uimanager
-
-    def on_click(self):
-        self.ui_manager.purge_ui_elements()
-        State.state.player.hp = State.state.player.max_hp
-        State.state.window.show_view(Fading.Fading(Exploration.Explore, 7, 4, should_reverse=True, only_reverse=True, should_reload_textures=True, reset_pos=Vector.Vector(0, 0)))
-
-
 def play_button(ui_manager: UIManager):
     ui_manager.purge_ui_elements()
     State.state.player.hp = State.state.player.max_hp
-    State.state.window.show_view(Fading.Fading(Exploration.Explore, 7, 4, should_reverse=True, only_reverse=True, should_reload_textures=True, reset_pos=Vector.Vector(0, 0)))
-
-
-class ResetCharacterButton(arcade.gui.UIFlatButton):
-    def __init__(self, uimanager: arcade.gui.UIManager, message):
-        super().__init__('Reset all Stats', State.state.screen_center.x, State.state.screen_center.y, 250, 50)
-        self.ui_manager = uimanager
-        self.message = message
-
-    def on_click(self):
-        self.ui_manager.purge_ui_elements()
-        State.state.window.show_view(ResetCharacterView(self.message))
+    State.state.window.show_view(Fading.Fading(Exploration.Explore, 10, 4, should_reverse=True, only_reverse=True, should_reload_textures=True, reset_pos=Vector.Vector(0, 0), reset_floor=1))
 
 
 def reset_character_button(ui_manager: UIManager, message):
     ui_manager.purge_ui_elements()
     State.state.window.show_view(ResetCharacterView(message))
-
-
-class SavingButton(arcade.gui.UIFlatButton):
-    def __init__(self, uimanager: arcade.gui.UIManager, message):
-        super().__init__('Save Character', State.state.screen_center.x, State.state.screen_center.y - 75, 200, 50)
-        self.ui_manager = uimanager
-        self.message = message
-
-    def on_click(self):
-        if State.state.preoccupied:
-            return
-        from W_Main_File.Views import Saving
-        self.ui_manager.purge_ui_elements()
-        State.state.window.show_view(Saving.Saving(lambda: PurgatoryScreen(self.message)))
 
 
 def saving_button(ui_manager: UIManager, message):

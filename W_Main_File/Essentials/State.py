@@ -60,12 +60,8 @@ class State:
             for y in range(-radius, radius + 1):
                 yield x, y
 
-    @staticmethod
-    def generate_edges(inner_radius):
-        for x in range(~inner_radius, inner_radius + 2):
-            for y in range(~inner_radius, inner_radius + 2):
-                if abs(x) > inner_radius or abs(y) > inner_radius:
-                    yield x, y
+    def give_gold(self, amount):
+        self.player.gold += round((((self.player.floor - 1) / 100) + 1) * amount)
 
 
 state = State()

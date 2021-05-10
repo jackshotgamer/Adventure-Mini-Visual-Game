@@ -1,6 +1,7 @@
 import arcade
 from arcade.gui import UIFlatButton, UIManager, UILabel
 
+from W_Main_File.Utilities import Action_Queue
 from W_Main_File.Essentials import State
 from W_Main_File.Utilities import Vector
 from functools import partial
@@ -28,6 +29,9 @@ class LogOutView(Event_Base.EventBase):
             State.state.texture_mapping = {}
             self.ui_manager.purge_ui_elements()
             self.on_confirm_func()
+        if Action_Queue.action_queue:
+            action = Action_Queue.action_queue.popleft()
+            action()
 
     def on_draw(self):
         super().on_draw()

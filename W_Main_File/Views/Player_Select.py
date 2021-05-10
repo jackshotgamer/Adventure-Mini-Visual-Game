@@ -30,6 +30,7 @@ class PlayerSelect(Event_Base.EventBase):
 
     def enter_button(self):
         player_username = self.username.text.strip()
+        print(self.username.text)
         player_password = self.password.text.strip()
         if not (player_username and player_password):
             return
@@ -86,7 +87,7 @@ class PlayerSelect(Event_Base.EventBase):
         arcade.draw_text('PASSWORD:', center_screen.x - self.password.width + 43, self.password.center_y, arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=20, anchor_x='center', anchor_y='center')
         if self.incorrect_password_end > time.time():
-            arcade.draw_text('Incorrect Password', State.state.screen_center.x, State.state.screen_center.y - 50, arcade.color.RED, font_name='arial', font_size=20, anchor_x='center', anchor_y='center')
+            arcade.draw_text('Incorrect Password', State.state.screen_center.x, State.state.screen_center.y - 100, arcade.color.RED, font_name='arial', font_size=20, anchor_x='center', anchor_y='center')
 
 
 # noinspection PyUnresolvedReferences,PyProtectedMember,PyAttributeOutsideInit
