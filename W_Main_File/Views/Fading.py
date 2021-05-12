@@ -2,9 +2,10 @@ from pathlib import Path
 
 from arcade import load_texture, gui, View
 import arcade
+import random
 
 from W_Main_File.Essentials import State
-from W_Main_File.Utilities import Vector
+from W_Main_File.Utilities import Vector, Seeding
 
 CIRCLE_FADE_FRAMES = [
     # <-- is apparently called an "Octothorp", but anyways    \/ this can be typed {i:0>2}, bruh
@@ -63,7 +64,8 @@ class Fading(View):
             if self.reset_floor is not None:
                 State.state.player.floor = self.reset_floor
             if self.should_reload_textures:
-                State.state.texture_mapping = {}
+                State.state.texture_mapping.clear()
+                Seeding.change_world_seed(random.randint(1, 75654655267269))
         if self.current_frame == -1:
             self.moving = False
             State.state.preoccupied = False

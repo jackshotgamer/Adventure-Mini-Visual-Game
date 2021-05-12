@@ -20,3 +20,6 @@
     * Attack
     * Defence
 * Pay gold to remain on the same floor when clicking Go Home (Cost scales per level)
+
+* Fix AssertionError's
+* Implement Saving and Loading for Floors, as well as Saving the changes to the world seed

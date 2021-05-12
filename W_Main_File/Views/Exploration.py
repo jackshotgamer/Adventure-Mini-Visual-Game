@@ -26,7 +26,6 @@ class Explore(Event_Base.EventBase):
         if ((State.state.moves_since_texture_save > 2 and State.state.is_new_tile) or State.state.player.pos == (0, 0)) and not State.state.player.meta_data.is_guest:
             for offset in State.state.generate_radius(5):
                 State.state.tile_type_pos(*(offset + State.state.player.pos))
-            State.state.save_textures()
             State.state.is_new_tile = False
             State.state.moves_since_texture_save = 0
         self.should_transition_to_animation = [False, 0, 0, lambda: None]

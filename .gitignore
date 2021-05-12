@@ -2,6 +2,6 @@ venv/
 .idea/
 __pycache__/
 Player_Saves.sqlite/
-Textures/
+Interactable_Tiles/
 Character_Data_Files/
 To_ Do_List.md

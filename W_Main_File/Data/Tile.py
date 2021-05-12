@@ -2,6 +2,7 @@ from W_Main_File.Essentials import State
 
 
 class Tile:
+    named_to_tile = {}
     def __init__(self, pos):
         self.pos = pos
 
@@ -34,3 +35,10 @@ class Tile:
             return True
         else:
             print('WHAT\nWARNING: Computer have become sentient, this is not a drill, i repeat, this is not a drill!')
+
+    # noinspection PyMethodMayBeStatic
+    def persistent_data(self):
+        return {}
+
+    def __init_subclass__(cls, **kwargs):
+        Tile.named_to_tile[cls.__name__] = cls

@@ -4,7 +4,7 @@ from arcade.gui import UIManager
 
 from W_Main_File.Views import Exploration, Event_Base, Log_Out
 from W_Main_File.Views import Fading
-from W_Main_File.Utilities import Vector
+from W_Main_File.Utilities import Vector, Seeding
 from W_Main_File.Essentials import State
 from arcade import gui
 import arcade
@@ -13,6 +13,7 @@ import arcade
 def play_button(ui_manager: UIManager):
     ui_manager.purge_ui_elements()
     State.state.player.hp = State.state.player.max_hp
+
     State.state.window.show_view(Fading.Fading(Exploration.Explore, 10, 4, should_reverse=True, only_reverse=True, should_reload_textures=True, reset_pos=Vector.Vector(0, 0), reset_floor=1))
 
 
@@ -94,11 +95,12 @@ def confirm_fun(ui_manager: UIManager):
     # noinspection PyPackages
     from ..Views import Player_Select
     ui_manager.purge_ui_elements()
+    from W_Main_File.Essentials.State import state
+    state.texture_mapping.clear()
     State.state.window.show_view(Player_Select.PlayerSelect())
 
 
 def deny_fun(ui_manager: UIManager, message):
     # noinspection PyPackages
     ui_manager.purge_ui_elements()
-    State.state.load_textures()
     State.state.window.show_view(PurgatoryScreen(message))

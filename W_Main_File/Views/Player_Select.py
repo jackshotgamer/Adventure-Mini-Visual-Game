@@ -3,7 +3,7 @@ from arcade import gui
 from urllib.parse import quote
 
 from W_Main_File.Essentials import State, Button_Sprite_Manager
-from W_Main_File.Utilities import Vector
+from W_Main_File.Utilities import Vector, Seeding
 import requests
 import time
 import sys
@@ -26,7 +26,7 @@ class PlayerSelect(Event_Base.EventBase):
         self.button_manager.append('Guest', 'Login as Guest', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y + 150), Vector.Vector(250, 50), on_click=self.guest_button)
         self.button_manager.append('Enter', 'Enter', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y), Vector.Vector(250, 50), on_click=self.enter_button)
         self.button_manager.append('Quit', 'Quit', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y - 50), Vector.Vector(100, 50), on_click=self.exit_button)
-        # self.button_manager.append('Dummy', 'You are a Dummy\n if you click\n this button!', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y + 250), Vector.Vector(250, 100))
+        State.state.texture_mapping.clear()
 
     def enter_button(self):
         player_username = self.username.text.strip()
@@ -54,7 +54,7 @@ class PlayerSelect(Event_Base.EventBase):
             print(state_player.__dict__)
             from W_Main_File.Views import Exploration
             self.ui_manager.purge_ui_elements()
-            State.state.load_textures()
+            Seeding.set_world_seed_from_string(state_player.name)
             State.state.window.show_view(Exploration.Explore())
         else:
             self.incorrect_password_end = time.time() + 1.5
@@ -77,6 +77,7 @@ class PlayerSelect(Event_Base.EventBase):
         state.floor = 1
         from W_Main_File.Views import Exploration
         self.ui_manager.purge_ui_elements()
+        Seeding.set_world_seed_from_string(state.name)
         State.state.window.show_view(Exploration.Explore())
 
     def on_draw(self):

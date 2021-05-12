@@ -21,7 +21,7 @@ class TrapdoorTile(Tile.Tile):
     def key_up(self, keycode, mods):
         if keycode == arcade.key.E and not State.state.preoccupied:
             State.state.preoccupied = True
-            State.state.window.show_view(Fading.Fading(Exploration.Explore, 7, 2, should_reverse=True, should_freeze=True, should_reload_textures=True,
+            State.state.window.show_view(Fading.Fading(Exploration.Explore, 7, 2, should_reverse=True, should_freeze=True, should_reload_textures=False,
                                                        reset_pos=Vector.Vector(0, 0), reset_floor=State.state.player.floor + 1))
 
     def on_render_foreground(self, center, top_left, cell_size):

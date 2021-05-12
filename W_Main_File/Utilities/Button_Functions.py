@@ -6,7 +6,7 @@ from arcade.gui import UIFlatButton, UIManager
 
 from W_Main_File.Utilities import Action_Queue
 from W_Main_File.Essentials import State
-from W_Main_File.Utilities import Vector
+from W_Main_File.Utilities import Vector, Seeding
 from W_Main_File.Views import Player_Select, Exploration, Fading, Log_Out, Event_Base
 
 
@@ -27,7 +27,7 @@ def register_custom_exploration_buttons(button_manager, ui_manager):
 def go_home_button():
     if State.state.preoccupied:
         return
-    State.state.window.show_view(Fading.Fading(Exploration.Explore, 4, 5, should_reverse=True, should_freeze=True, should_reload_textures=True, only_reverse=False,
+    State.state.window.show_view(Fading.Fading(Exploration.Explore, 4, 5, should_reverse=True, should_freeze=True, should_reload_textures=False, only_reverse=False,
                                                reset_pos=Vector.Vector(0, 0), reset_floor=1))
 
 
@@ -46,6 +46,8 @@ def confirm_funct(ui_manager: UIManager):
     # noinspection PyPackages
     from ..Views import Player_Select
     ui_manager.purge_ui_elements()
+    from W_Main_File.Essentials.State import state
+    state.texture_mapping.clear()
     Action_Queue.action_queue.append(lambda: State.state.window.show_view(Player_Select.PlayerSelect()))
 
 
@@ -53,5 +55,4 @@ def deny_funct(ui_manager: UIManager):
     # noinspection PyPackages
     from ..Views import Exploration
     ui_manager.purge_ui_elements()
-    State.state.load_textures()
     Action_Queue.action_queue.append(lambda: State.state.window.show_view(Exploration.Explore()))
