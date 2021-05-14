@@ -3,6 +3,7 @@ from W_Main_File.Essentials import State
 
 class Tile:
     named_to_tile = {}
+
     def __init__(self, pos):
         self.pos = pos
 
@@ -42,3 +43,7 @@ class Tile:
 
     def __init_subclass__(cls, **kwargs):
         Tile.named_to_tile[cls.__name__] = cls
+
+    @classmethod
+    def load_from_data(cls, persistent_data):
+        raise NotImplementedError

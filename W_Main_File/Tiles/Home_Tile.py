@@ -44,3 +44,12 @@ class HomeTile(Tile.Tile):
                 State.state.player.gold += self.heal_cost
         elif keycode == arcade.key.H and State.state.player.meta_data.is_me:
             State.state.player.hp //= 2
+
+    def persistent_data(self):
+        return {
+            'pos': self.pos
+        }
+
+    @classmethod
+    def load_from_data(cls, persistent_data):
+        return HomeTile(persistent_data['pos'])

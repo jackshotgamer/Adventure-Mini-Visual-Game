@@ -4,6 +4,7 @@
 * Enemy Tile
 * Finish Trapdoor Tile
 * Shop Tile
+  * Ransacking Villages
 * Seeds
 * Multiple Character's per Account
 * Damage and Defense
@@ -21,5 +22,4 @@
     * Defence
 * Pay gold to remain on the same floor when clicking Go Home (Cost scales per level)
 
-* Fix AssertionError's
 * Implement Saving and Loading for Floors, as well as Saving the changes to the world seed

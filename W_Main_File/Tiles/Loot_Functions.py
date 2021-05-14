@@ -112,5 +112,17 @@ class LootTile(Tile.Tile):
             self.on_enter()
         elif keycode == arcade.key.E and self.looted:
             table = LootTable(('Banana Peel', 8), ('Ball of Seaweed', 6), ('Rusty Can', 4))
-            print(str(table.get_item()))
+            # print(str(table.get_item()))
             self.looted = True
+
+    def persistent_data(self):
+        return {
+            'pos': self.pos,
+            'looted': self.looted
+        }
+
+    @classmethod
+    def load_from_data(cls, persistent_data):
+        tile = LootTile(persistent_data['pos'])
+        tile.looted = persistent_data['looted']
+        return tile

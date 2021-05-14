@@ -4,7 +4,7 @@ from arcade.gui import UIManager
 
 from W_Main_File.Views import Exploration, Event_Base, Log_Out
 from W_Main_File.Views import Fading
-from W_Main_File.Utilities import Vector, Seeding
+from W_Main_File.Utilities import Vector, Seeding, Action_Queue
 from W_Main_File.Essentials import State
 from arcade import gui
 import arcade
@@ -19,7 +19,11 @@ def play_button(ui_manager: UIManager):
 
 def reset_character_button(ui_manager: UIManager, message):
     ui_manager.purge_ui_elements()
-    State.state.window.show_view(ResetCharacterView(message))
+    Action_Queue.action_queue.append(
+        lambda: State.state.window.show_view(
+            ResetCharacterView(
+                message)))
+    # State.state.window.show_view(ResetCharacterView(message))
 
 
 def saving_button(ui_manager: UIManager, message):
@@ -27,7 +31,12 @@ def saving_button(ui_manager: UIManager, message):
         return
     from W_Main_File.Views import Saving
     ui_manager.purge_ui_elements()
-    State.state.window.show_view(Saving.Saving(lambda: PurgatoryScreen(message)))
+    Action_Queue.action_queue.append(
+        lambda: State.state.window.show_view(
+            Saving.Saving(
+                lambda: PurgatoryScreen(
+                    message))))
+    # State.state.window.show_view(Saving.Saving(lambda: PurgatoryScreen(message)))
 
 
 def confirm_func(message):
@@ -40,11 +49,19 @@ def confirm_func(message):
     state.xp = 0
     state.lvl = 1
     state.floor = 1
-    State.state.window.show_view(PurgatoryScreen(message))
+    Action_Queue.action_queue.append(
+        lambda: State.state.window.show_view(
+            PurgatoryScreen(
+                message)))
+    # State.state.window.show_view(PurgatoryScreen(message))
 
 
 def deny_func(message):
-    State.state.window.show_view(PurgatoryScreen(message))
+    Action_Queue.action_queue.append(
+        lambda: State.state.window.show_view(
+            PurgatoryScreen(
+                message)))
+    # State.state.window.show_view(PurgatoryScreen(message))
 
 
 class ResetCharacterView(Event_Base.EventBase):
@@ -62,6 +79,11 @@ class ResetCharacterView(Event_Base.EventBase):
         super().on_draw()
         arcade.draw_text('Warning: This cannot be undone!', State.state.screen_center.x, State.state.screen_center.y + 100, arcade.color.WHITE,
                          23, 800, anchor_x='center', anchor_y='center', align='center')
+
+    def update(self, delta_time: float):
+        if Action_Queue.action_queue:
+            action = Action_Queue.action_queue.popleft()
+            action()
 
 
 class PurgatoryScreen(Event_Base.EventBase):
@@ -86,6 +108,11 @@ class PurgatoryScreen(Event_Base.EventBase):
         arcade.draw_text(self.message, State.state.screen_center.x, State.state.screen_center.y + 150,
                          (arcade.color.RED if self.message == 'You Died' else arcade.color.WHITE), 23, 250, align='center', anchor_y='center', anchor_x='center')
 
+    def update(self, delta_time: float):
+        if Action_Queue.action_queue:
+            action = Action_Queue.action_queue.popleft()
+            action()
+
 
 def log_out_buttons(show_confirm_screen, message, ui_manager):
     State.state.window.show_view(Log_Out.LogOutView(on_deny_func=lambda: deny_fun(ui_manager, message), on_confirm_func=lambda: confirm_fun(ui_manager), show_confirmation_screen=show_confirm_screen))
@@ -97,10 +124,17 @@ def confirm_fun(ui_manager: UIManager):
     ui_manager.purge_ui_elements()
     from W_Main_File.Essentials.State import state
     state.texture_mapping.clear()
-    State.state.window.show_view(Player_Select.PlayerSelect())
+    Action_Queue.action_queue.append(
+        lambda: State.state.window.show_view(Player_Select.PlayerSelect()))
+
+    # State.state.window.show_view(Player_Select.PlayerSelect())
 
 
 def deny_fun(ui_manager: UIManager, message):
     # noinspection PyPackages
     ui_manager.purge_ui_elements()
-    State.state.window.show_view(PurgatoryScreen(message))
+    Action_Queue.action_queue.append(
+        lambda: State.state.window.show_view(
+            PurgatoryScreen(
+                message)))
+    # State.state.window.show_view(PurgatoryScreen(message))

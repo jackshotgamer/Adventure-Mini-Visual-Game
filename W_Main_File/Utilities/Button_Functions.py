@@ -4,7 +4,7 @@ import arcade
 # noinspection PyUnresolvedReferences
 from arcade.gui import UIFlatButton, UIManager
 
-from W_Main_File.Utilities import Action_Queue
+from W_Main_File.Utilities import Action_Queue, Floor_Data_Saving
 from W_Main_File.Essentials import State
 from W_Main_File.Utilities import Vector, Seeding
 from W_Main_File.Views import Player_Select, Exploration, Fading, Log_Out, Event_Base
@@ -27,19 +27,42 @@ def register_custom_exploration_buttons(button_manager, ui_manager):
 def go_home_button():
     if State.state.preoccupied:
         return
-    State.state.window.show_view(Fading.Fading(Exploration.Explore, 4, 5, should_reverse=True, should_freeze=True, should_reload_textures=False, only_reverse=False,
-                                               reset_pos=Vector.Vector(0, 0), reset_floor=1))
+    Action_Queue.action_queue.append(
+        lambda: State.state.window.show_view(
+            Fading.Fading(Exploration.Explore,
+                          4,
+                          5,
+                          should_reverse=True,
+                          should_freeze=True,
+                          should_reload_textures=False,
+                          only_reverse=False,
+                          reset_pos=Vector.Vector(0, 0),
+                          reset_floor=1)))
+    # State.state.window.show_view(Fading.Fading(Exploration.Explore, 4, 5, should_reverse=True, should_freeze=True, should_reload_textures=False, only_reverse=False,
+    #                                            reset_pos=Vector.Vector(0, 0), reset_floor=1))
 
 
 def log_out_button(show_confirm_screen, ui_manager):
-    State.state.window.show_view(Log_Out.LogOutView(on_deny_func=lambda: deny_funct(ui_manager), on_confirm_func=lambda: confirm_funct(ui_manager), show_confirmation_screen=show_confirm_screen))
+    if State.state.preoccupied:
+        return
+    Action_Queue.action_queue.append(
+        lambda: State.state.window.show_view(
+            Log_Out.LogOutView(
+                on_deny_func=lambda: deny_funct(ui_manager),
+                on_confirm_func=lambda: confirm_funct(ui_manager),
+                show_confirmation_screen=show_confirm_screen)))
+    # State.state.window.show_view(Log_Out.LogOutView(on_deny_func=lambda: deny_funct(ui_manager), on_confirm_func=lambda: confirm_funct(ui_manager), show_confirmation_screen=show_confirm_screen))
 
 
 def save_button():
     if State.state.preoccupied:
         return
     from W_Main_File.Views import Saving
-    State.state.window.show_view(Saving.Saving(Exploration.Explore))
+    Action_Queue.action_queue.append(
+        lambda: State.state.window.show_view(
+            Saving.Saving(
+                Exploration.Explore)))
+    # State.state.window.show_view(Saving.Saving(Exploration.Explore))
 
 
 def confirm_funct(ui_manager: UIManager):

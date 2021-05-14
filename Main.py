@@ -11,8 +11,8 @@ class TestRender(Tile.Tile):
         arcade.draw_rectangle_outline(center.x, center.y, State.state.cell_size.x - 2, State.state.cell_size.y - 2, arcade.color.BRONZE)
         # arcade.draw_texture_rectangle()
 
-    def key_down(self, keycode, mods):
-        print(keycode)
+    # def key_down(self, keycode, mods):
+    #     print(keycode)
 
 
 if State.state.player.floor == 1:

@@ -2,13 +2,13 @@ import arcade
 import arcade.gui
 from arcade import key
 
-from W_Main_File.Utilities import Button_Functions
+from W_Main_File.Utilities import Button_Functions, Action_Queue
 from W_Main_File.Views import Purgatory_Screen, Event_Base
 from W_Main_File.Data import Sprites_
 from W_Main_File.Essentials import State
 import time
 import random
-from W_Main_File.Tiles import Loot_Functions
+from W_Main_File.Tiles import Loot_Functions, Trapdoor_Functions
 from W_Main_File.Utilities.Vector import Vector
 
 
@@ -29,12 +29,19 @@ class Explore(Event_Base.EventBase):
             State.state.is_new_tile = False
             State.state.moves_since_texture_save = 0
         self.should_transition_to_animation = [False, 0, 0, lambda: None]
+        if not State.state.grid.get(-1, 0):
+            State.state.grid.add(Trapdoor_Functions.TrapdoorTile(Vector(-1, 0)))
+        if not State.state.grid.get(2, 0):
+            State.state.grid.add(Loot_Functions.LootTile(Vector(2, 0)))
 
     def update(self, delta_time: float):
         from W_Main_File.Views import Fading
         if State.state.player.hp <= 0:
             State.state.window.show_view(Fading.Fading((lambda: Purgatory_Screen.PurgatoryScreen('You Died')), 7, 4, should_reverse=False,
                                                        should_freeze=True, should_reload_textures=True, reset_pos=Vector(0, 0)))
+        if Action_Queue.action_queue:
+            action = Action_Queue.action_queue.popleft()
+            action()
         if self.should_transition_to_animation[0]:
             from W_Main_File.Views.Movement_Animator import MovementAnimator
             State.state.window.show_view(MovementAnimator(self.should_transition_to_animation[1], self.should_transition_to_animation[2], 13))

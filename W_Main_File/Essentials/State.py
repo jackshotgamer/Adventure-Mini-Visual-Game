@@ -1,6 +1,7 @@
 import json
 import pathlib
 import random
+from typing import List, Dict, Any, Union, Type
 
 from W_Main_File.Data import HpEntity, Grid, Sprites_, Meta_Data
 from W_Main_File.Utilities import Vector, Seeding
@@ -24,7 +25,6 @@ class State:
         # Meta_Data.is_me = True
 
     def tile_type_pos(self, x, y):
-        state.texture_mapping.clear()
         poss = Vector.Vector(x, y)
         xy = f'{int(x)} {int(y)}'
         if xy not in self.texture_mapping:
@@ -73,6 +73,29 @@ class State:
 
     def give_gold(self, amount):
         self.player.gold += round((((self.player.floor - 1) / 100) + 1) * amount)
+
+    def load_floor(self, floor_number, character_name):
+        if floor_number != 1:
+            state.grid.remove(Vector.Vector(0, 0))
+        elif not state.grid.get(0, 0):
+            from W_Main_File.Tiles import Home_Tile
+            state.grid.add(Home_Tile.HomeTile(Vector.Vector(0, 0)))
+        from W_Main_File.Utilities import Floor_Data_Saving
+        floor_file_path = Floor_Data_Saving.FloorSaveManager.get_floor_file_path(floor_number, character_name)
+        if not floor_file_path.exists():
+            return False
+        with open(floor_file_path, 'rb') as floor_file:
+            import pickle
+            data = pickle.load(floor_file)
+        Seeding.world_seed = data['seed']
+        state.grid.tiles.clear()
+        for tile in data['tiles']:
+            from W_Main_File.Data import Tile
+            class_name = tile['__name__']
+            class_obj = Tile.Tile.named_to_tile[class_name]
+            final_tile = class_obj.load_from_data(tile)
+            state.grid.add(final_tile)
+        return True
 
 
 state = State()

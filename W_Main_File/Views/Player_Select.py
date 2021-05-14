@@ -30,13 +30,13 @@ class PlayerSelect(Event_Base.EventBase):
 
     def enter_button(self):
         player_username = self.username.text.strip()
-        print(self.username.text)
+        # print(self.username.text)
         player_password = self.password.text.strip()
         if not (player_username and player_password):
             return
 
         json_ = requests.get(f'http://localhost:666/save_data?name={quote(player_username)}&pw={quote(player_password)}').json()
-        print(json_)
+        # print(json_)
         if not json_['error']:
             state_player = State.state.player
             state_player.name = json_['player_name']
@@ -51,10 +51,17 @@ class PlayerSelect(Event_Base.EventBase):
             state_player.meta_data.is_player = True
             state_player.meta_data.is_guest = False
             state_player.meta_data.is_enemy = False
-            print(state_player.__dict__)
+            # print(state_player.__dict__)
             from W_Main_File.Views import Exploration
             self.ui_manager.purge_ui_elements()
             Seeding.set_world_seed_from_string(state_player.name)
+            State.state.grid.tiles.clear()
+            if State.state.player.floor != 1:
+                State.state.grid.remove(Vector.Vector(0, 0))
+            elif not State.state.grid.get(0, 0):
+                from W_Main_File.Tiles import Home_Tile
+                State.state.grid.add(Home_Tile.HomeTile(Vector.Vector(0, 0)))
+            State.state.load_floor(state_player.floor, state_player.name)
             State.state.window.show_view(Exploration.Explore())
         else:
             self.incorrect_password_end = time.time() + 1.5
@@ -64,6 +71,10 @@ class PlayerSelect(Event_Base.EventBase):
 
     def guest_button(self):
         state = State.state.player
+        State.state.grid.tiles.clear()
+        if not State.state.grid.get(0, 0):
+            from W_Main_File.Tiles import Home_Tile
+            State.state.grid.add(Home_Tile.HomeTile(Vector.Vector(0, 0)))
         state.name = 'Guest'
         state.meta_data.is_player = False
         state.meta_data.is_guest = True

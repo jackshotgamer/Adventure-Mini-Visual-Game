@@ -1,11 +1,12 @@
 from typing import Tuple
 import collections
-from W_Main_File.Utilities import Vector
+from W_Main_File.Utilities import Vector, Action_Queue
 from W_Main_File.Essentials import State
 from W_Main_File.Data import Tile, Sprites_
 from W_Main_File.Views import Fading, Exploration
 import arcade
 import random
+
 
 ## Play Animation for black screen + closed trapdoor load in
 ## Play Animation for trapdoor opening
@@ -21,8 +22,29 @@ class TrapdoorTile(Tile.Tile):
     def key_up(self, keycode, mods):
         if keycode == arcade.key.E and not State.state.preoccupied:
             State.state.preoccupied = True
-            State.state.window.show_view(Fading.Fading(Exploration.Explore, 7, 2, should_reverse=True, should_freeze=True, should_reload_textures=False,
-                                                       reset_pos=Vector.Vector(0, 0), reset_floor=State.state.player.floor + 1))
+            Action_Queue.action_queue.append(
+                lambda: State.state.window.show_view(
+                    Fading.Fading(self.after_fadein, 7, 2,
+                                  should_reverse=False,
+                                  should_freeze=True,
+                                  should_reload_textures=False,
+                                  reset_pos=Vector.Vector(0, 0),
+                                  reset_floor=State.state.player.floor + 1
+                                  )))
+
+            # State.state.window.show_view(Fading.Fading(Exploration.Explore, 7, 2, should_reverse=True, should_freeze=True, should_reload_textures=False,
+            #                                            reset_pos=Vector.Vector(0, 0), reset_floor=State.state.player.floor + 1))
+
+    @staticmethod
+    def after_fadein():
+        State.state.grid.tiles.clear()
+        fade_to_explore = Fading.Fading(Exploration.Explore, 7, 2,
+                                        should_reverse=False,
+                                        should_freeze=True,
+                                        should_reload_textures=False,
+                                        only_reverse=True,
+                                        reset_pos=Vector.Vector(0, 0))
+        return fade_to_explore
 
     def on_render_foreground(self, center, top_left, cell_size):
         if State.state.player.pos == self.pos:
@@ -37,6 +59,15 @@ class TrapdoorTile(Tile.Tile):
 
     def on_enter(self):
         self.current_opacity = 0
+
+    def persistent_data(self):
+        return {
+            'pos': self.pos
+        }
+
+    @classmethod
+    def load_from_data(cls, persistent_data):
+        return TrapdoorTile(persistent_data['pos'])
 
     #     self.current_opacity = 0
     #     self.opening = False
