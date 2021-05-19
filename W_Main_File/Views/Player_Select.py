@@ -52,7 +52,7 @@ class PlayerSelect(Event_Base.EventBase):
             from W_Main_File.Views import Exploration
             self.ui_manager.purge_ui_elements()
             Seeding.set_world_seed_from_player_name()
-            State.state.grid.tiles.clear()
+            State.state.grid.interactable_tiles.clear()
             if State.state.player.floor != 1:
                 State.state.grid.remove(Vector.Vector(0, 0))
             elif not State.state.grid.get(0, 0):
@@ -68,7 +68,7 @@ class PlayerSelect(Event_Base.EventBase):
 
     def guest_button(self):
         state = State.state.player
-        State.state.grid.tiles.clear()
+        State.state.grid.interactable_tiles.clear()
         if not State.state.grid.get(0, 0):
             from W_Main_File.Tiles import Home_Tile
             State.state.grid.add(Home_Tile.HomeTile(Vector.Vector(0, 0)))

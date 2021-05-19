@@ -5,7 +5,9 @@
 * Finish Trapdoor Tile
 * Shop Tile
   * Ransacking Villages
-* Seeds
+  * Have a chance for either a |Smithy, Tavern|, Casino, Witch's hut, Enchanter, Dragon's Den
+* Tutorial
+  * Floor one is main place for it
 * Multiple Character's per Account
 * Damage and Defense
   * Blunt Damage
@@ -32,5 +34,56 @@
 * saving/loading bugs
   * tiles do not get saved/do not load when re-entering game after saving and quitting
   
-* Make a function for loading and saving seed/tiles/textures/everything
-* 
+[Sprites]
+* Enemies
+  * Witch
+    * Witch's Hut
+  * Dragon
+    * Gold-littered Lair
+  * Dummy
+  * Ogre
+  * Demon
+  * Village Mob
+    * Burning Village (Sprite for after Battle (if successful))
+  * Slime
+  * Wyrm
+  * Bandits
+* Weapons
+  * Sword
+  * Spear
+  * Mace
+  * Dagger
+  * Axe
+  * Bat
+* Trapdoor
+  * Opening
+* Basic Slash
+* Potions
+  * Mana
+  * Health
+  * Attack
+  * Defense
+  * Speed
+* Npc's
+  * Smithy
+    * Anvil w/ Hammer
+  * Barman
+    * Tavern
+    * Beer
+  * Dealer
+    * Cards
+  * Wizard
+    * Library
+* Effects
+  * Low health
+  * Regeneration
+    * Mana
+    * Health
+  * Sparkles
+  * Clashing
+* Tiles
+  * Desert
+  * Taiga
+  * Jungle
+  * Arctic
+  * Cave

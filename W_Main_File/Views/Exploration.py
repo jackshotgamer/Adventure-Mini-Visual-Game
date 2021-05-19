@@ -141,11 +141,23 @@ class Explore(Event_Base.EventBase):
             def after_update():
                 State.state.player.pos = new_player_pos
 
-                if not State.state.grid.get(new_player_pos.x, new_player_pos.y) and random.random() < 0.05 and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in {'1', '2'}:
+                if (
+                        not State.state.grid.get(new_player_pos.x, new_player_pos.y)
+                        and random.random() < 0.75
+                        and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in {'1', '2'}
+                        and new_player_pos.tuple() not in State.state.grid.visited_tiles
+                ):
                     loot = Loot_Functions.LootTile(new_player_pos)
                     State.state.grid.add(loot)
-                elif not State.state.grid.get(new_player_pos.x, new_player_pos.y) and random.random() < 0.02 and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in {'1', '2'}:
+                elif (
+                        not State.state.grid.get(new_player_pos.x, new_player_pos.y)
+                        and random.random() < 0.02
+                        and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in {'1', '2'}
+                        and new_player_pos.tuple() not in State.state.grid.visited_tiles
+                ):
                     pass
+
+                State.state.grid.add_visited_tile(new_player_pos)
 
             self.should_transition_to_animation = [True, prior_player_pos, new_player_pos, after_update]
 

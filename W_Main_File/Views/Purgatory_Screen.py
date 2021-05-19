@@ -39,7 +39,9 @@ def saving_button(ui_manager: UIManager, message):
 
 def confirm_func(message):
     state = State.state.player
-    State.state.texture_mapping = {}
+    State.state.clear_current_floor_data()
+    import shutil
+    shutil.rmtree(f'Interactable_Tiles/{State.state.player.name}')
     state.pos = Vector.Vector(0, 0)
     state.max_hp = 220
     state.hp = 200

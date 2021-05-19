@@ -9,17 +9,21 @@ class FloorSaveManager:
 
     @classmethod
     def floor_save(cls):
+        if State.state.player.meta_data.is_guest:
+            return
         name = State.state.player.name
         floor = State.state.player.floor
         seed = Seeding.world_seed
-        tiles = State.state.grid.tiles.values()
+        tiles = State.state.grid.interactable_tiles.values()
+        visited_tiles = State.state.grid.visited_tiles
         tile_list = []
         for x in tiles:
             tile_list.append(cls.get_tile_data(x))
         info = {
             'floor': floor,
             'seed': seed,
-            'tiles': tile_list
+            'tiles': tile_list,
+            'visited_tiles': visited_tiles
         }
         cls.ensure_save_directory()
         character_dir = cls.ensure_character_directory(name)
@@ -64,13 +68,15 @@ class FloorSaveManager:
         if state.player.floor == floor_number and not force_load:
             return
         floor_file_path = cls.get_floor_file_path(floor_number, character_name)
+        State.state.grid.visited_tiles.clear()
         if not floor_file_path.exists():
             return False
         with open(floor_file_path, 'rb') as floor_file:
             import pickle
             data = pickle.load(floor_file)
+        State.state.grid.visited_tiles = data['visited_tiles']
         Seeding.world_seed = data['seed']
-        state.grid.tiles.clear()
+        state.grid.interactable_tiles.clear()
         for tile in data['tiles']:
             from W_Main_File.Data import Tile
             class_name = tile['__name__']

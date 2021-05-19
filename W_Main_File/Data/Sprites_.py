@@ -64,6 +64,13 @@ BACKGROUND_FRAMES = [
     load_texture(Path('Background_Frames') / 'backdrop_7.png')
 ]
 
+CHARACTER_FRAMES = [
+    # load_texture(Path('Sprites') / 'Knight_Sprite_0_Start.png'),
+    load_texture(Path('Sprites') / 'Knight_Sprite_1.png'),
+    load_texture(Path('Sprites') / 'Knight_Sprite_2.png'),
+    load_texture(Path('Sprites') / 'Knight_Sprite_3.png')
+]
+
 current_backdrop_frame = 0
 backdrop_frame_count = 0
 reversing = False

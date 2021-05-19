@@ -50,7 +50,7 @@ class State:
 
     def clear_current_floor_data(self):
         self.texture_mapping.clear()
-        self.grid.tiles.clear()
+        self.grid.interactable_tiles.clear()
 
 
 state = State()
