@@ -21,7 +21,7 @@ class Saving(View):
         self.frame_count += 1
         if self.frame_count >= 10 and not self.saved:
             Networking.save()
-            Floor_Data_Saving.FloorSaveManager.floor_save(State.state.player.name, State.state.player.floor, Seeding.world_seed, State.state.grid.tiles.values())
+            Floor_Data_Saving.FloorSaveManager.floor_save()
             self.saved = True
         if self.frame_count >= 15 and self.saved:
             State.state.window.show_view(self.saving_screen_func())

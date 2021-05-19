@@ -24,9 +24,15 @@ def register_custom_exploration_buttons(button_manager, ui_manager):
                               Vector.Vector(200, 50), on_click=save_button)
 
 
+def invalidate_floor_data():
+    State.state.player.floor = 1
+
+
 def go_home_button():
     if State.state.preoccupied:
         return
+    Floor_Data_Saving.FloorSaveManager.floor_save()
+    State.state.clear_current_floor_data()
     Action_Queue.action_queue.append(
         lambda: State.state.window.show_view(
             Fading.Fading(Exploration.Explore,
@@ -34,12 +40,10 @@ def go_home_button():
                           5,
                           should_reverse=True,
                           should_freeze=True,
-                          should_reload_textures=False,
                           only_reverse=False,
                           reset_pos=Vector.Vector(0, 0),
+                          finishing_func=lambda: invalidate_floor_data(),
                           reset_floor=1)))
-    # State.state.window.show_view(Fading.Fading(Exploration.Explore, 4, 5, should_reverse=True, should_freeze=True, should_reload_textures=False, only_reverse=False,
-    #                                            reset_pos=Vector.Vector(0, 0), reset_floor=1))
 
 
 def log_out_button(show_confirm_screen, ui_manager):
@@ -51,7 +55,6 @@ def log_out_button(show_confirm_screen, ui_manager):
                 on_deny_func=lambda: deny_funct(ui_manager),
                 on_confirm_func=lambda: confirm_funct(ui_manager),
                 show_confirmation_screen=show_confirm_screen)))
-    # State.state.window.show_view(Log_Out.LogOutView(on_deny_func=lambda: deny_funct(ui_manager), on_confirm_func=lambda: confirm_funct(ui_manager), show_confirmation_screen=show_confirm_screen))
 
 
 def save_button():
@@ -62,7 +65,6 @@ def save_button():
         lambda: State.state.window.show_view(
             Saving.Saving(
                 Exploration.Explore)))
-    # State.state.window.show_view(Saving.Saving(Exploration.Explore))
 
 
 def confirm_funct(ui_manager: UIManager):
@@ -70,7 +72,7 @@ def confirm_funct(ui_manager: UIManager):
     from ..Views import Player_Select
     ui_manager.purge_ui_elements()
     from W_Main_File.Essentials.State import state
-    state.texture_mapping.clear()
+    state.clear_current_floor_data()
     Action_Queue.action_queue.append(lambda: State.state.window.show_view(Player_Select.PlayerSelect()))
 
 

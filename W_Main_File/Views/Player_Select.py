@@ -3,7 +3,7 @@ from arcade import gui
 from urllib.parse import quote
 
 from W_Main_File.Essentials import State, Button_Sprite_Manager
-from W_Main_File.Utilities import Vector, Seeding
+from W_Main_File.Utilities import Vector, Seeding, Floor_Data_Saving
 import requests
 import time
 import sys
@@ -26,17 +26,15 @@ class PlayerSelect(Event_Base.EventBase):
         self.button_manager.append('Guest', 'Login as Guest', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y + 150), Vector.Vector(250, 50), on_click=self.guest_button)
         self.button_manager.append('Enter', 'Enter', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y), Vector.Vector(250, 50), on_click=self.enter_button)
         self.button_manager.append('Quit', 'Quit', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y - 50), Vector.Vector(100, 50), on_click=self.exit_button)
-        State.state.texture_mapping.clear()
+        State.state.clear_current_floor_data()
 
     def enter_button(self):
         player_username = self.username.text.strip()
-        # print(self.username.text)
         player_password = self.password.text.strip()
         if not (player_username and player_password):
             return
 
         json_ = requests.get(f'http://localhost:666/save_data?name={quote(player_username)}&pw={quote(player_password)}').json()
-        # print(json_)
         if not json_['error']:
             state_player = State.state.player
             state_player.name = json_['player_name']
@@ -51,17 +49,16 @@ class PlayerSelect(Event_Base.EventBase):
             state_player.meta_data.is_player = True
             state_player.meta_data.is_guest = False
             state_player.meta_data.is_enemy = False
-            # print(state_player.__dict__)
             from W_Main_File.Views import Exploration
             self.ui_manager.purge_ui_elements()
-            Seeding.set_world_seed_from_string(state_player.name)
+            Seeding.set_world_seed_from_player_name()
             State.state.grid.tiles.clear()
             if State.state.player.floor != 1:
                 State.state.grid.remove(Vector.Vector(0, 0))
             elif not State.state.grid.get(0, 0):
                 from W_Main_File.Tiles import Home_Tile
                 State.state.grid.add(Home_Tile.HomeTile(Vector.Vector(0, 0)))
-            State.state.load_floor(state_player.floor, state_player.name)
+            Floor_Data_Saving.FloorSaveManager.load_floor(state_player.floor, force_load=True)
             State.state.window.show_view(Exploration.Explore())
         else:
             self.incorrect_password_end = time.time() + 1.5
@@ -88,7 +85,7 @@ class PlayerSelect(Event_Base.EventBase):
         state.floor = 1
         from W_Main_File.Views import Exploration
         self.ui_manager.purge_ui_elements()
-        Seeding.set_world_seed_from_string(state.name)
+        Seeding.set_world_seed_from_player_name()
         State.state.window.show_view(Exploration.Explore())
 
     def on_draw(self):

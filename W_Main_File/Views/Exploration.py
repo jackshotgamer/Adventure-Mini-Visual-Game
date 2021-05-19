@@ -38,7 +38,8 @@ class Explore(Event_Base.EventBase):
         from W_Main_File.Views import Fading
         if State.state.player.hp <= 0:
             State.state.window.show_view(Fading.Fading((lambda: Purgatory_Screen.PurgatoryScreen('You Died')), 7, 4, should_reverse=False,
-                                                       should_freeze=True, should_reload_textures=True, reset_pos=Vector(0, 0)))
+                                                       should_freeze=True, reset_pos=Vector(0, 0)))
+            State.state.clear_current_floor_data()
         if Action_Queue.action_queue:
             action = Action_Queue.action_queue.popleft()
             action()
@@ -140,7 +141,7 @@ class Explore(Event_Base.EventBase):
             def after_update():
                 State.state.player.pos = new_player_pos
 
-                if not State.state.grid.get(new_player_pos.x, new_player_pos.y) and random.random() < 0.02 and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in {'1', '2'}:
+                if not State.state.grid.get(new_player_pos.x, new_player_pos.y) and random.random() < 0.05 and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in {'1', '2'}:
                     loot = Loot_Functions.LootTile(new_player_pos)
                     State.state.grid.add(loot)
                 elif not State.state.grid.get(new_player_pos.x, new_player_pos.y) and random.random() < 0.02 and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in {'1', '2'}:

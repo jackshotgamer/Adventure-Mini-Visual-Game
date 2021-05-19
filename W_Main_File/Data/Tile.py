@@ -47,3 +47,6 @@ class Tile:
     @classmethod
     def load_from_data(cls, persistent_data):
         raise NotImplementedError
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__}, {self.pos}>'

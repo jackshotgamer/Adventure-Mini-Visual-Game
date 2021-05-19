@@ -5,7 +5,7 @@ import arcade
 import random
 
 from W_Main_File.Essentials import State
-from W_Main_File.Utilities import Vector, Seeding
+from W_Main_File.Utilities import Vector, Seeding, Floor_Data_Saving
 
 CIRCLE_FADE_FRAMES = [
     # <-- is apparently called an "Octothorp", but anyways    \/ this can be typed {i:0>2}, bruh
@@ -16,15 +16,14 @@ CIRCLE_FADE_FRAMES = [
 
 class Fading(View):
     def __init__(self, reset_screen_func, first_interval: int, second_interval: int = -1, should_reverse: bool = False, should_freeze: bool = False, only_reverse: bool = False,
-                 should_reload_textures: bool = False,
-                 reset_pos: Vector.Vector = None, reset_floor: int = None):
+                 reset_pos: Vector.Vector = None, reset_floor: int = None, finishing_func=lambda: None):
         from W_Main_File.Views import Exploration
         State.state.preoccupied = True
         super().__init__()
         self.explore = Exploration.Explore()
         self.moving = True
         self.reset_pos = reset_pos
-        self.reset_floor = reset_floor
+        self.reset_floor_number = reset_floor
         self.current_frame = 0
         self.frame_count = 1
         self.reversing = False
@@ -35,7 +34,7 @@ class Fading(View):
         self.second_interval = second_interval
         self.should_reverse = should_reverse
         self.should_freeze = should_freeze
-        self.should_reload_textures = should_reload_textures
+        self.finishing_func = finishing_func
         if only_reverse:
             self.should_reverse = True
             self.reversing = True
@@ -58,18 +57,20 @@ class Fading(View):
             else:
                 self.moving = False
                 State.state.preoccupied = False
-                State.state.window.show_view(self.reset_screen_func())
+                self.go_to_next_view()
             if self.reset_pos is not None:
                 State.state.player.pos = Vector.Vector(*self.reset_pos)
-            if self.reset_floor is not None:
-                State.state.player.floor = self.reset_floor
-            if self.should_reload_textures:
-                State.state.texture_mapping.clear()
-                Seeding.change_world_seed(random.randint(1, 75654655267269))
+            if self.reset_floor_number is not None:
+                Floor_Data_Saving.FloorSaveManager.load_floor(self.reset_floor_number)
+                State.state.player.floor = self.reset_floor_number
         if self.current_frame == -1:
             self.moving = False
             State.state.preoccupied = False
-            State.state.window.show_view(self.reset_screen_func())
+            self.go_to_next_view()
+
+    def go_to_next_view(self):
+        self.finishing_func()
+        State.state.window.show_view(self.reset_screen_func())
 
     def on_key_press(self, symbol: int, modifiers: int):
         return

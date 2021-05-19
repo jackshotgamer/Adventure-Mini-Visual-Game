@@ -83,7 +83,6 @@ class MovementAnimator(Event_Base.EventBase):
         for tile, start, end in self.affected_tiles:
             tile_center = Vector.Vector(*arcade.lerp_vec(start, end, self.current_steps / self.animation_steps))
             tile.on_render(tile_center, tile_center + (-(State.state.cell_size.x / 2), State.state.cell_size.y / 2), State.state.cell_size)
-            # sprite_offset = tile_center - end
 
         arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y, 99, 99, Sprites_.black_circle_sprite, 0, 75)
         arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y, 99, 99, Sprites_.black_circle_square_sprite, 0, 100)
@@ -92,7 +91,6 @@ class MovementAnimator(Event_Base.EventBase):
         for start, end in self.empty_tiles:
             tile_center = Vector.Vector(*arcade.lerp_vec(start, end, self.current_steps / self.animation_steps))
             arcade.draw_rectangle_outline(tile_center.x, tile_center.y, State.state.cell_size.x - 2, State.state.cell_size.y - 2, (120, 120, 120))
-            # sprite_offset = tile_center - end
 
         arcade.draw_circle_filled(center.x, center.y, 25, arcade.color.AERO_BLUE)
         arcade.draw_rectangle_outline(center.x, center.y, 500, 500, arcade.color.DARK_GRAY)

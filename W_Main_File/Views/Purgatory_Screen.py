@@ -14,7 +14,7 @@ def play_button(ui_manager: UIManager):
     ui_manager.purge_ui_elements()
     State.state.player.hp = State.state.player.max_hp
 
-    State.state.window.show_view(Fading.Fading(Exploration.Explore, 10, 4, should_reverse=True, only_reverse=True, should_reload_textures=True, reset_pos=Vector.Vector(0, 0), reset_floor=1))
+    State.state.window.show_view(Fading.Fading(Exploration.Explore, 10, 4, should_reverse=True, only_reverse=True, reset_pos=Vector.Vector(0, 0), reset_floor=1))
 
 
 def reset_character_button(ui_manager: UIManager, message):
@@ -23,7 +23,6 @@ def reset_character_button(ui_manager: UIManager, message):
         lambda: State.state.window.show_view(
             ResetCharacterView(
                 message)))
-    # State.state.window.show_view(ResetCharacterView(message))
 
 
 def saving_button(ui_manager: UIManager, message):
@@ -36,7 +35,6 @@ def saving_button(ui_manager: UIManager, message):
             Saving.Saving(
                 lambda: PurgatoryScreen(
                     message))))
-    # State.state.window.show_view(Saving.Saving(lambda: PurgatoryScreen(message)))
 
 
 def confirm_func(message):
@@ -53,7 +51,6 @@ def confirm_func(message):
         lambda: State.state.window.show_view(
             PurgatoryScreen(
                 message)))
-    # State.state.window.show_view(PurgatoryScreen(message))
 
 
 def deny_func(message):
@@ -61,7 +58,6 @@ def deny_func(message):
         lambda: State.state.window.show_view(
             PurgatoryScreen(
                 message)))
-    # State.state.window.show_view(PurgatoryScreen(message))
 
 
 class ResetCharacterView(Event_Base.EventBase):
@@ -127,8 +123,6 @@ def confirm_fun(ui_manager: UIManager):
     Action_Queue.action_queue.append(
         lambda: State.state.window.show_view(Player_Select.PlayerSelect()))
 
-    # State.state.window.show_view(Player_Select.PlayerSelect())
-
 
 def deny_fun(ui_manager: UIManager, message):
     # noinspection PyPackages
@@ -137,4 +131,3 @@ def deny_fun(ui_manager: UIManager, message):
         lambda: State.state.window.show_view(
             PurgatoryScreen(
                 message)))
-    # State.state.window.show_view(PurgatoryScreen(message))

@@ -112,7 +112,6 @@ class LootTile(Tile.Tile):
             self.on_enter()
         elif keycode == arcade.key.E and self.looted:
             table = LootTable(('Banana Peel', 8), ('Ball of Seaweed', 6), ('Rusty Can', 4))
-            # print(str(table.get_item()))
             self.looted = True
 
     def persistent_data(self):

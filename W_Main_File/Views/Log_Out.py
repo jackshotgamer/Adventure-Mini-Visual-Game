@@ -39,18 +39,3 @@ class LogOutView(Event_Base.EventBase):
             arcade.draw_text(('Warning:\n' 'This will NOT save your data. This cannot be undone!' if not State.state.player.meta_data.is_guest
                               else 'You will lose your progress. This cannot be undone!'), State.state.screen_center.x, State.state.screen_center.y + 100, arcade.color.WHITE,
                              23, 800, anchor_x='center', anchor_y='center', align='center')
-
-
-# def confirm_function(ui_manager: UIManager):
-#     # noinspection PyPackages
-#     from . import
-#     ui_manager.purge_ui_elements()
-#     State.state.window.show_view()
-#
-#
-# def deny_function(ui_manager: UIManager):
-#     # noinspection PyPackages
-#     from . import
-#     ui_manager.purge_ui_elements()
-#     State.state.load_textures()
-#     State.state.window.show_view()
