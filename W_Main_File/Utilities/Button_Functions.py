@@ -11,8 +11,6 @@ from W_Main_File.Views import Player_Select, Exploration, Fading, Log_Out, Event
 
 
 def register_custom_exploration_buttons(button_manager, ui_manager):
-    if State.state.preoccupied:
-        return
     button_manager.append('Home', 'Go Home', Vector.Vector(State.state.screen_center.x + 250 + State.state.cell_size.x, (State.state.screen_center.y + 50) + (State.state.cell_size.y - 24)),
                           Vector.Vector(200, 50), on_click=go_home_button)
     button_manager.append('Log Out', 'Log Out',

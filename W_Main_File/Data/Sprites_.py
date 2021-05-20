@@ -3,12 +3,15 @@ from pathlib import Path
 from W_Main_File.Essentials import State
 
 plains_sprite = load_texture(Path('Sprites') / 'Plains_Tile_0.png')
+plains_trap_sprite = load_texture(Path('Sprites') / 'Plains_Tile_0_TRAP.png')
 forest_sprite = load_texture(Path('Sprites') / 'Forest_Tile_2.0.png')
+forest_trap_sprite = load_texture(Path('Sprites') / 'Forest_Tile_2.0_TRAP.png')
 mountain_sprite = load_texture(Path('Sprites') / 'Mountain_Tile_1.png')
 village_sprite = load_texture(Path('Sprites') / 'Village_Tile_1.png')
 home_sprite = load_texture(Path('Sprites') / 'Home_Tile.png')
 chest_sprite = load_texture(Path('Sprites') / 'Chest_0.png')
 chest_body_sprite = load_texture(Path('Sprites') / 'Chest_Body_0.png')
+trap_alert = load_texture(Path('Sprites') / 'Trap_Alert_0.png')
 stick_sprite = load_texture(Path('Sprites') / 'Stick_Weapon_1.png')
 rusty_knife_sprite = load_texture(Path('Sprites') / 'Rusty_Knife_1.png')
 blank_button_dark = load_texture(Path('Sprites') / 'Button_Square_(No Decor)_0Dark.png')
@@ -24,7 +27,9 @@ black_circle_square_sprite = load_texture(Path('Sprites') / 'Black_Circle_Square
 black_square_circle_square_sprite = load_texture(Path('Sprites') / 'Black_Square_Square_Circle.png')
 
 # 0 = Plains
+# 0.5 = Plains TRAP
 # 1 = Forest
+# 1.5 = Forest TRAP
 # 2 = Mountain
 # 4 = Village
 # 9 = House
@@ -37,7 +42,9 @@ black_square_circle_square_sprite = load_texture(Path('Sprites') / 'Black_Square
 
 sprite_alias = {
     '0': plains_sprite,
+    '0.5': plains_trap_sprite,
     '1': forest_sprite,
+    '1.5': forest_trap_sprite,
     '2': mountain_sprite,
     '4': village_sprite
 }
@@ -65,10 +72,10 @@ BACKGROUND_FRAMES = [
 ]
 
 CHARACTER_FRAMES = [
-    # load_texture(Path('Sprites') / 'Knight_Sprite_0_Start.png'),
     load_texture(Path('Sprites') / 'Knight_Sprite_1.png'),
     load_texture(Path('Sprites') / 'Knight_Sprite_2.png'),
     load_texture(Path('Sprites') / 'Knight_Sprite_3.png')
+    # load_texture(Path('Sprites') / 'Knight_Sprite_0_Start.png')
 ]
 
 current_backdrop_frame = 0

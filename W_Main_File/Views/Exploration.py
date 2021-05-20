@@ -8,7 +8,7 @@ from W_Main_File.Data import Sprites_
 from W_Main_File.Essentials import State
 import time
 import random
-from W_Main_File.Tiles import Loot_Functions, Trapdoor_Functions
+from W_Main_File.Tiles import Loot_Functions, Trapdoor_Functions, Trap_Functions
 from W_Main_File.Utilities.Vector import Vector
 
 
@@ -21,7 +21,7 @@ class Explore(Event_Base.EventBase):
         self.ui_manager = arcade.gui.UIManager()
         if not State.state.preoccupied:
             self.ui_manager.purge_ui_elements()
-            Button_Functions.register_custom_exploration_buttons(self.button_manager, self.ui_manager)
+        Button_Functions.register_custom_exploration_buttons(self.button_manager, self.ui_manager)
         State.state.is_moving = False
         if ((State.state.moves_since_texture_save > 2 and State.state.is_new_tile) or State.state.player.pos == (0, 0)) and not State.state.player.meta_data.is_guest:
             for offset in State.state.generate_radius(5):
@@ -143,19 +143,26 @@ class Explore(Event_Base.EventBase):
 
                 if (
                         not State.state.grid.get(new_player_pos.x, new_player_pos.y)
-                        and random.random() < 0.75
+                        and random.random() < 0.02
                         and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in {'1', '2'}
                         and new_player_pos.tuple() not in State.state.grid.visited_tiles
                 ):
                     loot = Loot_Functions.LootTile(new_player_pos)
                     State.state.grid.add(loot)
+                # elif (
+                #         not State.state.grid.get(new_player_pos.x, new_player_pos.y)
+                #         and random.random() < 0.02
+                #         and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in {'1', '2'}
+                #         and new_player_pos.tuple() not in State.state.grid.visited_tiles
+                # ):
+                #     pass
                 elif (
-                        not State.state.grid.get(new_player_pos.x, new_player_pos.y)
-                        and random.random() < 0.02
-                        and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in {'1', '2'}
-                        and new_player_pos.tuple() not in State.state.grid.visited_tiles
+                        State.state.get_tile_id(Vector(new_player_pos.x, new_player_pos.y)) in ('0.5', '1.5')
+                        and not State.state.grid.get(new_player_pos.x, new_player_pos.y)
                 ):
-                    pass
+                    trap = Trap_Functions.TrapTile(new_player_pos)
+                    trap.on_enter()
+                    State.state.grid.add(trap)
 
                 State.state.grid.add_visited_tile(new_player_pos)
 
