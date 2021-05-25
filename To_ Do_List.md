@@ -11,6 +11,7 @@
 * Multiple Character's per Account
 * Damage and Defense
   * Blunt Damage
+  * Cutting Damage
   * Piercing Damage
   * Elemental Damage
     * This is only attainable by the player if they use enchantments

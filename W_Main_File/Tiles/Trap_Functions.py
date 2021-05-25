@@ -11,6 +11,7 @@ class TrapTile(Tile.Tile):
         self.finished_alert = False
         self.at_full_opacity = False
         self.alpha = 0
+        self.goal_hp = None
         self.frame_count = 0
         self.width = 100
         self.height = 100
@@ -29,6 +30,8 @@ class TrapTile(Tile.Tile):
         self.goal_hp = State.state.player.hp - subtract_amount
 
     def on_update(self, delta_time):
+        if not self.goal_hp:
+            return
         if self.finished_alert:
             self.finished_alert = False
             self.at_full_opacity = False

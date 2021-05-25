@@ -1,6 +1,6 @@
 import arcade
 from W_Main_File.Essentials import State
-from W_Main_File.Data import Tile
+from W_Main_File.Data import Tile, Item, HpEntity
 from W_Main_File.Utilities import Vector
 from W_Main_File.Views import Player_Select
 from W_Main_File.Tiles import Home_Tile, Loot_Functions, Trapdoor_Functions
