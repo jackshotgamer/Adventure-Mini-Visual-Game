@@ -1,7 +1,7 @@
 [X] To do
+* Leveling up
 * Inventory
-* Trap Tile
-* Enemy Tile
+  * Enemy Tile
 * Finish Trapdoor Tile
 * Shop Tile
   * Ransacking Villages
@@ -24,17 +24,7 @@
     * Attack
     * Defence
 * Pay gold to remain on the same floor when clicking Go Home (Cost scales per level)
-
-* Implement Saving and Loading for Floors, as well as Saving the changes to the world seed
-* Fix not storing if a tile has already been checked, and it contained nothing, has a chance of changing that when returning to tile
-* When going through trapdoors, tiles get deleted, they do not reload on re-entry into floor, saving or loading does not load tiles
-* trap door bugs
-  * texture staying same as previous floor
-* go home bugs
-  * tiles do not reappear on re-entry into floor
-* saving/loading bugs
-  * tiles do not get saved/do not load when re-entering game after saving and quitting
-  
+ 
 [Sprites]
 * Enemies
   * Witch

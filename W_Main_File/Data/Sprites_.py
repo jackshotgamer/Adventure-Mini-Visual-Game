@@ -17,10 +17,12 @@ rusty_knife_sprite = load_texture(Path('Sprites') / 'Rusty_Knife_1.png')
 blank_button_dark = load_texture(Path('Sprites') / 'Button_Square_(No Decor)_0Dark.png')
 blank_button_light = load_texture(Path('Sprites') / 'Button_Square_(No Decor)_1Light.png')
 blank_button_light_middle = load_texture(Path('Sprites') / 'Button_Square_(No Decor)_2LightMiddle.png')
-# temp_2 = load_texture(Path('Sprites') / '.png')
-# temp_3 = load_texture(Path('Sprites') / '.png')
+knight_start = load_texture(Path('Sprites') / 'Knight_Sprite_0_Start.png')
+knight_start_2 = load_texture(Path('Sprites') / 'Knight_Sprite_0_Start_2.png')
+knight_start_flipped = load_texture(Path('Sprites') / 'Knight_Sprite_0_Start_Flipped.png')
 # temp_4 = load_texture(Path('Sprites') / '.png')
 # temp_5 = load_texture(Path('Sprites') / '.png')
+swamp_monster = load_texture(Path('Sprites') / 'Swamp_Monster_0.png')
 black_sprite = load_texture(Path('Sprites') / 'Black_Square.png')
 black_circle_sprite = load_texture(Path('Sprites') / 'Black_Circle.png')
 black_circle_square_sprite = load_texture(Path('Sprites') / 'Black_Circle_Square.png')
@@ -75,8 +77,14 @@ CHARACTER_FRAMES = [
     load_texture(Path('Sprites') / 'Knight_Sprite_1.png'),
     load_texture(Path('Sprites') / 'Knight_Sprite_2.png'),
     load_texture(Path('Sprites') / 'Knight_Sprite_3.png')
-    # load_texture(Path('Sprites') / 'Knight_Sprite_0_Start.png')
 ]
+
+FLIPPED_CHARACTER_FRAMES = [
+    load_texture(Path('Sprites') / 'Knight_Sprite_1_Flipped.png'),
+    load_texture(Path('Sprites') / 'Knight_Sprite_2_Flipped.png'),
+    load_texture(Path('Sprites') / 'Knight_Sprite_3_Flipped.png')
+]
+
 
 current_backdrop_frame = 0
 backdrop_frame_count = 0
@@ -98,6 +106,33 @@ def update_backdrop():
         backdrop_frame_count = 1
 
 
+current_character_frame = 0
+character_frame_count = 0
+
+
+def update_character():
+    global current_character_frame
+    global character_frame_count
+    character_frame_count += 1
+    if not character_frame_count % 5:
+        if current_character_frame >= len(CHARACTER_FRAMES) - 1:
+            current_character_frame = -1
+        current_character_frame += 1
+    if character_frame_count > 90:
+        character_frame_count = 1
+
+
 def draw_backdrop():
     import arcade
     arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y, 1000, 800, BACKGROUND_FRAMES[current_backdrop_frame])
+
+
+def draw_character():
+    import arcade
+    from W_Main_File.Views.Exploration import Explore
+    if Explore.symbol_ in (arcade.key.W, arcade.key.D):
+        frames = CHARACTER_FRAMES[current_character_frame]
+    else:
+        frames = FLIPPED_CHARACTER_FRAMES[current_character_frame]
+    arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y, 75, 75,
+                                  frames)

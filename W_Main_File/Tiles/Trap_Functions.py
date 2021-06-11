@@ -1,4 +1,4 @@
-import arcade
+import arcade, random
 
 from W_Main_File.Data import Tile, Sprites_
 from W_Main_File.Essentials import State
@@ -35,30 +35,34 @@ class TrapTile(Tile.Tile):
         if self.finished_alert:
             self.finished_alert = False
             self.at_full_opacity = False
+            self.alpha = 0
             State.state.preoccupied = False
             return
         if not self.at_full_opacity:
-            self.alpha = min(255, self.alpha + 6)
+            self.alpha = min(255, self.alpha + 10)
             if self.alpha == 255:
                 self.at_full_opacity = True
         if self.at_full_opacity:
             self.frame_count += 1
-            if not self.frame_count % 1:
+            if not self.frame_count % 4:
                 if State.state.player.hp > 0:
                     State.state.player.hp = max(self.goal_hp, State.state.player.hp - 1)
-                if not self.frame_count % 10:
-                    if self.width == 100:
-                        self.width = 95
-                    elif self.width == 95:
-                        self.width = 100
-                    if self.height == 100:
-                        self.height = 95
-                    elif self.height == 95:
-                        self.height = 100
-                    if not State.state.player.hp > self.goal_hp or not State.state.player.hp > 0:
-                        self.finished_alert = True
-                        self.playing_alert = False
-                        self.frame_count = 0
+            if not self.frame_count % 8:
+                if self.width == 100:
+                    self.width = random.randint(90, 92)
+                elif self.width in (90, 91, 92):
+                    self.width = 100
+                if self.height == 100:
+                    self.height = random.randint(90, 92)
+                elif self.height in (90, 91, 92):
+                    self.height = 100
+                if not State.state.player.hp > self.goal_hp or not State.state.player.hp > 0:
+                    self.finished_alert = True
+                    self.playing_alert = False
+                    self.frame_count = 0
+
+    def on_exit(self):
+        self.goal_hp = None
 
     def persistent_data(self):
         return {

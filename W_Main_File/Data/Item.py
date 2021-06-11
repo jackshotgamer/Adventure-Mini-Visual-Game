@@ -60,10 +60,5 @@ class Weapon(Item, metaclass=abc.ABCMeta):
 
     def damage_inflicted(self, target: HpEntity):
         damage = random.randint(self.min_attack, self.max_attack)
-        if self.has_elemental_damage:
-            elemental_damage = damage * 0.2
-        else:
-            elemental_damage = 0
-        resistances = target.resistances
-        total_damage = (damage * resistances[self.damage_type & DamageType.Any_Basic]) + (elemental_damage * resistances[self.damage_type & DamageType.Any_Elemental])
-        return int(total_damage)
+        from W_Main_File.Utilities import Damage_Calc
+        return Damage_Calc.calculate_damage(damage, self.damage_type, target)

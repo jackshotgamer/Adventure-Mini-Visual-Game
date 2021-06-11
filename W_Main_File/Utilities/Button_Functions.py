@@ -23,14 +23,14 @@ def register_custom_exploration_buttons(button_manager, ui_manager):
 
 
 def invalidate_floor_data():
-    State.state.player.floor = 1
+    State.state.clear_current_floor_data()
 
 
 def go_home_button():
     if State.state.preoccupied:
         return
     Floor_Data_Saving.FloorSaveManager.floor_save()
-    State.state.clear_current_floor_data()
+    explore = Exploration.Explore()
     Action_Queue.action_queue.append(
         lambda: State.state.window.show_view(
             Fading.Fading(Exploration.Explore,
@@ -40,8 +40,9 @@ def go_home_button():
                           should_freeze=True,
                           only_reverse=False,
                           reset_pos=Vector.Vector(0, 0),
-                          finishing_func=lambda: invalidate_floor_data(),
-                          reset_floor=1)))
+                          halfway_func=lambda: invalidate_floor_data(),
+                          reset_floor=1,
+                          render=lambda _: explore.on_draw())))
 
 
 def log_out_button(show_confirm_screen, ui_manager):

@@ -72,6 +72,7 @@ class PlayerSelect(Event_Base.EventBase):
         if not State.state.grid.get(0, 0):
             from W_Main_File.Tiles import Home_Tile
             State.state.grid.add(Home_Tile.HomeTile(Vector.Vector(0, 0)))
+        import shutil
         state.name = 'Guest'
         state.meta_data.is_player = False
         state.meta_data.is_guest = True
@@ -83,6 +84,9 @@ class PlayerSelect(Event_Base.EventBase):
         state.xp = 0
         state.lvl = 1
         state.floor = 1
+        import os
+        if os.path.exists(f'Interactable_Tiles/Guest/'):
+            shutil.rmtree(f'Interactable_Tiles/Guest/')
         from W_Main_File.Views import Exploration
         self.ui_manager.purge_ui_elements()
         Seeding.set_world_seed_from_player_name()

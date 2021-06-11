@@ -8,13 +8,14 @@ from W_Main_File.Data import Sprites_
 from W_Main_File.Essentials import State
 import time
 import random
-from W_Main_File.Tiles import Loot_Functions, Trapdoor_Functions, Trap_Functions
+from W_Main_File.Tiles import Loot_Functions, Trapdoor_Functions, Trap_Functions, Enemy
 from W_Main_File.Utilities.Vector import Vector
 
 
 class Explore(Event_Base.EventBase):
     fps = 0
     last_update = 0
+    symbol_ = arcade.key.D
 
     def __init__(self):
         super().__init__()
@@ -38,14 +39,14 @@ class Explore(Event_Base.EventBase):
         from W_Main_File.Views import Fading
         if State.state.player.hp <= 0:
             State.state.window.show_view(Fading.Fading((lambda: Purgatory_Screen.PurgatoryScreen('You Died')), 7, 4, should_reverse=False,
-                                                       should_freeze=True, reset_pos=Vector(0, 0)))
+                                                       should_freeze=True, reset_pos=Vector(0, 0), render=lambda _: self.on_draw()))
             State.state.clear_current_floor_data()
         if Action_Queue.action_queue:
             action = Action_Queue.action_queue.popleft()
             action()
         if self.should_transition_to_animation[0]:
             from W_Main_File.Views.Movement_Animator import MovementAnimator
-            State.state.window.show_view(MovementAnimator(self.should_transition_to_animation[1], self.should_transition_to_animation[2], 13))
+            State.state.window.show_view(MovementAnimator(self.should_transition_to_animation[1], self.should_transition_to_animation[2], 14))
             self.should_transition_to_animation[0] = False
             self.should_transition_to_animation[3]()
         else:
@@ -93,7 +94,7 @@ class Explore(Event_Base.EventBase):
         arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y, 99, 99, Sprites_.black_square_circle_square_sprite, 0, 125)
 
         arcade.draw_rectangle_filled(center_screen.x, center_screen.y - 270, 500, 38, (0, 0, 0))
-        arcade.draw_circle_filled(center_screen.x, center_screen.y, 25, arcade.color.AERO_BLUE)
+        # arcade.draw_circle_filled(center_screen.x, center_screen.y, 25, arcade.color.AERO_BLUE)
         arcade.draw_rectangle_outline(center_screen.x, center_screen.y, 500, 500, arcade.color.DARK_GRAY, 2)
         arcade.draw_text(f'Name: {State.state.player.name}', center_screen.x - 225, center_screen.y - 270, arcade.color.LIGHT_GRAY,
                          font_size=11, font_name='arial')
@@ -110,6 +111,10 @@ class Explore(Event_Base.EventBase):
         arcade.draw_text(str(State.state.player.pos.tuple()), center_screen.x, center_screen.y + (State.state.cell_size.y * .37), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=12, anchor_x='center', anchor_y='center')
         Sprites_.draw_backdrop()
+        if Explore.symbol_ == arcade.key.D:
+            arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y, 75, 75, Sprites_.knight_start)
+        elif Explore.symbol_ == arcade.key.A:
+            arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y, 75, 75, Sprites_.knight_start_flipped)
         arcade.draw_text(f'FPS = {self.fps:.1f}', 2, self.window.height - 22, arcade.color.GREEN,
                          font_name='arial', font_size=14)
         for tile, *args in render_queue:
@@ -124,6 +129,8 @@ class Explore(Event_Base.EventBase):
         if symbol == arcade.key.B:
             State.state.player.hp -= 200
         if symbol in self.key_offset:
+            if symbol in (arcade.key.A, arcade.key.D):
+                self.__class__.symbol_ = symbol
             if State.state.preoccupied:
                 return
             State.state.moves_since_texture_save += 1
@@ -149,6 +156,14 @@ class Explore(Event_Base.EventBase):
                 ):
                     loot = Loot_Functions.LootTile(new_player_pos)
                     State.state.grid.add(loot)
+                elif (
+                        not State.state.grid.get(new_player_pos.x, new_player_pos.y)
+                        and random.random() < 0.4
+                        and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in {'1'}
+                        and new_player_pos.tuple() not in State.state.grid.visited_tiles
+                ):
+                    enemy = Enemy.EnemyTile(new_player_pos)
+                    State.state.grid.add(enemy)
                 # elif (
                 #         not State.state.grid.get(new_player_pos.x, new_player_pos.y)
                 #         and random.random() < 0.02

@@ -54,6 +54,7 @@ class MovementAnimator(Event_Base.EventBase):
             State.state.is_moving = False
             State.state.window.show_view(Exploration.Explore())
         Sprites_.update_backdrop()
+        Sprites_.update_character()
         if Exploration.Explore.last_update == 0 or time.time() - Exploration.Explore.last_update > 0.5:
             Exploration.Explore.fps = 1 / delta_time
             Exploration.Explore.last_update = time.time()
@@ -92,7 +93,7 @@ class MovementAnimator(Event_Base.EventBase):
             tile_center = Vector.Vector(*arcade.lerp_vec(start, end, self.current_steps / self.animation_steps))
             arcade.draw_rectangle_outline(tile_center.x, tile_center.y, State.state.cell_size.x - 2, State.state.cell_size.y - 2, (120, 120, 120))
 
-        arcade.draw_circle_filled(center.x, center.y, 25, arcade.color.AERO_BLUE)
+        # arcade.draw_circle_filled(center.x, center.y, 25, arcade.color.AERO_BLUE)
         arcade.draw_rectangle_outline(center.x, center.y, 500, 500, arcade.color.DARK_GRAY)
         arcade.draw_rectangle_filled(center.x, center.y - 270, 500, 38, (0, 0, 0))
         arcade.draw_rectangle_filled(center.x, center.y + 270, 500, 38, (0, 0, 0))
@@ -111,6 +112,7 @@ class MovementAnimator(Event_Base.EventBase):
         arcade.draw_text(str(State.state.player.pos.tuple()), center.x, center.y + (State.state.cell_size.y * .37), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=12, anchor_x='center', anchor_y='center')
         Sprites_.draw_backdrop()
+        Sprites_.draw_character()
         from W_Main_File.Views import Exploration
         arcade.draw_text(f'FPS = {Exploration.Explore.fps:.1f}', 2, self.window.height - 22, arcade.color.GREEN,
                          font_name='arial', font_size=14)

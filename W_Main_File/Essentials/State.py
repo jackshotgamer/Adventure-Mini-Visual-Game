@@ -36,6 +36,9 @@ class State:
         return Sprites_.sprite_alias[self.texture_mapping[xy]]
 
     def get_tile_id(self, vector):
+        """
+        return the numeric id of the texture at the given vector position
+        """
         self.tile_type_pos(vector.x, vector.y)
         return self.texture_mapping[f'{vector.x} {vector.y}']
 

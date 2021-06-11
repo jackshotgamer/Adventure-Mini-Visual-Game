@@ -9,8 +9,6 @@ class FloorSaveManager:
 
     @classmethod
     def floor_save(cls):
-        if State.state.player.meta_data.is_guest:
-            return
         name = State.state.player.name
         floor = State.state.player.floor
         seed = Seeding.world_seed

@@ -22,26 +22,33 @@ class TrapdoorTile(Tile.Tile):
     def key_up(self, keycode, mods):
         if keycode == arcade.key.E and not State.state.preoccupied:
             State.state.preoccupied = True
+            explore = Exploration.Explore()
             Action_Queue.action_queue.append(
                 lambda: State.state.window.show_view(
                     Fading.Fading(self.after_fadein, 7, 2,
                                   should_reverse=False,
                                   should_freeze=True,
-                                  reset_pos=Vector.Vector(0, 0)
+                                  reset_pos=Vector.Vector(0, 0),
+                                  render=lambda _: explore.on_draw()
                                   )))
 
     @staticmethod
-    def after_fadein():
+    def invalidate_floor_data():
+        State.state.clear_current_floor_data()
+
+    def after_fadein(self):
         from W_Main_File.Utilities import Floor_Data_Saving, Seeding
         Floor_Data_Saving.FloorSaveManager.floor_save()
-        State.state.clear_current_floor_data()
-        Floor_Data_Saving.FloorSaveManager.load_floor(State.state.player.floor + 1)
-        State.state.player.floor += 1
+        print(State.state.player.floor)
+        explore = Exploration.Explore()
         fade_to_explore = Fading.Fading(Exploration.Explore, 7, 2,
                                         should_reverse=False,
                                         should_freeze=True,
                                         only_reverse=True,
-                                        reset_pos=Vector.Vector(0, 0))
+                                        halfway_func=lambda: self.invalidate_floor_data(),
+                                        reset_floor=State.state.player.floor + 1,
+                                        reset_pos=Vector.Vector(0, 0),
+                                        render=lambda _: explore.on_draw())
         return fade_to_explore
 
     def on_render_foreground(self, center, top_left, cell_size):
