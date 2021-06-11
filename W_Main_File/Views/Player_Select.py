@@ -78,8 +78,8 @@ class PlayerSelect(Event_Base.EventBase):
         state.meta_data.is_guest = True
         state.meta_data.is_enemy = False
         state.pos = Vector.Vector(0, 0)
-        state.max_hp = 220
-        state.hp = 200
+        state.max_hp = 1000
+        state.hp = 1000
         state.gold = 0
         state.xp = 0
         state.lvl = 1

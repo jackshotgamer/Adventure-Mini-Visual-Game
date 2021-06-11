@@ -43,8 +43,8 @@ def confirm_func(message):
     import shutil
     shutil.rmtree(f'Interactable_Tiles/{State.state.player.name}')
     state.pos = Vector.Vector(0, 0)
-    state.max_hp = 220
-    state.hp = 200
+    state.max_hp = 1000
+    state.hp = 1000
     state.gold = 0
     state.xp = 0
     state.lvl = 1
@@ -104,7 +104,7 @@ class PurgatoryScreen(Event_Base.EventBase):
     def on_draw(self):
         super().on_draw()
         arcade.draw_text(self.message, State.state.screen_center.x, State.state.screen_center.y + 150,
-                         (arcade.color.RED if self.message == 'You Died' else arcade.color.WHITE), 23, 250, align='center', anchor_y='center', anchor_x='center')
+                         (arcade.color.RED if self.message == 'You Died' else arcade.color.RED), 23, 1000, align='center', anchor_y='center', anchor_x='center')
 
     def update(self, delta_time: float):
         if Action_Queue.action_queue:

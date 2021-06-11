@@ -11,7 +11,7 @@ class State:
     Textures_folder = pathlib.Path('Interactable_Tiles')
 
     def __init__(self):
-        self.player = HpEntity.HpEntity('', Vector.Vector(0, 0), 220, 200, 0, 0, 1, 1, Meta_Data.MetaData(is_player=True))
+        self.player = HpEntity.HpEntity('', Vector.Vector(0, 0), 1000, 1000, 0, 0, 1, 1, Meta_Data.MetaData(is_player=True))
         self.window = None
         self.grid = Grid.Grid()
         self.cell_size = Vector.Vector(100, 100)

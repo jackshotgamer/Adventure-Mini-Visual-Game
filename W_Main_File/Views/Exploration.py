@@ -127,7 +127,7 @@ class Explore(Event_Base.EventBase):
 
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol == arcade.key.B:
-            State.state.player.hp -= 200
+            State.state.player.hp -= State.state.player.max_hp
         if symbol in self.key_offset:
             if symbol in (arcade.key.A, arcade.key.D):
                 self.__class__.symbol_ = symbol
