@@ -46,6 +46,7 @@ class PlayerSelect(Event_Base.EventBase):
             state_player.xp = json_['xp']
             state_player.lvl = json_['lvl']
             state_player.floor = json_['floor']
+            state_player.deaths = json_['deaths']
             state_player.meta_data.is_player = True
             state_player.meta_data.is_guest = False
             state_player.meta_data.is_enemy = False
@@ -84,6 +85,7 @@ class PlayerSelect(Event_Base.EventBase):
         state.xp = 0
         state.lvl = 1
         state.floor = 1
+        state.deaths = 0
         import os
         if os.path.exists(f'Interactable_Tiles/Guest/'):
             shutil.rmtree(f'Interactable_Tiles/Guest/')

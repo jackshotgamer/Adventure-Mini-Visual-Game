@@ -13,8 +13,8 @@ import arcade
 def play_button(ui_manager: UIManager):
     ui_manager.purge_ui_elements()
     State.state.player.hp = State.state.player.max_hp
-
-    State.state.window.show_view(Fading.Fading(Exploration.Explore, 10, 4, should_reverse=True, only_reverse=True, reset_pos=Vector.Vector(0, 0), reset_floor=1))
+    explore = Exploration.Explore()
+    State.state.window.show_view(Fading.Fading(lambda: explore, 10, 4, should_reverse=True, only_reverse=True, reset_pos=Vector.Vector(0, 0), reset_floor=1, render=lambda _: explore.on_draw()))
 
 
 def reset_character_button(ui_manager: UIManager, message):
@@ -85,7 +85,7 @@ class ResetCharacterView(Event_Base.EventBase):
 
 
 class PurgatoryScreen(Event_Base.EventBase):
-    def __init__(self, message):
+    def __init__(self, message, increment_death=False):
         super().__init__()
         State.state.player.hp = State.state.player.max_hp
         self.message = message
@@ -100,6 +100,10 @@ class PurgatoryScreen(Event_Base.EventBase):
                                        on_click=partial(saving_button, self.ui_manager, message))
             self.button_manager.append('Reset Character', 'Reset all Stats', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y), Vector.Vector(250, 50),
                                        on_click=partial(reset_character_button, self.ui_manager, message))
+        if increment_death:
+            State.state.player.deaths += 1
+            from W_Main_File.Utilities import Seeding
+            Seeding.set_world_seed_from_player_name()
 
     def on_draw(self):
         super().on_draw()

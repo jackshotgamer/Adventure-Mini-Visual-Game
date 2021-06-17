@@ -38,7 +38,7 @@ class Explore(Event_Base.EventBase):
     def update(self, delta_time: float):
         from W_Main_File.Views import Fading
         if State.state.player.hp <= 0:
-            State.state.window.show_view(Fading.Fading((lambda: Purgatory_Screen.PurgatoryScreen('You Died')), 7, 4, should_reverse=False,
+            State.state.window.show_view(Fading.Fading((lambda: Purgatory_Screen.PurgatoryScreen('You Died', True)), 7, 4, should_reverse=False,
                                                        should_freeze=True, reset_pos=Vector(0, 0), render=lambda _: self.on_draw()))
             State.state.clear_current_floor_data()
         if Action_Queue.action_queue:
@@ -158,7 +158,7 @@ class Explore(Event_Base.EventBase):
                     State.state.grid.add(loot)
                 elif (
                         not State.state.grid.get(new_player_pos.x, new_player_pos.y)
-                        and random.random() < 0.4
+                        and random.random() < 0.05
                         and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in {'1'}
                         and new_player_pos.tuple() not in State.state.grid.visited_tiles
                 ):
@@ -186,3 +186,5 @@ class Explore(Event_Base.EventBase):
         else:
             if tile := State.state.grid.get(*State.state.player.pos):
                 tile.key_down(symbol, modifiers)
+        current_grid = State.state.grid.get(*State.state.player.pos)
+        print(current_grid.__class__, current_grid.__dict__ if current_grid is not None else '')

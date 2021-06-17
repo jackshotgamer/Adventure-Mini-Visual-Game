@@ -28,9 +28,10 @@ class TrapTile(Tile.Tile):
         subtract_amount = (int(State.state.player.max_hp * 0.2) if (State.state.player.hp / State.state.player.max_hp) >= 0.4 else int(State.state.player.max_hp * 0.1))
         # noinspection PyAttributeOutsideInit
         self.goal_hp = State.state.player.hp - subtract_amount
+        print(self.goal_hp)
 
     def on_update(self, delta_time):
-        if not self.goal_hp:
+        if self.goal_hp is None:
             return
         if self.finished_alert:
             self.finished_alert = False
@@ -44,9 +45,9 @@ class TrapTile(Tile.Tile):
                 self.at_full_opacity = True
         if self.at_full_opacity:
             self.frame_count += 1
-            if not self.frame_count % 4:
+            if not self.frame_count % 2:
                 if State.state.player.hp > 0:
-                    State.state.player.hp = max(self.goal_hp, State.state.player.hp - 1)
+                    State.state.player.hp = max(0, max(self.goal_hp, State.state.player.hp - 2))
             if not self.frame_count % 8:
                 if self.width == 100:
                     self.width = random.randint(90, 92)

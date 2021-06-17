@@ -1,7 +1,5 @@
-
-
 class HpEntity:
-    def __init__(self, name, pos, max_hp, hp, gold, xp, lvl, floor, meta_data=None):
+    def __init__(self, name, pos, max_hp, hp, gold, xp, lvl, floor, meta_data=None, deaths=0):
         self.name = name
         self.pos = pos
         self.max_hp = max_hp
@@ -10,6 +8,7 @@ class HpEntity:
         self.xp = xp
         self.lvl = lvl
         self.floor = floor
+        self.deaths = deaths
         self.meta_data = meta_data
 
     @property

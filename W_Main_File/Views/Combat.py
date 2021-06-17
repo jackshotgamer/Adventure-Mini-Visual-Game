@@ -16,12 +16,13 @@ class Combat(Event_Base.EventBase):
     def __init__(self, combatant: Enemy_Data.EnemyData):
         super().__init__()
         self.combatant = combatant
-        self.colour = 200
-        self.colour2 = 200
+        self.colour = State.state.player.hp / State.state.player.max_hp
+        self.colour2 = self.combatant.hp / self.combatant.max_hp
         self.truthy = False
         self.truthy2 = False
         self.key_ = False
         self.symbol2 = arcade.key.D
+        from W_Main_File.Tiles import Enemy
         from W_Main_File.Views import Exploration
         self.explore = Exploration.Explore()
         self.button_manager.append('Flee', f'Flee from {self.combatant.name}', Vector(130, 55), Vector(200, 50), text_size=16, on_click=self.flee)
@@ -53,14 +54,13 @@ class Combat(Event_Base.EventBase):
                          State.state.window.height * 0.61, (255 - int(self.colour2 * 255), int(self.colour2 * 255), 0), 20, 150, 'center', anchor_x='center', anchor_y='center')
         self.button_manager.render()
 
-
     def update(self, delta_time: float):
         self.colour = State.state.player.hp / State.state.player.max_hp
         self.colour2 = self.combatant.hp / self.combatant.max_hp
         if State.state.player.hp <= 0:
             from W_Main_File.Views import Purgatory_Screen, Fading
-            State.state.window.show_view(Fading.Fading((lambda: Purgatory_Screen.PurgatoryScreen(f'You were killed by a {self.combatant.name}')), 7, 4, should_reverse=False,
-                                                       should_freeze=True, reset_pos=Vector(0, 0), render=lambda _: self.on_draw()))
+            State.state.window.show_view(Fading.Fading((lambda: Purgatory_Screen.PurgatoryScreen(f'You were killed by a {self.combatant.name}', increment_death=True)), 7, 4, should_reverse=False,
+                                                       should_freeze=True, reset_pos=Vector(0, 0), render=lambda _: self.fading_render(_)))
             State.state.clear_current_floor_data()
             return
         if self.combatant.hp <= 0:
@@ -69,7 +69,7 @@ class Combat(Event_Base.EventBase):
                                                        should_freeze=True, render=lambda _: self.fading_render(_)))
             return
         if self.truthy:
-            State.state.player.hp -= 1
+            State.state.player.hp -= 2
         if self.truthy2:
             self.combatant.hp -= 1
         if self.symbol2 == arcade.key.D:

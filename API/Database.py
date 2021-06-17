@@ -43,10 +43,11 @@ class PlayerData(Base):
     xp = Column(Integer, nullable=False, default=0)
     lvl = Column(Integer, nullable=False, default=1)
     floor = Column(Integer, nullable=False, default=1)
+    deaths = Column(Integer, nullable=False, default=0)
 
     @classmethod
-    def new(cls, name, pw, player_x=0, player_y=0, hp=1000, max_hp=1000, gold=0, xp=0, lvl=1, floor=1):
-        return PlayerData(character_name=name, character_pw=pw, player_x=player_x, player_y=player_y, hp=hp, max_hp=max_hp, gold=gold, xp=xp, lvl=lvl, floor=floor)
+    def new(cls, name, pw, player_x=0, player_y=0, hp=1000, max_hp=1000, gold=0, xp=0, lvl=1, floor=1, deaths=0):
+        return PlayerData(character_name=name, character_pw=pw, player_x=player_x, player_y=player_y, hp=hp, max_hp=max_hp, gold=gold, xp=xp, lvl=lvl, floor=floor, deaths=deaths)
 
     def as_dict(self):
         return dict(
@@ -58,7 +59,8 @@ class PlayerData(Base):
             gold=self.gold,
             xp=self.xp,
             lvl=self.lvl,
-            floor=self.floor
+            floor=self.floor,
+            deaths=self.deaths
         )
 
 

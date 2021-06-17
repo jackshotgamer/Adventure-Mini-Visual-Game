@@ -21,7 +21,7 @@ def seed_for_vector(vector):
 
 def set_world_seed_from_player_name():
     global world_seed
-    world_seed = int(hashlib.md5(State.state.player.name.encode()).hexdigest(), 16)
+    world_seed = int(hashlib.md5(f'{State.state.player.name}{State.state.player.deaths}'.encode()).hexdigest(), 16)
 
 
 def get_floor_seed():
