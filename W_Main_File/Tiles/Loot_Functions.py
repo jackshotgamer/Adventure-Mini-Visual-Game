@@ -1,8 +1,10 @@
 from typing import Tuple
 import collections
+
+from W_Main_File.Items import All_Items
 from W_Main_File.Utilities import Vector
 from W_Main_File.Essentials import State
-from W_Main_File.Data import Tile, Sprites_
+from W_Main_File.Data import Tile, Sprites_, Item
 import arcade
 import random
 
@@ -34,18 +36,22 @@ class LootTile(Tile.Tile):
         self.opened = False
         self.weapon_sprite_pos = Vector.Vector(0, -15)
         self.waiting = 0
-        self.table = LootTable(('Broken Stick', 8), ('Rusty Knife', 8))  # , ('Iron Knife', 5), ('Iron Short-sword', 4), ('Iron Broad-sword', 1))
+        self.given_item = False
+        self.table = LootTable(('Broken_Stick', 8), ('Rusty_Knife', 8))  # , ('Iron Knife', 5), ('Iron Short-sword', 4), ('Iron Broad-sword', 1))
         self.loot_result_dict = {
-            'Broken Stick': Sprites_.stick_sprite,
-            'Rusty Knife': Sprites_.rusty_knife_sprite,
+            'Broken_Stick': Sprites_.stick_sprite,
+            'Rusty_Knife': Sprites_.rusty_knife_sprite,
         }
         self.loot_result = ''
 
     def on_render_foreground(self, center, top_left, cell_size):
+        from W_Main_File.Utilities import Inventory_GUI
+        if Inventory_GUI.is_inv():
+            return
         if State.state.player.pos == self.pos and not self.opening:
             if State.state.is_moving:
                 return
-            arcade.draw_rectangle_filled(center.x, center.y, cell_size.x * 1, cell_size.y * 0.2, (0, 0, 0, self.current_opacity))
+            arcade.draw_rectangle_filled(center.x, center.y, State.state.cell_render_size.x * 1, State.state.cell_render_size.y * 0.2, (0, 0, 0, self.current_opacity))
             if not self.looted:
                 arcade.draw_text(f'Press E to Loot!', State.state.screen_center.x, State.state.screen_center.y, (255, 69, 0, 220),
                                  12, anchor_x='center', anchor_y='center')
@@ -53,15 +59,18 @@ class LootTile(Tile.Tile):
                 arcade.draw_text(f'Looted.', State.state.screen_center.x, State.state.screen_center.y, (255, 0, 0, 220),
                                  12, anchor_x='center', anchor_y='center')
         elif State.state.player.pos == self.pos and self.opening:
-            arcade.draw_rectangle_filled(State.state.screen_center.x, State.state.screen_center.y - (State.state.cell_size.y * 1.5), 300, 200, (0, 0, 0, self.alpha))
+            arcade.draw_rectangle_filled(State.state.screen_center.x, State.state.screen_center.y - (State.state.cell_render_size.y * 1.5),
+                                         (State.state.window.width * 0.3), (State.state.window.height * 0.25), (0, 0, 0, self.alpha))
             if self.alpha < 255:
-                arcade.draw_texture_rectangle(State.state.screen_center.x, (State.state.screen_center.y - (State.state.cell_size.y * 2)), 100, 100, Sprites_.CHEST_OPENING_FRAMES[0], alpha=self.alpha)
+                arcade.draw_texture_rectangle(State.state.screen_center.x, (State.state.screen_center.y - (State.state.cell_render_size.y * 2)),
+                                              (State.state.window.width * 0.1), (State.state.window.height * 0.125), Sprites_.CHEST_OPENING_FRAMES[0], alpha=self.alpha)
             if self.alpha == 255:
-                arcade.draw_texture_rectangle(State.state.screen_center.x, (State.state.screen_center.y - (State.state.cell_size.y * 2)), 100, 100, Sprites_.CHEST_OPENING_FRAMES[self.frame_step])
+                arcade.draw_texture_rectangle(State.state.screen_center.x, (State.state.screen_center.y - (State.state.cell_render_size.y * 2)),
+                                              (State.state.window.width * 0.1), (State.state.window.height * 0.125), Sprites_.CHEST_OPENING_FRAMES[self.frame_step])
                 if self.opened:
-                    chest_body = Vector.Vector(State.state.screen_center.x, (State.state.screen_center.y - (State.state.cell_size.y * 2)))
-                    arcade.draw_texture_rectangle(chest_body.x, chest_body.y + self.weapon_sprite_pos.y, 50, 50, self.loot_result_dict[self.loot_result])
-                    arcade.draw_texture_rectangle(chest_body.x, chest_body.y, 100, 100, Sprites_.chest_body_sprite)
+                    chest_body = Vector.Vector(State.state.screen_center.x, (State.state.screen_center.y - (State.state.cell_render_size.y * 2)))
+                    arcade.draw_texture_rectangle(chest_body.x, chest_body.y + self.weapon_sprite_pos.y, (State.state.window.width * 0.05), (State.state.window.height * 0.0625), self.loot_result_dict[self.loot_result])
+                    arcade.draw_texture_rectangle(chest_body.x, chest_body.y, (State.state.window.width * 0.1), (State.state.window.height * 0.125), Sprites_.chest_body_sprite)
 
     def can_player_move(self):
         if self.true == self.true:
@@ -69,7 +78,19 @@ class LootTile(Tile.Tile):
         else:
             print('WHAT\nWARNING: Computer have become sentient, this is not a drill, i repeat, this is not a drill!')
 
+    def get_item_from_loot_result(self):
+        dict_ = {
+            'Rusty_Knife': All_Items.rusty_knife,
+            'Nullifier': All_Items.null_weapon_1,
+            'Disannull': All_Items.null_weapon_2
+        }
+        if not self.loot_result == 'Broken_Stick':
+            return dict_[self.loot_result]
+
     def on_update(self, delta_time):
+        from W_Main_File.Utilities import Inventory_GUI
+        if Inventory_GUI.is_inv():
+            return
         self.current_opacity = min(200, self.current_opacity + 4)
         if self.opening:
             self.alpha = min(255, self.alpha + 2)
@@ -85,6 +106,13 @@ class LootTile(Tile.Tile):
             if self.opened and self.weapon_sprite_pos.y < 100:
                 self.weapon_sprite_pos += 0, 1
             elif self.opened and self.weapon_sprite_pos.y >= 100:
+                if not self.given_item:
+                    if self.loot_result == 'Broken_Stick':
+                        self.given_item = True
+                        return
+                    item_to_add = self.get_item_from_loot_result()
+                    State.state.inventory.add_item(item_to_add)
+                    self.given_item = True
                 self.waiting += 1
                 if self.waiting >= 60:
                     self.opening = False
@@ -102,6 +130,9 @@ class LootTile(Tile.Tile):
 
     def key_up(self, keycode, mods):
         if self.opening:
+            return
+        from W_Main_File.Utilities import Inventory_GUI
+        if Inventory_GUI.is_inv():
             return
         if keycode == arcade.key.E and not self.looted:
             self.opening = True

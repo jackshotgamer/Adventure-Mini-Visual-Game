@@ -1,25 +1,37 @@
-from functools import partial
-
-import arcade
+import typing
 # noinspection PyUnresolvedReferences
 from arcade.gui import UIFlatButton, UIManager
 
-from W_Main_File.Utilities import Action_Queue, Floor_Data_Saving
+from W_Main_File.Utilities import Action_Queue, Floor_Data_Saving, Inventory_GUI
 from W_Main_File.Essentials import State
-from W_Main_File.Utilities import Vector, Seeding
-from W_Main_File.Views import Player_Select, Exploration, Fading, Log_Out, Event_Base
+from W_Main_File.Utilities import Vector
+from W_Main_File.Views import Exploration, Fading, Log_Out
+
+if typing.TYPE_CHECKING:
+    from W_Main_File.Essentials import Button_Sprite_Manager
 
 
-def register_custom_exploration_buttons(button_manager, ui_manager):
-    button_manager.append('Home', 'Go Home', Vector.Vector(State.state.screen_center.x + 250 + State.state.cell_size.x, (State.state.screen_center.y + 50) + (State.state.cell_size.y - 24)),
-                          Vector.Vector(200, 50), on_click=go_home_button)
+def register_custom_exploration_buttons(button_manager: 'Button_Sprite_Manager.ButtonManager', ui_manager):
+    button_manager.clear_all(True)
     button_manager.append('Log Out', 'Log Out',
-                          Vector.Vector(State.state.screen_center.x + 250 + State.state.cell_size.x, (State.state.screen_center.y + 150) + (State.state.cell_size.y - 24)),
-                          Vector.Vector(200, 50), on_click=lambda: log_out_button(True, ui_manager))
+                          Vector.Vector(State.state.screen_center.x + (State.state.window.width * 0.25) + State.state.cell_render_size.x,
+                                        (State.state.screen_center.y + (State.state.window.height * 0.1875)) + (State.state.cell_render_size.y - (State.state.window.height * 0.03))),
+                          Vector.Vector((State.state.window.width * 0.2), (State.state.window.height * 0.0625)), on_click=lambda: log_out_button(True, ui_manager))
+    button_manager.append('Home', 'Go Home',
+                          Vector.Vector(State.state.screen_center.x + (State.state.window.width * 0.25) + State.state.cell_render_size.x,
+                                        (State.state.screen_center.y + (State.state.window.height * 0.0625))
+                                        + (State.state.cell_render_size.y - (State.state.window.height * 0.03))),
+                          Vector.Vector((State.state.window.width * 0.2), (State.state.window.height * 0.0625)), on_click=go_home_button)
+
     if not State.state.player.meta_data.is_guest:
         button_manager.append('Save Data', 'Save Data',
-                              Vector.Vector(State.state.screen_center.x + 250 + State.state.cell_size.x, (State.state.screen_center.y - 50) + (State.state.cell_size.y - 24)),
-                              Vector.Vector(200, 50), on_click=save_button)
+                              Vector.Vector(State.state.screen_center.x + (State.state.window.width * 0.25) + State.state.cell_render_size.x,
+                                            (State.state.screen_center.y - (State.state.window.height * 0.0625)) + (State.state.cell_render_size.y - (State.state.window.height * 0.03))),
+                              Vector.Vector((State.state.window.width * 0.2), (State.state.window.height * 0.0625)), on_click=save_button)
+    button_manager.append('Inventory', 'Open Inventory',
+                          Vector.Vector(State.state.screen_center.x + (State.state.window.width * 0.25) + State.state.cell_render_size.x,
+                                        (State.state.screen_center.y - (State.state.window.height * 0.1875)) + (State.state.cell_render_size.y - (State.state.window.height * 0.03))),
+                          Vector.Vector((State.state.window.width * 0.2), (State.state.window.height * 0.0625)), on_click=toggle_inv)
 
 
 def invalidate_floor_data():
@@ -64,6 +76,15 @@ def save_button():
         lambda: State.state.window.show_view(
             Saving.Saving(
                 Exploration.Explore)))
+
+
+def toggle_inv():
+    if Inventory_GUI.is_inv():
+        Inventory_GUI.hide_inv()
+    else:
+        if State.state.preoccupied:
+            return
+        Inventory_GUI.show_inv()
 
 
 def confirm_funct(ui_manager: UIManager):

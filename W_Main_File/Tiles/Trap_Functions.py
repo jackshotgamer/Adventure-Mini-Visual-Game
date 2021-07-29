@@ -20,6 +20,9 @@ class TrapTile(Tile.Tile):
         if State.state.player.pos == self.pos and self.playing_alert:
             if State.state.is_moving:
                 return
+            from W_Main_File.Utilities import Inventory_GUI
+            if Inventory_GUI.is_inv():
+                return
             arcade.draw_texture_rectangle(center.x, (center.y + 100), self.width, self.height, Sprites_.trap_alert, alpha=self.alpha)
 
     def on_enter(self):
@@ -31,6 +34,9 @@ class TrapTile(Tile.Tile):
         print(self.goal_hp)
 
     def on_update(self, delta_time):
+        from W_Main_File.Utilities import Inventory_GUI
+        if Inventory_GUI.is_inv():
+            return
         if self.goal_hp is None:
             return
         if self.finished_alert:

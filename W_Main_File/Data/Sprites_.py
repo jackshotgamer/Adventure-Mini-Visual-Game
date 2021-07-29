@@ -18,7 +18,7 @@ blank_button_dark = load_texture(Path('Sprites') / 'Button_Square_(No Decor)_0Da
 blank_button_light = load_texture(Path('Sprites') / 'Button_Square_(No Decor)_1Light.png')
 blank_button_light_middle = load_texture(Path('Sprites') / 'Button_Square_(No Decor)_2LightMiddle.png')
 knight_start = load_texture(Path('Sprites') / 'Knight_Sprite_0_Start.png')
-knight_start_2 = load_texture(Path('Sprites') / 'Knight_Sprite_0_Start_2.png')
+knight_start_2 = load_texture(Path('Sprites') / 'Knight_Sprite_0_Start_2_Foot.png')
 knight_start_flipped = load_texture(Path('Sprites') / 'Knight_Sprite_0_Start_Flipped.png')
 # temp_4 = load_texture(Path('Sprites') / '.png')
 # temp_5 = load_texture(Path('Sprites') / '.png')
@@ -74,9 +74,9 @@ BACKGROUND_FRAMES = [
 ]
 
 CHARACTER_FRAMES = [
-    load_texture(Path('Sprites') / 'Knight_Sprite_1.png'),
-    load_texture(Path('Sprites') / 'Knight_Sprite_2.png'),
-    load_texture(Path('Sprites') / 'Knight_Sprite_3.png')
+    load_texture(Path('Sprites') / 'Knight_Sprite_1_2.png'),
+    load_texture(Path('Sprites') / 'Knight_Sprite_2_2.png'),
+    # load_texture(Path('Sprites') / 'Knight_Sprite_3.png')
 ]
 
 FLIPPED_CHARACTER_FRAMES = [
@@ -124,7 +124,7 @@ def update_character():
 
 def draw_backdrop():
     import arcade
-    arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y, 1000, 800, BACKGROUND_FRAMES[current_backdrop_frame])
+    arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y, State.state.window.width, State.state.window.height, BACKGROUND_FRAMES[current_backdrop_frame])
 
 
 def draw_character():
@@ -134,5 +134,6 @@ def draw_character():
         frames = CHARACTER_FRAMES[current_character_frame]
     else:
         frames = FLIPPED_CHARACTER_FRAMES[current_character_frame]
-    arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y, 75, 75,
+    arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y - 1,
+                                  State.state.cell_render_size.y * 0.75, State.state.cell_render_size.y * 0.75,
                                   frames)

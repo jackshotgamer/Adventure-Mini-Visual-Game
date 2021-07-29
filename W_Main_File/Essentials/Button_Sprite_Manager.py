@@ -61,6 +61,12 @@ class ButtonManager:
         if id_ in self.buttons:
             del self.buttons[id_]
 
+    def clear_all(self, confirm):
+        if confirm:
+            self.buttons.clear()
+        else:
+            return
+
     def on_click_check(self, x, y):
         self.check_hovered(x, y)
         for id_ in self.hover_buttons:

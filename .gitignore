@@ -2,6 +2,8 @@ venv/
 .idea/
 __pycache__/
 Player_Saves.sqlite
+Weapon_Templates.py
 Interactable_Tiles/
 Character_Data_Files/
-To_ Do_List.md
+Inventory_Contents/
+To_Do_List.md

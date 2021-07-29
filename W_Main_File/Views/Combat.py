@@ -25,7 +25,9 @@ class Combat(Event_Base.EventBase):
         from W_Main_File.Tiles import Enemy
         from W_Main_File.Views import Exploration
         self.explore = Exploration.Explore()
-        self.button_manager.append('Flee', f'Flee from {self.combatant.name}', Vector(130, 55), Vector(200, 50), text_size=16, on_click=self.flee)
+        screen_percentage_of_default = (State.state.window.height / State.state.default_window_size.y)
+        self.button_manager.append('Flee', f'Flee from {self.combatant.name}', Vector((State.state.window.width * 0.13), (State.state.window.height * 0.06875)),
+                                   Vector((State.state.window.width * 0.2), (State.state.window.height * 0.0625)), text_size=(16 * screen_percentage_of_default), on_click=self.flee)
 
     def on_draw(self):
         arcade.set_background_color((18, 18, 18))
@@ -54,19 +56,23 @@ class Combat(Event_Base.EventBase):
                          State.state.window.height * 0.61, (255 - int(self.colour2 * 255), int(self.colour2 * 255), 0), 20, 150, 'center', anchor_x='center', anchor_y='center')
         self.button_manager.render()
 
+    def change_background_colour(self):
+        arcade.set_background_color((0, 0, 0))
+        self.truthy = self.truthy
+
     def update(self, delta_time: float):
         self.colour = State.state.player.hp / State.state.player.max_hp
         self.colour2 = self.combatant.hp / self.combatant.max_hp
         if State.state.player.hp <= 0:
             from W_Main_File.Views import Purgatory_Screen, Fading
             State.state.window.show_view(Fading.Fading((lambda: Purgatory_Screen.PurgatoryScreen(f'You were killed by a {self.combatant.name}', increment_death=True)), 7, 4, should_reverse=False,
-                                                       should_freeze=True, reset_pos=Vector(0, 0), render=lambda _: self.fading_render(_)))
+                                                       should_freeze=True, reset_pos=Vector(0, 0), halfway_func=self.change_background_colour, render=lambda _: self.fading_render(_)))
             State.state.clear_current_floor_data()
             return
         if self.combatant.hp <= 0:
             from W_Main_File.Views import Fading
             State.state.window.show_view(Fading.Fading(lambda: self.explore, 7, 4, should_reverse=True,
-                                                       should_freeze=True, render=lambda _: self.fading_render(_)))
+                                                       should_freeze=True, halfway_func=self.change_background_colour, render=lambda _: self.fading_render(_)))
             return
         if self.truthy:
             State.state.player.hp -= 2
@@ -106,5 +112,5 @@ class Combat(Event_Base.EventBase):
         else:
             State.state.player.hp -= int(State.state.player.max_hp * 0.25)
         State.state.window.show_view(Fading.Fading(lambda: self.explore, 7, 4, should_reverse=True,
-                                                   should_freeze=True, render=lambda _: self.fading_render(_)))
+                                                   should_freeze=True, halfway_func=self.change_background_colour, render=lambda _: self.fading_render(_)))
         return

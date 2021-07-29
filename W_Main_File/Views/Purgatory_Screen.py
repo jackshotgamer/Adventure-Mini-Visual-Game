@@ -87,19 +87,12 @@ class ResetCharacterView(Event_Base.EventBase):
 class PurgatoryScreen(Event_Base.EventBase):
     def __init__(self, message, increment_death=False):
         super().__init__()
+        arcade.set_background_color((0, 0, 0))
         State.state.player.hp = State.state.player.max_hp
         self.message = message
         self.ui_manager = gui.UIManager()
-        self.ui_manager.purge_ui_elements()
-        self.button_manager.append('Play', 'Play game', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y + 75), Vector.Vector(250, 50),
-                                   on_click=partial(play_button, self.ui_manager))
-        self.button_manager.append('Log Out', 'Log Out', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y - 150),
-                                   Vector.Vector(200, 50), on_click=lambda: log_out_buttons(True, message, self.ui_manager))
-        if not State.state.player.meta_data.is_guest:
-            self.button_manager.append('Save', 'Save Character', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y - 75), Vector.Vector(200, 50),
-                                       on_click=partial(saving_button, self.ui_manager, message))
-            self.button_manager.append('Reset Character', 'Reset all Stats', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y), Vector.Vector(250, 50),
-                                       on_click=partial(reset_character_button, self.ui_manager, message))
+        self.current_window_size = Vector.Vector(State.state.window.width, State.state.window.height)
+        self.buttons()
         if increment_death:
             State.state.player.deaths += 1
             from W_Main_File.Utilities import Seeding
@@ -114,6 +107,26 @@ class PurgatoryScreen(Event_Base.EventBase):
         if Action_Queue.action_queue:
             action = Action_Queue.action_queue.popleft()
             action()
+        self.check_if_resized()
+
+    def buttons(self):
+        self.ui_manager.purge_ui_elements()
+        self.button_manager.append('Play', 'Play game', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y + 75), Vector.Vector(250, 50),
+                                   on_click=partial(play_button, self.ui_manager))
+        self.button_manager.append('Log Out', 'Log Out', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y - 150),
+                                   Vector.Vector(200, 50), on_click=lambda: log_out_buttons(True, self.message, self.ui_manager))
+        if not State.state.player.meta_data.is_guest:
+            self.button_manager.append('Save', 'Save Character', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y - 75), Vector.Vector(200, 50),
+                                       on_click=partial(saving_button, self.ui_manager, self.message))
+            self.button_manager.append('Reset Character', 'Reset all Stats', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y), Vector.Vector(250, 50),
+                                       on_click=partial(reset_character_button, self.ui_manager, self.message))
+
+    def check_if_resized(self):
+        if self.current_window_size.x == State.state.window.width and self.current_window_size.y == State.state.window.height:
+            return
+        else:
+            self.buttons()
+            self.current_window_size = Vector.Vector(State.state.window.width, State.state.window.height)
 
 
 def log_out_buttons(show_confirm_screen, message, ui_manager):

@@ -4,6 +4,7 @@ import random
 from typing import List, Dict, Any, Union, Type
 
 from W_Main_File.Data import HpEntity, Grid, Sprites_, Meta_Data
+from W_Main_File.Items import Inventory
 from W_Main_File.Utilities import Vector, Seeding
 
 
@@ -16,8 +17,10 @@ class State:
         self.grid = Grid.Grid()
         self.cell_size = Vector.Vector(100, 100)
         self.render_radius = 2
+        self.default_window_size = Vector.Vector(1000, 800)
         self.pw = ''
         self.texture_mapping = {}
+        self.inventory = Inventory.InventoryContainer()
         self.is_new_tile = False
         self.is_moving = False
         self.moves_since_texture_save = 0
@@ -45,6 +48,10 @@ class State:
     @property
     def screen_center(self):
         return Vector.Vector(self.window.width / 2, self.window.height / 2)
+
+    @property
+    def cell_render_size(self):
+        return self.cell_size * ((self.window.width / self.default_window_size.x), (self.window.height / self.default_window_size.y))
 
     @staticmethod
     def generate_radius(radius):

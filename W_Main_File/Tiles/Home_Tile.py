@@ -14,10 +14,13 @@ class HomeTile(Tile.Tile):
 
     def on_render(self, center, top_left, cell_size):
         arcade.draw_rectangle_outline(center.x, center.y, State.state.cell_size.x - 2, State.state.cell_size.y - 2, arcade.color.BRONZE)
-        arcade.draw_texture_rectangle(center.x, center.y, 97, 97, Sprites_.home_sprite)
+        arcade.draw_texture_rectangle(center.x, center.y, State.state.window.width * 0.097, State.state.window.height * 0.12125, Sprites_.home_sprite)
 
     def on_render_foreground(self, center, top_left, cell_size):
         if State.state.player.pos == self.pos:
+            from W_Main_File.Utilities import Inventory_GUI
+            if Inventory_GUI.is_inv():
+                return
             if State.state.player.hp < State.state.player.max_hp:
                 if State.state.is_moving:
                     return
@@ -35,7 +38,6 @@ class HomeTile(Tile.Tile):
                 arcade.draw_text(f'You are at full health!\nCome back when you\'re a little..\n mmmmm.. hurt.', center.x, center.y, (255, 215, 0, 220),
                                  12, anchor_x='center', anchor_y='center', align='center')
 
-
     def on_update(self, delta_time):
         self.current_opacity = min(200, self.current_opacity + 4)
 
@@ -43,6 +45,9 @@ class HomeTile(Tile.Tile):
         self.current_opacity = 0
 
     def key_down(self, keycode, mods):
+        from W_Main_File.Utilities import Inventory_GUI
+        if Inventory_GUI.is_inv():
+            return
         if State.state.player.hp < State.state.player.max_hp:
             if keycode == arcade.key.E:
                 if State.state.player.gold >= self.heal_cost:

@@ -16,6 +16,8 @@ class Explore(Event_Base.EventBase):
     fps = 0
     last_update = 0
     symbol_ = arcade.key.D
+    previous_pos = Vector(0, 0)
+    current_window_size = Vector(1000, 800)
 
     def __init__(self):
         super().__init__()
@@ -46,11 +48,13 @@ class Explore(Event_Base.EventBase):
             action()
         if self.should_transition_to_animation[0]:
             from W_Main_File.Views.Movement_Animator import MovementAnimator
-            State.state.window.show_view(MovementAnimator(self.should_transition_to_animation[1], self.should_transition_to_animation[2], 14))
+            State.state.window.show_view(MovementAnimator(self.should_transition_to_animation[1],
+                                                          self.should_transition_to_animation[2], 14 if (State.state.window.width, State.state.window.height) == (1000, 800) else 14))
             self.should_transition_to_animation[0] = False
             self.should_transition_to_animation[3]()
         else:
             Sprites_.update_backdrop()
+            self.check_if_resized()
             if Explore.last_update == 0 or time.time() - Explore.last_update > 0.5:
                 Explore.fps = 1 / delta_time
                 Explore.last_update = time.time()
@@ -60,6 +64,13 @@ class Explore(Event_Base.EventBase):
 
                 if tile := State.state.grid.get(*real_grid_pos):
                     tile.on_update(delta_time)
+
+    def check_if_resized(self):
+        if self.current_window_size.x == State.state.window.width and self.current_window_size.y == State.state.window.height:
+            return
+        else:
+            Button_Functions.register_custom_exploration_buttons(self.button_manager, self.ui_manager)
+            self.current_window_size = Vector(State.state.window.width, State.state.window.height)
 
     key_offset = {
         key.W: (0, 1),
@@ -72,49 +83,59 @@ class Explore(Event_Base.EventBase):
         arcade.start_render()
         center_screen = State.state.screen_center
         render_queue = []
+        cell_render_size = (State.state.cell_size * ((State.state.window.width / State.state.default_window_size.x), (State.state.window.height / State.state.default_window_size.y)))
         for x_off, y_off in State.state.generate_radius(State.state.render_radius):
             real_grid_pos = State.state.player.pos + (x_off, y_off)
-            render_pos = Vector(center_screen.x + x_off * State.state.cell_size.x, center_screen.y + y_off * State.state.cell_size.y)
-            arcade.draw_texture_rectangle(render_pos.x, render_pos.y, 100, 100, State.state.tile_type_pos(*real_grid_pos))
+            render_pos = Vector(center_screen.x + x_off * cell_render_size.x, center_screen.y + y_off * cell_render_size.y)
+            arcade.draw_texture_rectangle(render_pos.x, render_pos.y, cell_render_size.x, cell_render_size.y, State.state.tile_type_pos(*real_grid_pos))
 
         for x_off, y_off in State.state.generate_radius(State.state.render_radius):
             real_grid_pos = State.state.player.pos + (x_off, y_off)
-            render_pos = Vector(center_screen.x + x_off * State.state.cell_size.x, center_screen.y + y_off * State.state.cell_size.y)
+            render_pos = Vector(center_screen.x + x_off * cell_render_size.x, center_screen.y + y_off * cell_render_size.y)
 
             if tile := State.state.grid.get(*real_grid_pos):
-                render_queue.append((tile, render_pos, render_pos + (-(State.state.cell_size.x / 2), State.state.cell_size.y / 2), State.state.cell_size))
+                render_queue.append((tile, render_pos, render_pos + (-(cell_render_size.x / 2), cell_render_size.y / 2), cell_render_size))
             else:
-                arcade.draw_rectangle_outline(render_pos.x, render_pos.y, State.state.cell_size.x - 2, State.state.cell_size.y - 2, (120, 120, 120))
+                arcade.draw_rectangle_outline(render_pos.x, render_pos.y, cell_render_size.x, cell_render_size.y, (120, 120, 120))
 
         for tile, *args in render_queue:
             tile.on_render(*args)
 
-        arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y, 99, 99, Sprites_.black_circle_sprite, 0, 75)
-        arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y, 99, 99, Sprites_.black_circle_square_sprite, 0, 100)
-        arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y, 99, 99, Sprites_.black_square_circle_square_sprite, 0, 125)
+        arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y,
+                                      State.state.cell_render_size.x * 0.95, State.state.cell_render_size.y * 0.95, Sprites_.black_circle_sprite, 0, 75)
+        arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y,
+                                      State.state.cell_render_size.x * 0.95, State.state.cell_render_size.y * 0.95, Sprites_.black_circle_square_sprite, 0, 100)
+        arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y,
+                                      State.state.cell_render_size.x * 0.95, State.state.cell_render_size.y * 0.95, Sprites_.black_square_circle_square_sprite, 0, 125)
 
-        arcade.draw_rectangle_filled(center_screen.x, center_screen.y - 270, 500, 38, (0, 0, 0))
+        arcade.draw_rectangle_filled(center_screen.x, center_screen.y - (State.state.window.height * 0.3375), State.state.window.width * 0.625, State.state.window.height * 0.0475, (0, 0, 0))
         # arcade.draw_circle_filled(center_screen.x, center_screen.y, 25, arcade.color.AERO_BLUE)
-        arcade.draw_rectangle_outline(center_screen.x, center_screen.y, 500, 500, arcade.color.DARK_GRAY, 2)
-        arcade.draw_text(f'Name: {State.state.player.name}', center_screen.x - 225, center_screen.y - 270, arcade.color.LIGHT_GRAY,
-                         font_size=11, font_name='arial')
-        arcade.draw_text(f'Hp: {int(State.state.player.hp)} / {int(State.state.player.max_hp)}', center_screen.x - 25, center_screen.y - 270, arcade.color.LIGHT_GRAY,
-                         font_size=11, font_name='arial')
-        arcade.draw_text(f'Level: {int(State.state.player.lvl)}', center_screen.x + 170, center_screen.y - 270, arcade.color.LIGHT_GRAY,
-                         font_size=11, font_name='arial')
-        arcade.draw_text(f'Gold: {int(State.state.player.gold)}', center_screen.x - 145, center_screen.y + 250, arcade.color.LIGHT_GRAY,
-                         font_size=14, font_name='arial')
-        arcade.draw_text(f'xp: {int(State.state.player.xp)}', center_screen.x + 65, center_screen.y + 250, arcade.color.LIGHT_GRAY,
-                         font_size=14, font_name='arial')
-        arcade.draw_text(f'Floor: {int(State.state.player.floor)}', center_screen.x, center_screen.y - (State.state.cell_size.y * .37), arcade.color.LIGHT_GRAY,
-                         font_name='arial', font_size=12, anchor_x='center', anchor_y='center')
-        arcade.draw_text(str(State.state.player.pos.tuple()), center_screen.x, center_screen.y + (State.state.cell_size.y * .37), arcade.color.LIGHT_GRAY,
-                         font_name='arial', font_size=12, anchor_x='center', anchor_y='center')
+        arcade.draw_rectangle_outline(center_screen.x, center_screen.y, State.state.window.width * 0.5, State.state.window.height * 0.625, (120, 120, 120), 4)
+        screen_percentage_of_default = (State.state.window.height / State.state.default_window_size.y)
+        arcade.draw_text(f'Name: {State.state.player.name}', State.state.window.width * 0.275, State.state.window.height * 0.1625, arcade.color.LIGHT_GRAY,
+                         font_size=(11 * screen_percentage_of_default), font_name='arial')
+        arcade.draw_text(f'Hp: {int(State.state.player.hp)} / {int(State.state.player.max_hp)}', State.state.window.width * 0.475, State.state.window.height * 0.1625, arcade.color.LIGHT_GRAY,
+                         font_size=(11 * screen_percentage_of_default), font_name='arial')
+        arcade.draw_text(f'Level: {int(State.state.player.lvl)}', State.state.window.width * 0.67, State.state.window.height * 0.1625, arcade.color.LIGHT_GRAY,
+                         font_size=(11 * screen_percentage_of_default), font_name='arial')
+        arcade.draw_text(f'Gold: {int(State.state.player.gold)}', State.state.window.width * 0.355, State.state.window.height * 0.8125, arcade.color.LIGHT_GRAY,
+                         font_size=(14 * screen_percentage_of_default), font_name='arial')
+        arcade.draw_text(f'xp: {int(State.state.player.xp)}', State.state.window.width * 0.565, State.state.window.height * 0.8125, arcade.color.LIGHT_GRAY,
+                         font_size=(14 * screen_percentage_of_default), font_name='arial')
+        arcade.draw_text(f'Floor: {int(State.state.player.floor)}', State.state.window.width * 0.5, (State.state.window.height * 0.5) - (cell_render_size.y * .37), arcade.color.LIGHT_GRAY,
+                         font_name='arial', font_size=(12 * screen_percentage_of_default), anchor_x='center', anchor_y='center')
+        arcade.draw_text(str(State.state.player.pos.tuple()), State.state.window.width * 0.5, (State.state.window.height * 0.5) + (cell_render_size.y * .37), arcade.color.LIGHT_GRAY,
+                         font_name='arial', font_size=(12 * screen_percentage_of_default), anchor_x='center', anchor_y='center')
         Sprites_.draw_backdrop()
+
         if Explore.symbol_ == arcade.key.D:
-            arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y, 75, 75, Sprites_.knight_start)
+            arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y,
+                                          State.state.cell_render_size.y * 0.75, State.state.cell_render_size.y * 0.75, Sprites_.knight_start_2)
         elif Explore.symbol_ == arcade.key.A:
-            arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y, 75, 75, Sprites_.knight_start_flipped)
+            arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y,
+                                          State.state.cell_render_size.y * 0.75, State.state.cell_render_size.y * 0.75, Sprites_.knight_start_flipped)
+        from W_Main_File.Utilities import Inventory_GUI
+        Inventory_GUI.render_inventory()
         arcade.draw_text(f'FPS = {self.fps:.1f}', 2, self.window.height - 22, arcade.color.GREEN,
                          font_name='arial', font_size=14)
         for tile, *args in render_queue:
@@ -125,6 +146,12 @@ class Explore(Event_Base.EventBase):
         if tile := State.state.grid.get(*State.state.player.pos):
             tile.key_up(symbol, mods)
 
+    def on_mouse_press(self, x: float, y: float, button: int, modifiers: int):
+        thing_to_do = (State.state.grid.get(*State.state.player.pos, default="EmptyTile"))
+        thing_to_do_2 = (State.state.grid.get(*self.previous_pos, default="EmptyTile"))
+        print(f'Current tile: {thing_to_do.__class__.__name__ if not thing_to_do.__class__.__name__ == "str" else "EmptyTile"}'
+              f'\nPrevious tile: {thing_to_do_2.__class__.__name__ if not thing_to_do_2.__class__.__name__ == "str" else "EmptyTile"}\n')
+
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol == arcade.key.B:
             State.state.player.hp -= State.state.player.max_hp
@@ -133,6 +160,7 @@ class Explore(Event_Base.EventBase):
                 self.__class__.symbol_ = symbol
             if State.state.preoccupied:
                 return
+            self.__class__.previous_pos = State.state.player.pos
             State.state.moves_since_texture_save += 1
             offset = Vector(*self.key_offset[symbol])
             prior_player_pos = State.state.player.pos
@@ -186,5 +214,3 @@ class Explore(Event_Base.EventBase):
         else:
             if tile := State.state.grid.get(*State.state.player.pos):
                 tile.key_down(symbol, modifiers)
-        current_grid = State.state.grid.get(*State.state.player.pos)
-        print(current_grid.__class__, current_grid.__dict__ if current_grid is not None else '')

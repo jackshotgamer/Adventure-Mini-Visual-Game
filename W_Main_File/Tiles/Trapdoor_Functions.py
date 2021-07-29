@@ -20,7 +20,11 @@ class TrapdoorTile(Tile.Tile):
     current_opacity = 0
 
     def key_up(self, keycode, mods):
+
         if keycode == arcade.key.E and not State.state.preoccupied:
+            from W_Main_File.Utilities import Inventory_GUI
+            if Inventory_GUI.is_inv():
+                return
             State.state.preoccupied = True
             explore = Exploration.Explore()
             Action_Queue.action_queue.append(
@@ -52,6 +56,9 @@ class TrapdoorTile(Tile.Tile):
         return fade_to_explore
 
     def on_render_foreground(self, center, top_left, cell_size):
+        from W_Main_File.Utilities import Inventory_GUI
+        if Inventory_GUI.is_inv():
+            return
         if State.state.player.pos == self.pos:
             if State.state.is_moving:
                 return

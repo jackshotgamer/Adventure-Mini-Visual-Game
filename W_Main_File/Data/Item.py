@@ -1,8 +1,9 @@
+import abc
+import random
 from enum import Enum, IntFlag, auto
-import abc, random
+from typing import Union
 
 from W_Main_File.Data import HpEntity
-from W_Main_File.Essentials import State
 
 
 class ItemType(Enum):
@@ -16,11 +17,14 @@ class DamageType(IntFlag):
     Blunt = auto()
     Piercing = auto()
     Cutting = auto()
-
+    Spectral = auto()
+    Null = auto()
     Water_Elemental = auto()
     Earth_Elemental = auto()
     Fire_Elemental = auto()
     Air_Elemental = auto()
+    Void_Elemental = auto()
+
 
     Any_Elemental = Water_Elemental | Earth_Elemental | Fire_Elemental | Air_Elemental
     Any_Basic = Blunt | Piercing | Cutting
@@ -43,7 +47,7 @@ class Item:
 
 
 class Weapon(Item, metaclass=abc.ABCMeta):
-    def __init__(self, name, id_, min_attack, max_attack, speed, damage_type: DamageType, has_special_move: bool):
+    def __init__(self, name, id_, min_attack, max_attack, speed, damage_type: Union[int, DamageType], has_special_move: bool):
         super().__init__(name, id_, ItemType.Weapon)
         self.min_attack = min_attack
         self.max_attack = max_attack

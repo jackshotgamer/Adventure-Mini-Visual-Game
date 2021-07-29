@@ -8,7 +8,6 @@ import arcade
 import random
 
 
-
 class EnemyTile(Tile.Tile):
 
     def __init__(self, pos):
@@ -40,6 +39,9 @@ class EnemyTile(Tile.Tile):
         if State.state.player.pos == self.pos:
             if State.state.is_moving:
                 return
+            from W_Main_File.Utilities import Inventory_GUI
+            if Inventory_GUI.is_inv():
+                return
             if self.fought:
                 if len(self.combat.combatant.name) < 7:
                     arcade.draw_rectangle_filled(center.x, center.y * 1.018, cell_size.x * 2.1, cell_size.y * 0.2, (0, 0, 0, self.current_opacity))
@@ -61,7 +63,24 @@ class EnemyTile(Tile.Tile):
     def on_update(self, delta_time):
         if State.state.is_moving:
             return
+        from W_Main_File.Utilities import Inventory_GUI
+        if Inventory_GUI.is_inv():
+            return
         self.current_opacity = min(200, self.current_opacity + 4)
         if not self.called_on_enter:
             self.on_enter()
             self.called_on_enter = True
+
+    def persistent_data(self):
+        return {
+            'pos': self.pos,
+            'fought': self.fought,
+            'combat': self.combat
+        }
+
+    @classmethod
+    def load_from_data(cls, persistent_data):
+        tile = EnemyTile(persistent_data['pos'])
+        tile.fought = persistent_data['fought']
+        tile.combat = persistent_data['combat']
+        return tile

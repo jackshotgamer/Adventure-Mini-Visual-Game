@@ -3,7 +3,7 @@ from arcade import gui
 from urllib.parse import quote
 
 from W_Main_File.Essentials import State, Button_Sprite_Manager
-from W_Main_File.Utilities import Vector, Seeding, Floor_Data_Saving
+from W_Main_File.Utilities import Vector, Seeding, Floor_Data_Saving, Button_Functions
 import requests
 import time
 import sys
@@ -14,18 +14,14 @@ from . import Event_Base
 class PlayerSelect(Event_Base.EventBase):
     def __init__(self):
         super().__init__()
+        arcade.set_background_color((0, 0, 0))
         self.ui_manager = gui.UIManager()
         self.ui_manager.purge_ui_elements()
-        self.username = gui.UIInputBox(State.state.screen_center.x, State.state.screen_center.y + 100, 300, 50)
-        self.username.text_adapter = LimitText()
-        self.password = gui.UIInputBox(State.state.screen_center.x, State.state.screen_center.y + 50, 300, 50)
-        self.password.text_adapter = LimitText()
-        self.ui_manager.add_ui_element(self.username)
-        self.ui_manager.add_ui_element(self.password)
+        self.username = None
+        self.password = None
+        self.current_window_size = Vector.Vector(1000, 800)
         self.incorrect_password_end = 0
-        self.button_manager.append('Guest', 'Login as Guest', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y + 150), Vector.Vector(250, 50), on_click=self.guest_button)
-        self.button_manager.append('Enter', 'Enter', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y), Vector.Vector(250, 50), on_click=self.enter_button)
-        self.button_manager.append('Quit', 'Quit', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y - 50), Vector.Vector(100, 50), on_click=self.exit_button)
+        self.buttons()
         State.state.clear_current_floor_data()
 
     def enter_button(self):
@@ -47,6 +43,7 @@ class PlayerSelect(Event_Base.EventBase):
             state_player.lvl = json_['lvl']
             state_player.floor = json_['floor']
             state_player.deaths = json_['deaths']
+            State.state.inventory.load(state_player.name)
             state_player.meta_data.is_player = True
             state_player.meta_data.is_guest = False
             state_player.meta_data.is_enemy = False
@@ -64,8 +61,30 @@ class PlayerSelect(Event_Base.EventBase):
         else:
             self.incorrect_password_end = time.time() + 1.5
 
+    def on_update(self, delta_time: float):
+        self.check_if_resized()
+
     def exit_button(self):
         sys.exit()
+
+    def buttons(self):
+        self.ui_manager.purge_ui_elements()
+        self.username = gui.UIInputBox(State.state.screen_center.x, State.state.screen_center.y + 100, 300, 50)
+        self.username.text_adapter = LimitText()
+        self.password = gui.UIInputBox(State.state.screen_center.x, State.state.screen_center.y + 50, 300, 50)
+        self.password.text_adapter = LimitText()
+        self.ui_manager.add_ui_element(self.username)
+        self.ui_manager.add_ui_element(self.password)
+        self.button_manager.append('Guest', 'Login as Guest', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y + 150), Vector.Vector(250, 50), on_click=self.guest_button)
+        self.button_manager.append('Enter', 'Enter', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y), Vector.Vector(250, 50), on_click=self.enter_button)
+        self.button_manager.append('Quit', 'Quit', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y - 50), Vector.Vector(100, 50), on_click=self.exit_button)
+
+    def check_if_resized(self):
+        if self.current_window_size.x == State.state.window.width and self.current_window_size.y == State.state.window.height:
+            return
+        else:
+            self.buttons()
+            self.current_window_size = Vector.Vector(State.state.window.width, State.state.window.height)
 
     def guest_button(self):
         state = State.state.player
