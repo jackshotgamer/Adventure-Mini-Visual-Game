@@ -39,6 +39,9 @@ class HomeTile(Tile.Tile):
                                  12, anchor_x='center', anchor_y='center', align='center')
 
     def on_update(self, delta_time):
+        from W_Main_File.Utilities import Inventory_GUI
+        if Inventory_GUI.is_inv():
+            return
         self.current_opacity = min(200, self.current_opacity + 4)
 
     def on_enter(self):

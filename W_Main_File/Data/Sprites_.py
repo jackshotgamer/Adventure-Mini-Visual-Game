@@ -19,9 +19,15 @@ blank_button_light = load_texture(Path('Sprites') / 'Button_Square_(No Decor)_1L
 blank_button_light_middle = load_texture(Path('Sprites') / 'Button_Square_(No Decor)_2LightMiddle.png')
 knight_start = load_texture(Path('Sprites') / 'Knight_Sprite_0_Start.png')
 knight_start_2 = load_texture(Path('Sprites') / 'Knight_Sprite_0_Start_2_Foot.png')
-knight_start_flipped = load_texture(Path('Sprites') / 'Knight_Sprite_0_Start_Flipped.png')
-# temp_4 = load_texture(Path('Sprites') / '.png')
-# temp_5 = load_texture(Path('Sprites') / '.png')
+knight_start_flipped = load_texture(Path('Sprites') / 'Knight_Sprite_0_Start_2_Foot_Flipped.png')
+Null = load_texture(Path('Sprites') / 'X.png')
+arrow_button_dark_left = load_texture(Path('Sprites') / 'ButtonArrow_DarkLeft.png')
+arrow_button_dark_right = load_texture(Path('Sprites') / 'ButtonArrow_DarkRight.png')
+arrow_button_light_left = load_texture(Path('Sprites') / 'ButtonArrow_LightLeft.png')
+arrow_button_light_right = load_texture(Path('Sprites') / 'ButtonArrow_LightRight.png')
+arrow_button_bright_left = load_texture(Path('Sprites') / 'ButtonArrow_BrightLeft.png')
+arrow_button_bright_right = load_texture(Path('Sprites') / 'ButtonArrow_BrightRight.png')
+# = load_texture(Path('Sprites') / '.png')
 swamp_monster = load_texture(Path('Sprites') / 'Swamp_Monster_0.png')
 black_sprite = load_texture(Path('Sprites') / 'Black_Square.png')
 black_circle_sprite = load_texture(Path('Sprites') / 'Black_Circle.png')
@@ -76,13 +82,23 @@ BACKGROUND_FRAMES = [
 CHARACTER_FRAMES = [
     load_texture(Path('Sprites') / 'Knight_Sprite_1_2.png'),
     load_texture(Path('Sprites') / 'Knight_Sprite_2_2.png'),
-    # load_texture(Path('Sprites') / 'Knight_Sprite_3.png')
+    load_texture(Path('Sprites') / 'Knight_Sprite_3_2.png'),
+    load_texture(Path('Sprites') / 'Knight_Sprite_4.png'),
+    load_texture(Path('Sprites') / 'Knight_Sprite_5.png'),
+    load_texture(Path('Sprites') / 'Knight_Sprite_6.png'),
+    load_texture(Path('Sprites') / 'Knight_Sprite_7.png'),
+    load_texture(Path('Sprites') / 'Knight_Sprite_8.png'),
 ]
 
 FLIPPED_CHARACTER_FRAMES = [
-    load_texture(Path('Sprites') / 'Knight_Sprite_1_Flipped.png'),
-    load_texture(Path('Sprites') / 'Knight_Sprite_2_Flipped.png'),
-    load_texture(Path('Sprites') / 'Knight_Sprite_3_Flipped.png')
+    load_texture(Path('Sprites') / 'Knight_Sprite_1_2_Flipped.png'),
+    load_texture(Path('Sprites') / 'Knight_Sprite_2_2_Flipped.png'),
+    load_texture(Path('Sprites') / 'Knight_Sprite_3_2_Flipped.png'),
+    load_texture(Path('Sprites') / 'Knight_Sprite_4_Flipped.png'),
+    load_texture(Path('Sprites') / 'Knight_Sprite_5_Flipped.png'),
+    load_texture(Path('Sprites') / 'Knight_Sprite_6_Flipped.png'),
+    load_texture(Path('Sprites') / 'Knight_Sprite_7_Flipped.png'),
+    load_texture(Path('Sprites') / 'Knight_Sprite_8_Flipped.png'),
 ]
 
 
@@ -114,12 +130,13 @@ def update_character():
     global current_character_frame
     global character_frame_count
     character_frame_count += 1
-    if not character_frame_count % 5:
+    if character_frame_count > 18:
+        character_frame_count = 1
+    if not character_frame_count % 3:
         if current_character_frame >= len(CHARACTER_FRAMES) - 1:
             current_character_frame = -1
         current_character_frame += 1
-    if character_frame_count > 90:
-        character_frame_count = 1
+
 
 
 def draw_backdrop():

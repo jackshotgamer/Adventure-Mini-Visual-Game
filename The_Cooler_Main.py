@@ -1,6 +1,4 @@
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from W_Main_File.Data import Item
+from W_Main_File.Data import Item
 from typing import Union
 from W_Main_File.Essentials import State
 
@@ -17,8 +15,6 @@ class InventoryContainer:
                 return
         self.items.append(item)
         print(f'added, item: {item}')
-        if State.state.player.meta_data.is_player and not State.state.player.meta_data.is_guest:
-            self.save(f'{State.state.player.name}')
 
     def remove_item(self, index: int, page_num: int = None):
         if self.items:
@@ -28,8 +24,6 @@ class InventoryContainer:
                 index1 = index
             if 0 <= index1 < len(self.items):
                 self.items[index1] = None
-        if State.state.player.meta_data.is_player and not State.state.player.meta_data.is_guest:
-            self.save(f'{State.state.player.name}')
 
     def count_items(self, id_):
         if isinstance(id_, str):
@@ -55,22 +49,27 @@ class InventoryContainer:
                             index1 = index
                         return self.items[index1]
 
-    def load(self, file_path):
-        import pathlib
-        import pickle
-        if not pathlib.Path(f'Inventory_Contents/{file_path}').exists():
-            with open(f'Inventory_Contents/{file_path}', 'wb') as file:
-                pickle.dump([], file)
-        with open(f'Inventory_Contents/{file_path}', 'rb') as file:
-            self.items = pickle.load(file)
 
-    def save(self, file_path):
-        import pathlib
-        import pickle
-        if not pathlib.Path('Inventory_Contents').exists():
-            pathlib.Path('Inventory_Contents').mkdir()
-        with open(f'Inventory_Contents/{file_path}', 'wb') as file:
-            pickle.dump(self.items, file)
-    """
-    
-    """
+i = InventoryContainer()
+from W_Main_File.Items.All_Items import rusty_knife, null_weapon_2, null_weapon_1
+for _ in range(0, 24):
+    i.add_item(rusty_knife)
+    i.add_item(null_weapon_1)
+    i.add_item(null_weapon_2)
+    i.add_item(rusty_knife)
+i.add_item(Item.Item('Torch', 'Torch', Item.ItemType.Consumable))
+amount_of_knives = i.count_items(rusty_knife.id_)
+import random
+for x in range(0, 10):
+    i.remove_item(x, 0)
+amount_of_knives2 = i.count_items(rusty_knife.id_)
+obj = i.get_item(21, 3)
+print(amount_of_knives)
+print(amount_of_knives2)
+
+"""
+page: ...
+page 2: ...
+page3: None
+page: 4 ...
+"""

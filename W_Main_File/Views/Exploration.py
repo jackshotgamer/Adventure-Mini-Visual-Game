@@ -36,6 +36,9 @@ class Explore(Event_Base.EventBase):
             State.state.grid.add(Trapdoor_Functions.TrapdoorTile(Vector(-1, 0)))
         if not State.state.grid.get(2, 0):
             State.state.grid.add(Loot_Functions.LootTile(Vector(2, 0)))
+        from W_Main_File.Items import Inventory
+        if State.state.player.meta_data.is_player:
+            print(State.state.inventory.items)
 
     def update(self, delta_time: float):
         from W_Main_File.Views import Fading
@@ -49,7 +52,7 @@ class Explore(Event_Base.EventBase):
         if self.should_transition_to_animation[0]:
             from W_Main_File.Views.Movement_Animator import MovementAnimator
             State.state.window.show_view(MovementAnimator(self.should_transition_to_animation[1],
-                                                          self.should_transition_to_animation[2], 14 if (State.state.window.width, State.state.window.height) == (1000, 800) else 14))
+                                                          self.should_transition_to_animation[2], 18 if (State.state.window.width, State.state.window.height) == (1000, 800) else 18))
             self.should_transition_to_animation[0] = False
             self.should_transition_to_animation[3]()
         else:
@@ -110,7 +113,31 @@ class Explore(Event_Base.EventBase):
 
         arcade.draw_rectangle_filled(center_screen.x, center_screen.y - (State.state.window.height * 0.3375), State.state.window.width * 0.625, State.state.window.height * 0.0475, (0, 0, 0))
         # arcade.draw_circle_filled(center_screen.x, center_screen.y, 25, arcade.color.AERO_BLUE)
+        screen_percentage_of_default = (State.state.window.height / State.state.default_window_size.y)
+        arcade.draw_text(f'Floor: {int(State.state.player.floor)}', State.state.window.width * 0.5, (State.state.window.height * 0.5) - (cell_render_size.y * .37), arcade.color.LIGHT_GRAY,
+                         font_name='arial', font_size=(12 * screen_percentage_of_default), anchor_x='center', anchor_y='center')
+        arcade.draw_text(str(State.state.player.pos.tuple()), State.state.window.width * 0.5, (State.state.window.height * 0.5) + (cell_render_size.y * .37), arcade.color.LIGHT_GRAY,
+                         font_name='arial', font_size=(12 * screen_percentage_of_default), anchor_x='center', anchor_y='center')
+        Sprites_.draw_backdrop()
         arcade.draw_rectangle_outline(center_screen.x, center_screen.y, State.state.window.width * 0.5, State.state.window.height * 0.625, (120, 120, 120), 4)
+
+        if Explore.symbol_ == arcade.key.D:
+            arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y,
+                                          State.state.cell_render_size.y * 0.75, State.state.cell_render_size.y * 0.75, Sprites_.knight_start_2)
+        elif Explore.symbol_ == arcade.key.A:
+            arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y,
+                                          State.state.cell_render_size.y * 0.75, State.state.cell_render_size.y * 0.75, Sprites_.knight_start_flipped)
+        from W_Main_File.Utilities import Inventory_GUI
+        arcade.draw_text(f'FPS = {self.fps:.1f}', 2, self.window.height - 22, arcade.color.GREEN,
+                         font_name='arial', font_size=14)
+        for tile, *args in render_queue:
+            tile.on_render_foreground(*args)
+        self.text_render()
+        Inventory_GUI.render_inventory()
+        self.button_manager.render()
+
+    # noinspection PyMethodMayBeStatic
+    def text_render(self):
         screen_percentage_of_default = (State.state.window.height / State.state.default_window_size.y)
         arcade.draw_text(f'Name: {State.state.player.name}', State.state.window.width * 0.275, State.state.window.height * 0.1625, arcade.color.LIGHT_GRAY,
                          font_size=(11 * screen_percentage_of_default), font_name='arial')
@@ -122,25 +149,6 @@ class Explore(Event_Base.EventBase):
                          font_size=(14 * screen_percentage_of_default), font_name='arial')
         arcade.draw_text(f'xp: {int(State.state.player.xp)}', State.state.window.width * 0.565, State.state.window.height * 0.8125, arcade.color.LIGHT_GRAY,
                          font_size=(14 * screen_percentage_of_default), font_name='arial')
-        arcade.draw_text(f'Floor: {int(State.state.player.floor)}', State.state.window.width * 0.5, (State.state.window.height * 0.5) - (cell_render_size.y * .37), arcade.color.LIGHT_GRAY,
-                         font_name='arial', font_size=(12 * screen_percentage_of_default), anchor_x='center', anchor_y='center')
-        arcade.draw_text(str(State.state.player.pos.tuple()), State.state.window.width * 0.5, (State.state.window.height * 0.5) + (cell_render_size.y * .37), arcade.color.LIGHT_GRAY,
-                         font_name='arial', font_size=(12 * screen_percentage_of_default), anchor_x='center', anchor_y='center')
-        Sprites_.draw_backdrop()
-
-        if Explore.symbol_ == arcade.key.D:
-            arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y,
-                                          State.state.cell_render_size.y * 0.75, State.state.cell_render_size.y * 0.75, Sprites_.knight_start_2)
-        elif Explore.symbol_ == arcade.key.A:
-            arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y,
-                                          State.state.cell_render_size.y * 0.75, State.state.cell_render_size.y * 0.75, Sprites_.knight_start_flipped)
-        from W_Main_File.Utilities import Inventory_GUI
-        Inventory_GUI.render_inventory()
-        arcade.draw_text(f'FPS = {self.fps:.1f}', 2, self.window.height - 22, arcade.color.GREEN,
-                         font_name='arial', font_size=14)
-        for tile, *args in render_queue:
-            tile.on_render_foreground(*args)
-        self.button_manager.render()
 
     def on_key_release(self, symbol, mods):
         if tile := State.state.grid.get(*State.state.player.pos):

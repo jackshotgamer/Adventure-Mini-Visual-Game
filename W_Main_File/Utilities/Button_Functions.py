@@ -11,27 +11,26 @@ if typing.TYPE_CHECKING:
     from W_Main_File.Essentials import Button_Sprite_Manager
 
 
-def register_custom_exploration_buttons(button_manager: 'Button_Sprite_Manager.ButtonManager', ui_manager):
+def register_custom_exploration_buttons(button_manager: 'Button_Sprite_Manager.ButtonManager', ui_manager, inv_button_works=True):
     button_manager.clear_all(True)
     button_manager.append('Log Out', 'Log Out',
-                          Vector.Vector(State.state.screen_center.x + (State.state.window.width * 0.25) + State.state.cell_render_size.x,
+                          Vector.Vector((State.state.window.width * 0.875),
                                         (State.state.screen_center.y + (State.state.window.height * 0.1875)) + (State.state.cell_render_size.y - (State.state.window.height * 0.03))),
                           Vector.Vector((State.state.window.width * 0.2), (State.state.window.height * 0.0625)), on_click=lambda: log_out_button(True, ui_manager))
     button_manager.append('Home', 'Go Home',
-                          Vector.Vector(State.state.screen_center.x + (State.state.window.width * 0.25) + State.state.cell_render_size.x,
+                          Vector.Vector((State.state.window.width * 0.875),
                                         (State.state.screen_center.y + (State.state.window.height * 0.0625))
                                         + (State.state.cell_render_size.y - (State.state.window.height * 0.03))),
                           Vector.Vector((State.state.window.width * 0.2), (State.state.window.height * 0.0625)), on_click=go_home_button)
-
+    button_manager.append('Inventory', 'Open Inventory',
+                          Vector.Vector((State.state.window.width * 0.875),
+                                        (State.state.screen_center.y - (State.state.window.height * 0.0625)) + (State.state.cell_render_size.y - (State.state.window.height * 0.03))),
+                          Vector.Vector((State.state.window.width * 0.2), (State.state.window.height * 0.0625)), on_click=toggle_inv if inv_button_works else None)
     if not State.state.player.meta_data.is_guest:
         button_manager.append('Save Data', 'Save Data',
-                              Vector.Vector(State.state.screen_center.x + (State.state.window.width * 0.25) + State.state.cell_render_size.x,
-                                            (State.state.screen_center.y - (State.state.window.height * 0.0625)) + (State.state.cell_render_size.y - (State.state.window.height * 0.03))),
+                              Vector.Vector((State.state.window.width * 0.875),
+                                            (State.state.screen_center.y - (State.state.window.height * 0.1875)) + (State.state.cell_render_size.y - (State.state.window.height * 0.03))),
                               Vector.Vector((State.state.window.width * 0.2), (State.state.window.height * 0.0625)), on_click=save_button)
-    button_manager.append('Inventory', 'Open Inventory',
-                          Vector.Vector(State.state.screen_center.x + (State.state.window.width * 0.25) + State.state.cell_render_size.x,
-                                        (State.state.screen_center.y - (State.state.window.height * 0.1875)) + (State.state.cell_render_size.y - (State.state.window.height * 0.03))),
-                          Vector.Vector((State.state.window.width * 0.2), (State.state.window.height * 0.0625)), on_click=toggle_inv)
 
 
 def invalidate_floor_data():

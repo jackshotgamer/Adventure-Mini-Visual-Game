@@ -17,7 +17,7 @@ class MovementAnimator(Event_Base.EventBase):
         self.grid_end = grid_end
         self.animation_steps = animation_steps
         self.current_steps = 0
-        Button_Functions.register_custom_exploration_buttons(self.button_manager, self.ui_manager)
+        Button_Functions.register_custom_exploration_buttons(self.button_manager, self.ui_manager, False)
         self.tile_render_offset = Vector.Vector(0, 0)
         self.affected_tiles = self.get_affected_tiles()
         self.empty_tiles = self.get_empty_tiles()
@@ -90,14 +90,11 @@ class MovementAnimator(Event_Base.EventBase):
             tile_center = Vector.Vector(*arcade.lerp_vec(start, end, self.current_steps / self.animation_steps))
             tile.on_render(tile_center, tile_center + (-(self.cell_render_size.x / 2), self.cell_render_size.y / 2), self.cell_render_size)
 
-
-
         for start, end in self.empty_tiles:
             tile_center = Vector.Vector(*arcade.lerp_vec(start, end, self.current_steps / self.animation_steps))
             arcade.draw_rectangle_outline(tile_center.x, tile_center.y, self.cell_render_size.x, self.cell_render_size.y, (120, 120, 120))
 
         # arcade.draw_circle_filled(center.x, center.y, 25, arcade.color.AERO_BLUE)
-        arcade.draw_rectangle_outline(center.x, center.y, State.state.window.width * 0.5, State.state.window.height * 0.625, (120, 120, 120), 4)
         arcade.draw_rectangle_filled(center.x, center.y - (State.state.window.height * 0.3375), State.state.window.width * 0.625, State.state.window.height * 0.0475, (0, 0, 0))
         arcade.draw_rectangle_filled(center.x, center.y + (State.state.window.height * 0.3375), State.state.window.width * 0.625, State.state.window.height * 0.0475, (0, 0, 0))
         arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y,
@@ -106,6 +103,25 @@ class MovementAnimator(Event_Base.EventBase):
                                       State.state.cell_render_size.x * 0.95, State.state.cell_render_size.y * 0.95, Sprites_.black_circle_square_sprite, 0, 100)
         arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y,
                                       State.state.cell_render_size.x * 0.95, State.state.cell_render_size.y * 0.95, Sprites_.black_square_circle_square_sprite, 0, 125)
+        screen_percentage_of_default = (State.state.window.height / State.state.default_window_size.y)
+        arcade.draw_text(f'Floor: {int(State.state.player.floor)}', State.state.window.width * 0.5, (State.state.window.height * 0.5) - (self.cell_render_size.y * .37), arcade.color.LIGHT_GRAY,
+                         font_name='arial', font_size=(12 * screen_percentage_of_default), anchor_x='center', anchor_y='center')
+        arcade.draw_text(str(State.state.player.pos.tuple()), State.state.window.width * 0.5, (State.state.window.height * 0.5) + (self.cell_render_size.y * .37), arcade.color.LIGHT_GRAY,
+                         font_name='arial', font_size=(12 * screen_percentage_of_default), anchor_x='center', anchor_y='center')
+        Sprites_.draw_backdrop()
+        Sprites_.draw_character()
+        arcade.draw_rectangle_outline(center.x, center.y, State.state.window.width * 0.5, State.state.window.height * 0.625, (120, 120, 120), 4)
+        from W_Main_File.Views import Exploration
+        arcade.draw_text(f'FPS = {Exploration.Explore.fps:.1f}', 2, self.window.height - 22, arcade.color.GREEN,
+                         font_name='arial', font_size=14)
+        for tile, start, end in self.affected_tiles:
+            tile_center = Vector.Vector(*arcade.lerp_vec(start, end, self.current_steps / self.animation_steps))
+            tile.on_render_foreground(tile_center, tile_center + (-(self.cell_render_size.x / 2), self.cell_render_size.y / 2), self.cell_render_size)
+        self.text_render()
+        self.button_manager.render()
+
+    # noinspection PyMethodMayBeStatic
+    def text_render(self):
         screen_percentage_of_default = (State.state.window.height / State.state.default_window_size.y)
         arcade.draw_text(f'Name: {State.state.player.name}', State.state.window.width * 0.275, State.state.window.height * 0.1625, arcade.color.LIGHT_GRAY,
                          font_size=(11 * screen_percentage_of_default), font_name='arial')
@@ -117,19 +133,6 @@ class MovementAnimator(Event_Base.EventBase):
                          font_size=(14 * screen_percentage_of_default), font_name='arial')
         arcade.draw_text(f'xp: {int(State.state.player.xp)}', State.state.window.width * 0.565, State.state.window.height * 0.8125, arcade.color.LIGHT_GRAY,
                          font_size=(14 * screen_percentage_of_default), font_name='arial')
-        arcade.draw_text(f'Floor: {int(State.state.player.floor)}', State.state.window.width * 0.5, (State.state.window.height * 0.5) - (self.cell_render_size.y * .37), arcade.color.LIGHT_GRAY,
-                         font_name='arial', font_size=(12 * screen_percentage_of_default), anchor_x='center', anchor_y='center')
-        arcade.draw_text(str(State.state.player.pos.tuple()), State.state.window.width * 0.5, (State.state.window.height * 0.5) + (self.cell_render_size.y * .37), arcade.color.LIGHT_GRAY,
-                         font_name='arial', font_size=(12 * screen_percentage_of_default), anchor_x='center', anchor_y='center')
-        Sprites_.draw_backdrop()
-        Sprites_.draw_character()
-        from W_Main_File.Views import Exploration
-        arcade.draw_text(f'FPS = {Exploration.Explore.fps:.1f}', 2, self.window.height - 22, arcade.color.GREEN,
-                         font_name='arial', font_size=14)
-        for tile, start, end in self.affected_tiles:
-            tile_center = Vector.Vector(*arcade.lerp_vec(start, end, self.current_steps / self.animation_steps))
-            tile.on_render_foreground(tile_center, tile_center + (-(self.cell_render_size.x / 2), self.cell_render_size.y / 2), self.cell_render_size)
-        self.button_manager.render()
 
     @staticmethod
     def draw_edges(inner_radius):

@@ -3,7 +3,7 @@ import random
 from enum import Enum, IntFlag, auto
 from typing import Union
 
-from W_Main_File.Data import HpEntity
+from W_Main_File.Data import HpEntity, Sprites_
 
 
 class ItemType(Enum):
@@ -25,7 +25,6 @@ class DamageType(IntFlag):
     Air_Elemental = auto()
     Void_Elemental = auto()
 
-
     Any_Elemental = Water_Elemental | Earth_Elemental | Fire_Elemental | Air_Elemental
     Any_Basic = Blunt | Piercing | Cutting
 
@@ -40,15 +39,20 @@ class DamageType(IntFlag):
 
 
 class Item:
-    def __init__(self, name, id_, type_: ItemType):
+    def __init__(self, name, id_, type_: ItemType, sprite=Sprites_.Null):
         self.name = name
         self.id_ = id_
         self.type_ = type_
+        self.sprite = sprite
+        self.is_missingno = (id_ == 'MISSINGNO')
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__} name = {self.name!r}, id = {self.id_!r}, type = {self.type_!r}>'
 
 
-class Weapon(Item, metaclass=abc.ABCMeta):
-    def __init__(self, name, id_, min_attack, max_attack, speed, damage_type: Union[int, DamageType], has_special_move: bool):
-        super().__init__(name, id_, ItemType.Weapon)
+class Weapon(Item):
+    def __init__(self, name, id_, min_attack, max_attack, speed, damage_type: Union[int, DamageType], has_special_move: bool, sprite=Sprites_.Null):
+        super().__init__(name, id_, ItemType.Weapon, sprite=sprite)
         self.min_attack = min_attack
         self.max_attack = max_attack
         self.speed = speed

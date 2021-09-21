@@ -37,7 +37,7 @@ class LootTile(Tile.Tile):
         self.weapon_sprite_pos = Vector.Vector(0, -15)
         self.waiting = 0
         self.given_item = False
-        self.table = LootTable(('Broken_Stick', 8), ('Rusty_Knife', 8))  # , ('Iron Knife', 5), ('Iron Short-sword', 4), ('Iron Broad-sword', 1))
+        self.table = LootTable(('Broken_Stick', 8), ('Rusty_Knife', 2000))  # , ('Iron Knife', 5), ('Iron Short-sword', 4), ('Iron Broad-sword', 1))
         self.loot_result_dict = {
             'Broken_Stick': Sprites_.stick_sprite,
             'Rusty_Knife': Sprites_.rusty_knife_sprite,
@@ -91,11 +91,12 @@ class LootTile(Tile.Tile):
         from W_Main_File.Utilities import Inventory_GUI
         if Inventory_GUI.is_inv():
             return
+        multipler_speed = 5
         self.current_opacity = min(200, self.current_opacity + 4)
         if self.opening:
-            self.alpha = min(255, self.alpha + 2)
+            self.alpha = min(255, self.alpha + (2 * multipler_speed))
         if self.alpha == 255:
-            self.elapsed_frames += 1
+            self.elapsed_frames += (1 * multipler_speed)
             if not self.elapsed_frames % 10:
                 self.frame_step += 1
             if self.frame_step > 8:
@@ -104,7 +105,7 @@ class LootTile(Tile.Tile):
                     self.loot_result = self.table.get_item()
                 self.opened = True
             if self.opened and self.weapon_sprite_pos.y < 100:
-                self.weapon_sprite_pos += 0, 1
+                self.weapon_sprite_pos += 0, (1 * multipler_speed)
             elif self.opened and self.weapon_sprite_pos.y >= 100:
                 if not self.given_item:
                     if self.loot_result == 'Broken_Stick':
@@ -113,7 +114,7 @@ class LootTile(Tile.Tile):
                     item_to_add = self.get_item_from_loot_result()
                     State.state.inventory.add_item(item_to_add)
                     self.given_item = True
-                self.waiting += 1
+                self.waiting += (1 * multipler_speed)
                 if self.waiting >= 60:
                     self.opening = False
                     State.state.preoccupied = False
@@ -140,6 +141,7 @@ class LootTile(Tile.Tile):
             State.state.preoccupied = True
         elif keycode == arcade.key.H and State.state.player.meta_data.is_me and self.looted:
             self.looted = False
+            self.given_item = False
             self.on_enter()
         elif keycode == arcade.key.E and self.looted:
             table = LootTable(('Banana Peel', 8), ('Ball of Seaweed', 6), ('Rusty Can', 4))

@@ -5,7 +5,21 @@ from W_Main_File.Data import Sprites_
 from W_Main_File.Utilities.Vector import Vector
 from collections import namedtuple
 
-Button = namedtuple('Button', 'id_, text, center, size, idle_texture, hover_texture, click_texture, alpha, on_click, text_colour, text_size')
+
+class Button:
+    def __init__(self, id_, text, center, size, idle_texture, hover_texture, click_texture, alpha, on_click, text_colour, text_size, enabled):
+        self.id_ = id_
+        self.text = text
+        self.center = center
+        self.size = size
+        self.idle_texture = idle_texture
+        self.hover_texture = hover_texture
+        self.click_texture = click_texture
+        self.alpha = alpha
+        self.on_click = on_click
+        self.text_colour = text_colour
+        self.text_size = text_size
+        self.enabled = enabled
 
 
 class ButtonManager:
@@ -25,7 +39,8 @@ class ButtonManager:
                alpha: int = 255,
                on_click=lambda: None,
                text_colour=(255, 255, 255),
-               text_size=22
+               text_size=22,
+               enabled=True
                ):
         if not idle_texture:
             idle_texture = Sprites_.blank_button_dark
@@ -33,7 +48,7 @@ class ButtonManager:
             hover_texture = Sprites_.blank_button_light
         if not click_texture:
             click_texture = Sprites_.blank_button_light_middle
-        self.buttons[id_] = Button(id_, text, center, size, idle_texture, hover_texture, click_texture, alpha, on_click, text_colour, text_size)
+        self.buttons[id_] = Button(id_, text, center, size, idle_texture, hover_texture, click_texture, alpha, on_click, text_colour, text_size, enabled)
 
     def render(self):
         for button in self.buttons.values():
@@ -75,7 +90,8 @@ class ButtonManager:
     def on_click_release(self):
         self.clicked_buttons.clear()
         for id_ in self.hover_buttons:
-            self.buttons[id_].on_click()
+            if self.buttons[id_].on_click is not None:
+                self.buttons[id_].on_click()
 
     def check_hovered(self, mouse_x, mouse_y):
         for button in self.buttons.values():

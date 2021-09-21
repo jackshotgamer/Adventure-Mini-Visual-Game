@@ -113,7 +113,8 @@ class PurgatoryScreen(Event_Base.EventBase):
         self.ui_manager.purge_ui_elements()
         self.button_manager.append('Play', 'Play game', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y + 75), Vector.Vector(250, 50),
                                    on_click=partial(play_button, self.ui_manager))
-        self.button_manager.append('Log Out', 'Log Out', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y - 150),
+        self.button_manager.append('Log Out', 'Log Out', (Vector.Vector(State.state.screen_center.x, State.state.screen_center.y - 150) if State.state.player.meta_data.is_player
+                                                          else Vector.Vector(State.state.screen_center.x, State.state.screen_center.y)),
                                    Vector.Vector(200, 50), on_click=lambda: log_out_buttons(True, self.message, self.ui_manager))
         if not State.state.player.meta_data.is_guest:
             self.button_manager.append('Save', 'Save Character', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y - 75), Vector.Vector(200, 50),
