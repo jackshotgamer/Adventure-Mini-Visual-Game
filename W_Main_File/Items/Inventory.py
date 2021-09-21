@@ -10,7 +10,11 @@ class InventoryContainer:
         self.items = []
         self.page_size = page_size
 
-    def add_item(self, item: Item):
+    @property
+    def page_count(self):
+        return (len(self.items) // State.state.inventory.page_size) + 1 if (len(self.items) / State.state.inventory.page_size) % 1 else 0
+
+    def add_item(self, item: 'Item'):
         for index, item1 in enumerate(self.items):
             if item1 is None:
                 self.items[index] = item
@@ -53,7 +57,8 @@ class InventoryContainer:
                             index1 = index + (page_num * self.page_size)
                         else:
                             index1 = index
-                        return self.items[index1]
+                        if 0 <= index1 < len(self.items):
+                            return self.items[index1]
 
     def load(self, file_path):
         import pathlib

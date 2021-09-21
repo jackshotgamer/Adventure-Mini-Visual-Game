@@ -25,7 +25,7 @@ def register_custom_exploration_buttons(button_manager: 'Button_Sprite_Manager.B
     button_manager.append('Inventory', 'Open Inventory',
                           Vector.Vector((State.state.window.width * 0.875),
                                         (State.state.screen_center.y - (State.state.window.height * 0.0625)) + (State.state.cell_render_size.y - (State.state.window.height * 0.03))),
-                          Vector.Vector((State.state.window.width * 0.2), (State.state.window.height * 0.0625)), on_click=toggle_inv if inv_button_works else None)
+                          Vector.Vector((State.state.window.width * 0.2), (State.state.window.height * 0.0625)), on_click=(lambda: toggle_inv(button_manager)) if inv_button_works else None)
     if not State.state.player.meta_data.is_guest:
         button_manager.append('Save Data', 'Save Data',
                               Vector.Vector((State.state.window.width * 0.875),
@@ -77,13 +77,13 @@ def save_button():
                 Exploration.Explore)))
 
 
-def toggle_inv():
+def toggle_inv(button_manager: 'Button_Sprite_Manager.ButtonManager'):
     if Inventory_GUI.is_inv():
-        Inventory_GUI.hide_inv()
+        Inventory_GUI.hide_inv(button_manager)
     else:
         if State.state.preoccupied:
             return
-        Inventory_GUI.show_inv()
+        Inventory_GUI.show_inv(button_manager)
 
 
 def confirm_funct(ui_manager: UIManager):

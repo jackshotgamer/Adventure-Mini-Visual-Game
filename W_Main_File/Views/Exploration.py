@@ -74,6 +74,10 @@ class Explore(Event_Base.EventBase):
         else:
             Button_Functions.register_custom_exploration_buttons(self.button_manager, self.ui_manager)
             self.current_window_size = Vector(State.state.window.width, State.state.window.height)
+        from W_Main_File.Utilities import Inventory_GUI
+        if Inventory_GUI.is_inv():
+            Inventory_GUI.hide_inv(self.button_manager)
+            Inventory_GUI.show_inv(self.button_manager)
 
     key_offset = {
         key.W: (0, 1),
@@ -163,6 +167,10 @@ class Explore(Event_Base.EventBase):
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol == arcade.key.B:
             State.state.player.hp -= State.state.player.max_hp
+        if symbol == arcade.key.I:
+            for num in range(0, 3):
+                from W_Main_File.Items import All_Items
+                State.state.inventory.items.append(random.choice((All_Items.rusty_knife, All_Items.null_weapon_1, All_Items.null_weapon_2)))
         if symbol in self.key_offset:
             if symbol in (arcade.key.A, arcade.key.D):
                 self.__class__.symbol_ = symbol

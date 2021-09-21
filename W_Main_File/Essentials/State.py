@@ -21,6 +21,7 @@ class State:
         self.pw = ''
         self.texture_mapping = {}
         self.inventory = Inventory.InventoryContainer()
+        self.current_page = 0
         self.is_new_tile = False
         self.is_moving = False
         self.moves_since_texture_save = 0
