@@ -10,9 +10,12 @@ class InventoryContainer:
         self.items = []
         self.page_size = page_size
 
+    def remove_empty_pages(self):
+        pass
+
     @property
     def page_count(self):
-        return (len(self.items) // State.state.inventory.page_size) + 1 if (len(self.items) / State.state.inventory.page_size) % 1 else 0
+        return (len(self.items) // State.state.inventory.page_size) + (1 if (len(self.items) / State.state.inventory.page_size) % 1 else 0)
 
     def add_item(self, item: 'Item'):
         for index, item1 in enumerate(self.items):
@@ -21,8 +24,6 @@ class InventoryContainer:
                 return
         self.items.append(item)
         print(f'added, item: {item}')
-        if State.state.player.meta_data.is_player and not State.state.player.meta_data.is_guest:
-            self.save(f'{State.state.player.name}')
 
     def remove_item(self, index: int, page_num: int = None):
         if self.items:
@@ -32,8 +33,6 @@ class InventoryContainer:
                 index1 = index
             if 0 <= index1 < len(self.items):
                 self.items[index1] = None
-        if State.state.player.meta_data.is_player and not State.state.player.meta_data.is_guest:
-            self.save(f'{State.state.player.name}')
 
     def count_items(self, id_):
         if isinstance(id_, str):
@@ -76,6 +75,4 @@ class InventoryContainer:
             pathlib.Path('Inventory_Contents').mkdir()
         with open(f'Inventory_Contents/{file_path}', 'wb') as file:
             pickle.dump(self.items, file)
-    """
-    
-    """
+        print('hi')

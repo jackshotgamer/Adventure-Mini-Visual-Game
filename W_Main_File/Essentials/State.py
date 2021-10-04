@@ -3,6 +3,8 @@ import pathlib
 import random
 from typing import List, Dict, Any, Union, Type
 
+import arcade
+
 from W_Main_File.Data import HpEntity, Grid, Sprites_, Meta_Data
 from W_Main_File.Items import Inventory
 from W_Main_File.Utilities import Vector, Seeding
@@ -33,7 +35,7 @@ class State:
         xy = f'{int(x)} {int(y)}'
         if xy not in self.texture_mapping:
             rnjesus = Seeding.seed_for_vector(poss)
-            sprite_textures = rnjesus.choices(tuple(Sprites_.sprite_alias), k=1, weights=(45, 1.1, 35, 1.1, 15, 1))
+            sprite_textures = rnjesus.choices(tuple(Sprites_.sprite_alias), k=1, weights=(45, 1.1, 35, 1.1, 15, 1.5, 1))
             # 20, 15, 10, 5, 3,
             self.texture_mapping[xy] = rnjesus.choice(sprite_textures)
             self.is_new_tile = True
@@ -66,6 +68,12 @@ class State:
     def clear_current_floor_data(self):
         self.texture_mapping.clear()
         self.grid.interactable_tiles.clear()
+
+    # noinspection PyProtectedMember
+    def render_mouse(self):
+        arcade.draw_circle_outline(self.window._mouse_x, self.window._mouse_y, 10, (0, 255, 0, 175), 2)
+        arcade.draw_line(self.window._mouse_x - 10, self.window._mouse_y, self.window._mouse_x + 10, self.window._mouse_y, (0, 255, 0, 175))
+        arcade.draw_line(self.window._mouse_x, self.window._mouse_y - 10, self.window._mouse_x, self.window._mouse_y + 10, (0, 255, 0, 175))
 
 
 state = State()

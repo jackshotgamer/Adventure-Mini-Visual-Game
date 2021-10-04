@@ -102,6 +102,7 @@ class PurgatoryScreen(Event_Base.EventBase):
         super().on_draw()
         arcade.draw_text(self.message, State.state.screen_center.x, State.state.screen_center.y + 150,
                          (arcade.color.RED if self.message == 'You Died' else arcade.color.RED), 23, 1000, align='center', anchor_y='center', anchor_x='center')
+        State.state.render_mouse()
 
     def update(self, delta_time: float):
         if Action_Queue.action_queue:

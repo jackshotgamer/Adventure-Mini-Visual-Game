@@ -8,6 +8,7 @@ forest_sprite = load_texture(Path('Sprites') / 'Forest_Tile_2.0.png')
 forest_trap_sprite = load_texture(Path('Sprites') / 'Forest_Tile_2.0_TRAP.png')
 mountain_sprite = load_texture(Path('Sprites') / 'Mountain_Tile_1.png')
 village_sprite = load_texture(Path('Sprites') / 'Village_Tile_1.png')
+trapdoor_sprite = load_texture(Path('Sprites') / 'Trapdoor_Tile_0.png')
 home_sprite = load_texture(Path('Sprites') / 'Home_Tile.png')
 chest_sprite = load_texture(Path('Sprites') / 'Chest_0.png')
 chest_body_sprite = load_texture(Path('Sprites') / 'Chest_Body_0.png')
@@ -34,6 +35,16 @@ black_circle_sprite = load_texture(Path('Sprites') / 'Black_Circle.png')
 black_circle_square_sprite = load_texture(Path('Sprites') / 'Black_Circle_Square.png')
 black_square_circle_square_sprite = load_texture(Path('Sprites') / 'Black_Square_Square_Circle.png')
 
+sprite_id_to_texture = {
+    'rusty_knifeDefaultWeapon': rusty_knife_sprite,
+    'Null': Null,
+}
+
+
+def get_sprite_from_id(id_):
+    return sprite_id_to_texture.get(id_, Null)
+
+
 # 0 = Plains
 # 0.5 = Plains TRAP
 # 1 = Forest
@@ -54,7 +65,8 @@ sprite_alias = {
     '1': forest_sprite,
     '1.5': forest_trap_sprite,
     '2': mountain_sprite,
-    '4': village_sprite
+    '4': village_sprite,
+    '10': trapdoor_sprite
 }
 
 CHEST_OPENING_FRAMES = [
@@ -101,7 +113,6 @@ FLIPPED_CHARACTER_FRAMES = [
     load_texture(Path('Sprites') / 'Knight_Sprite_8_Flipped.png'),
 ]
 
-
 current_backdrop_frame = 0
 backdrop_frame_count = 0
 reversing = False
@@ -136,7 +147,6 @@ def update_character():
         if current_character_frame >= len(CHARACTER_FRAMES) - 1:
             current_character_frame = -1
         current_character_frame += 1
-
 
 
 def draw_backdrop():

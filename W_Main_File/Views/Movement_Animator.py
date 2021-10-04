@@ -120,7 +120,7 @@ class MovementAnimator(Event_Base.EventBase):
         self.text_render()
         self.button_manager.render()
 
-    # noinspection PyMethodMayBeStatic
+    # noinspection PyMethodMayBeStatic,PyProtectedMember
     def text_render(self):
         screen_percentage_of_default = (State.state.window.height / State.state.default_window_size.y)
         arcade.draw_text(f'Name: {State.state.player.name}', State.state.window.width * 0.275, State.state.window.height * 0.1625, arcade.color.LIGHT_GRAY,
@@ -133,6 +133,7 @@ class MovementAnimator(Event_Base.EventBase):
                          font_size=(14 * screen_percentage_of_default), font_name='arial')
         arcade.draw_text(f'xp: {int(State.state.player.xp)}', State.state.window.width * 0.565, State.state.window.height * 0.8125, arcade.color.LIGHT_GRAY,
                          font_size=(14 * screen_percentage_of_default), font_name='arial')
+        State.state.render_mouse()
 
     @staticmethod
     def draw_edges(inner_radius):

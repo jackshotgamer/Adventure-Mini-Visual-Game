@@ -39,3 +39,4 @@ class LogOutView(Event_Base.EventBase):
             arcade.draw_text(('Warning:\n' 'This will NOT save your data. This cannot be undone!' if not State.state.player.meta_data.is_guest
                               else 'You will lose your progress. This cannot be undone!'), State.state.screen_center.x, State.state.screen_center.y + 100, arcade.color.WHITE,
                              23, 800, anchor_x='center', anchor_y='center', align='center')
+        State.state.render_mouse()

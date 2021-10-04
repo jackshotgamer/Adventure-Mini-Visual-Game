@@ -50,6 +50,7 @@ class Fading(View):
         arcade.start_render()
         self.render(self.transition_state)
         arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y, State.state.window.width, State.state.window.height, CIRCLE_FADE_FRAMES[self.current_frame])
+        State.state.render_mouse()
 
     def update(self, delta_time: float):
         self.frame_count += 1

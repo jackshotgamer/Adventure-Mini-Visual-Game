@@ -26,6 +26,12 @@ class FloorSaveManager:
         cls.ensure_save_directory()
         character_dir = cls.ensure_character_directory(name)
         floor_file = character_dir / f'{floor}.pickle'
+        for x in tile_list:
+            print(x)
+            try:
+                pickle.dumps(x)
+            except ValueError:
+                print(x)
         with floor_file.open('wb') as file:
             pickle.dump(info, file)
 

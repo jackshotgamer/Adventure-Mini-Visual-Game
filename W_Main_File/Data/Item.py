@@ -39,11 +39,10 @@ class DamageType(IntFlag):
 
 
 class Item:
-    def __init__(self, name, id_, type_: ItemType, sprite=Sprites_.Null):
+    def __init__(self, name, id_, type_: ItemType):
         self.name = name
         self.id_ = id_
         self.type_ = type_
-        self.sprite = sprite
         self.is_missingno = (id_ == 'MISSINGNO')
 
     def __repr__(self):
@@ -51,8 +50,8 @@ class Item:
 
 
 class Weapon(Item):
-    def __init__(self, name, id_, min_attack, max_attack, speed, damage_type: Union[int, DamageType], has_special_move: bool, sprite=Sprites_.Null):
-        super().__init__(name, id_, ItemType.Weapon, sprite=sprite)
+    def __init__(self, name, id_, min_attack, max_attack, speed, damage_type: Union[int, DamageType], has_special_move: bool):
+        super().__init__(name, id_, ItemType.Weapon)
         self.min_attack = min_attack
         self.max_attack = max_attack
         self.speed = speed

@@ -11,11 +11,17 @@ import sys
 from . import Event_Base
 
 
+class CursorPriorityManager(gui.UIManager):
+    def on_draw(self):
+        super().on_draw()
+        State.state.render_mouse()
+
+
 class PlayerSelect(Event_Base.EventBase):
     def __init__(self):
         super().__init__()
         arcade.set_background_color((0, 0, 0))
-        self.ui_manager = gui.UIManager()
+        self.ui_manager = CursorPriorityManager()
         self.ui_manager.purge_ui_elements()
         self.username = None
         self.password = None
@@ -47,6 +53,9 @@ class PlayerSelect(Event_Base.EventBase):
             state_player.meta_data.is_player = True
             state_player.meta_data.is_guest = False
             state_player.meta_data.is_enemy = False
+            from W_Main_File.Utilities import Inventory_GUI
+            Inventory_GUI._inventory_toggle = False
+            State.state.preoccupied = False
             from W_Main_File.Views import Exploration
             self.ui_manager.purge_ui_elements()
             Seeding.set_world_seed_from_player_name()
@@ -105,6 +114,9 @@ class PlayerSelect(Event_Base.EventBase):
         state.lvl = 1
         state.floor = 1
         state.deaths = 0
+        from W_Main_File.Utilities import Inventory_GUI
+        Inventory_GUI._inventory_toggle = False
+        State.state.preoccupied = False
         import os
         if os.path.exists(f'Interactable_Tiles/Guest/'):
             shutil.rmtree(f'Interactable_Tiles/Guest/')
@@ -113,6 +125,7 @@ class PlayerSelect(Event_Base.EventBase):
         Seeding.set_world_seed_from_player_name()
         State.state.window.show_view(Exploration.Explore())
 
+    # noinspection PyProtectedMember
     def on_draw(self):
         super().on_draw()
         center_screen = Vector.Vector(self.window.width / 2, self.window.height / 2)
@@ -122,7 +135,6 @@ class PlayerSelect(Event_Base.EventBase):
                          font_name='arial', font_size=20, anchor_x='center', anchor_y='center')
         if self.incorrect_password_end > time.time():
             arcade.draw_text('Incorrect Password', State.state.screen_center.x, State.state.screen_center.y - 100, arcade.color.RED, font_name='arial', font_size=20, anchor_x='center', anchor_y='center')
-
 
 # noinspection PyUnresolvedReferences,PyProtectedMember,PyAttributeOutsideInit
 class LimitText(gui.elements.inputbox._KeyAdapter):

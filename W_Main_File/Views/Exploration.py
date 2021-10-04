@@ -86,6 +86,7 @@ class Explore(Event_Base.EventBase):
         key.D: (1, 0)
     }
 
+    # noinspection PyProtectedMember
     def on_draw(self):
         arcade.start_render()
         center_screen = State.state.screen_center
@@ -118,9 +119,11 @@ class Explore(Event_Base.EventBase):
         arcade.draw_rectangle_filled(center_screen.x, center_screen.y - (State.state.window.height * 0.3375), State.state.window.width * 0.625, State.state.window.height * 0.0475, (0, 0, 0))
         # arcade.draw_circle_filled(center_screen.x, center_screen.y, 25, arcade.color.AERO_BLUE)
         screen_percentage_of_default = (State.state.window.height / State.state.default_window_size.y)
-        arcade.draw_text(f'Floor: {int(State.state.player.floor)}', State.state.window.width * 0.5, (State.state.window.height * 0.5) - (cell_render_size.y * .37), arcade.color.LIGHT_GRAY,
+        arcade.draw_text(f'Floor: {int(State.state.player.floor)}', State.state.window.width * 0.5,
+                         (State.state.window.height * 0.5) - (cell_render_size.y * .37), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=(12 * screen_percentage_of_default), anchor_x='center', anchor_y='center')
-        arcade.draw_text(str(State.state.player.pos.tuple()), State.state.window.width * 0.5, (State.state.window.height * 0.5) + (cell_render_size.y * .37), arcade.color.LIGHT_GRAY,
+        arcade.draw_text(str(State.state.player.pos.tuple()), State.state.window.width * 0.5,
+                         (State.state.window.height * 0.5) + (cell_render_size.y * .37), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=(12 * screen_percentage_of_default), anchor_x='center', anchor_y='center')
         Sprites_.draw_backdrop()
         arcade.draw_rectangle_outline(center_screen.x, center_screen.y, State.state.window.width * 0.5, State.state.window.height * 0.625, (120, 120, 120), 4)
@@ -139,6 +142,7 @@ class Explore(Event_Base.EventBase):
         self.text_render()
         Inventory_GUI.render_inventory()
         self.button_manager.render()
+        State.state.render_mouse()
 
     # noinspection PyMethodMayBeStatic
     def text_render(self):
@@ -155,22 +159,30 @@ class Explore(Event_Base.EventBase):
                          font_size=(14 * screen_percentage_of_default), font_name='arial')
 
     def on_key_release(self, symbol, mods):
+        super().on_key_release(symbol, mods)
         if tile := State.state.grid.get(*State.state.player.pos):
             tile.key_up(symbol, mods)
 
     def on_mouse_press(self, x: float, y: float, button: int, modifiers: int):
+        super().on_mouse_press(x, y, button, modifiers)
         thing_to_do = (State.state.grid.get(*State.state.player.pos, default="EmptyTile"))
         thing_to_do_2 = (State.state.grid.get(*self.previous_pos, default="EmptyTile"))
         print(f'Current tile: {thing_to_do.__class__.__name__ if not thing_to_do.__class__.__name__ == "str" else "EmptyTile"}'
               f'\nPrevious tile: {thing_to_do_2.__class__.__name__ if not thing_to_do_2.__class__.__name__ == "str" else "EmptyTile"}\n')
 
     def on_key_press(self, symbol: int, modifiers: int):
+        super().on_key_press(symbol, modifiers)
         if symbol == arcade.key.B:
             State.state.player.hp -= State.state.player.max_hp
         if symbol == arcade.key.I:
-            for num in range(0, 3):
-                from W_Main_File.Items import All_Items
-                State.state.inventory.items.append(random.choice((All_Items.rusty_knife, All_Items.null_weapon_1, All_Items.null_weapon_2)))
+            if modifiers & arcade.key.MOD_SHIFT:
+                for num in range(0, 10):
+                    from W_Main_File.Items import All_Items
+                    State.state.inventory.items.append(random.choice((All_Items.rusty_knife, All_Items.null_weapon_1, All_Items.null_weapon_2)))
+            else:
+                for num in range(0, 3):
+                    from W_Main_File.Items import All_Items
+                    State.state.inventory.items.append(random.choice((All_Items.rusty_knife, All_Items.null_weapon_1, All_Items.null_weapon_2)))
         if symbol in self.key_offset:
             if symbol in (arcade.key.A, arcade.key.D):
                 self.__class__.symbol_ = symbol
@@ -208,13 +220,12 @@ class Explore(Event_Base.EventBase):
                 ):
                     enemy = Enemy.EnemyTile(new_player_pos)
                     State.state.grid.add(enemy)
-                # elif (
-                #         not State.state.grid.get(new_player_pos.x, new_player_pos.y)
-                #         and random.random() < 0.02
-                #         and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in {'1', '2'}
-                #         and new_player_pos.tuple() not in State.state.grid.visited_tiles
-                # ):
-                #     pass
+                elif (
+                        State.state.get_tile_id(Vector(new_player_pos.x, new_player_pos.y)) == '10'
+                        and not State.state.grid.get(new_player_pos.x, new_player_pos.y)
+                ):
+                    trapdoor = Trapdoor_Functions.TrapdoorTile(Vector(new_player_pos.x, new_player_pos.y))
+                    State.state.grid.add(trapdoor)
                 elif (
                         State.state.get_tile_id(Vector(new_player_pos.x, new_player_pos.y)) in ('0.5', '1.5')
                         and not State.state.grid.get(new_player_pos.x, new_player_pos.y)

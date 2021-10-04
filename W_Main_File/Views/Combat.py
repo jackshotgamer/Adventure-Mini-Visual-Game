@@ -55,6 +55,7 @@ class Combat(Event_Base.EventBase):
         arcade.draw_text(f'{self.combatant.hp} / {self.combatant.max_hp}\nHealth', State.state.window.width / 1.3,
                          State.state.window.height * 0.61, (255 - int(self.colour2 * 255), int(self.colour2 * 255), 0), 20, 150, 'center', anchor_x='center', anchor_y='center')
         self.button_manager.render()
+        State.state.render_mouse()
 
     def change_background_colour(self):
         arcade.set_background_color((0, 0, 0))

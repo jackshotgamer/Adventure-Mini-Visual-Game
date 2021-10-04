@@ -1,6 +1,8 @@
 import arcade
+import pyglet
+from pyglet.window import ImageMouseCursor
 from W_Main_File.Essentials import State
-from W_Main_File.Data import Tile, Item, HpEntity
+from W_Main_File.Data import Tile, Item, HpEntity, Sprites_
 from W_Main_File.Utilities import Vector
 from W_Main_File.Views import Player_Select
 from W_Main_File.Tiles import Home_Tile, Loot_Functions, Trapdoor_Functions
@@ -20,6 +22,15 @@ window.show_view(Player_Select.PlayerSelect())
 State.state.player.meta_data.is_me = True
 State.state.grid.add(Trapdoor_Functions.TrapdoorTile(Vector.Vector(-1, 0)))
 State.state.grid.add(Loot_Functions.LootTile(Vector.Vector(2, 0)))
-
+State.state.window.set_mouse_visible(False)
+# State.state.window.draw_mouse_cursor()
+# cursor_image = arcade.Sprite('Sprites/Rusty_Knife_1.png')
+# cursor_image = Texture(50, 50, )
+# cursor_image = pyglet.resource.image('Sprites/Rusty_Knife_1.png')
+# with open('Sprites/Rusty_Knife_1.png', 'rb') as file:
+#     pic = pyglet.image.load('Sprites/Rusty_Knife_1.png', file=file)
+# cursor = ImageMouseCursor(pic, 24, 7)
+# State.state.window.set_mouse_cursor(cursor=pic)
+# DOING CUSTOM MOUSE SPRITE
 if __name__ == '__main__':
     arcade.run()

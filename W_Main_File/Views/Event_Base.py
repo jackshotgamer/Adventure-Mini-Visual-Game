@@ -4,7 +4,10 @@ import arcade.gui
 from W_Main_File.Data import Sprites_
 from W_Main_File.Utilities.Vector import Vector
 from collections import namedtuple
-from W_Main_File.Essentials import Button_Sprite_Manager
+from W_Main_File.Essentials import Button_Sprite_Manager, State
+
+symbols = []
+held_modifiers = 0
 
 
 class EventBase(arcade.View):
@@ -20,7 +23,36 @@ class EventBase(arcade.View):
 
     def on_mouse_release(self, x: float, y: float, button: int, modifiers: int):
         self.button_manager.on_click_release()
+        State.state.window.set_mouse_visible(False)
 
     def on_draw(self):
         arcade.start_render()
         self.button_manager.render()
+
+    def on_key_press(self, symbol: int, modifiers: int):
+        global symbols
+        global held_modifiers
+        symbols.append(symbol)
+        held_modifiers |= modifiers
+
+    def on_key_release(self, _symbol: int, _modifiers: int):
+        global symbols
+        global held_modifiers
+        if _symbol in symbols:
+            symbols.remove(_symbol)
+        held_modifiers &= _modifiers
+
+
+"""
+100 shift
+010 ctrl
+
+press a + shift
+held_modifiers = 0b100
+
+release shift
+press b
+
+
+
+"""

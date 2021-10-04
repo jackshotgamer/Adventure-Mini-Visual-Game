@@ -57,7 +57,8 @@ def go_home_button():
 
 
 def log_out_button(show_confirm_screen, ui_manager):
-    if State.state.preoccupied:
+    from W_Main_File.Utilities import Inventory_GUI
+    if State.state.preoccupied and not Inventory_GUI.is_inv():
         return
     Action_Queue.action_queue.append(
         lambda: State.state.window.show_view(
@@ -92,6 +93,7 @@ def confirm_funct(ui_manager: UIManager):
     ui_manager.purge_ui_elements()
     from W_Main_File.Essentials.State import state
     state.clear_current_floor_data()
+    State.state.inventory.items.clear()
     Action_Queue.action_queue.append(lambda: State.state.window.show_view(Player_Select.PlayerSelect()))
 
 
