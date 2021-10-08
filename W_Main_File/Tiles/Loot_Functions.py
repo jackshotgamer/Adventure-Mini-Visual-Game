@@ -24,6 +24,11 @@ class LootTable:
 
 
 class LootTile(Tile.Tile):
+    loot_result_dict = {
+        'Broken_Stick': Sprites_.stick_sprite,
+        'Rusty_Knife': Sprites_.rusty_knife_sprite,
+    }
+    
     def __init__(self, pos):
         super().__init__(pos)
         self.current_opacity = 0
@@ -38,10 +43,7 @@ class LootTile(Tile.Tile):
         self.waiting = 0
         self.given_item = False
         self.table = LootTable(('Broken_Stick', 8), ('Rusty_Knife', 2000))  # , ('Iron Knife', 5), ('Iron Short-sword', 4), ('Iron Broad-sword', 1))
-        self.loot_result_dict = {
-            'Broken_Stick': Sprites_.stick_sprite,
-            'Rusty_Knife': Sprites_.rusty_knife_sprite,
-        }
+
         self.loot_result = ''
 
     def on_render_foreground(self, center, top_left, cell_size):

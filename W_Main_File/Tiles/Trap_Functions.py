@@ -28,7 +28,9 @@ class TrapTile(Tile.Tile):
     def on_enter(self):
         State.state.preoccupied = True
         self.playing_alert = True
-        subtract_amount = (int(State.state.player.max_hp * 0.2) if (State.state.player.hp / State.state.player.max_hp) >= 0.4 else int(State.state.player.max_hp * 0.1))
+        subtract_amount = (int(State.state.player.max_hp * random.uniform(0.15, 0.25)) if
+                           (State.state.player.hp / State.state.player.max_hp) >= 0.4 else
+                           int(State.state.player.max_hp * random.uniform(0.05, 0.15)))
         # noinspection PyAttributeOutsideInit
         self.goal_hp = State.state.player.hp - subtract_amount
         print(self.goal_hp)
@@ -53,7 +55,7 @@ class TrapTile(Tile.Tile):
             self.frame_count += 1
             if not self.frame_count % 2:
                 if State.state.player.hp > 0:
-                    State.state.player.hp = max(0, max(self.goal_hp, State.state.player.hp - 2))
+                    State.state.player.hp = max(0, max(self.goal_hp, State.state.player.hp - 3))
             if not self.frame_count % 8:
                 if self.width == 100:
                     self.width = random.randint(90, 92)

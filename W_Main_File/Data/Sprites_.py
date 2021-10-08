@@ -123,7 +123,7 @@ def update_backdrop():
     global backdrop_frame_count
     global reversing
     backdrop_frame_count += 1
-    if not backdrop_frame_count % 15:
+    if not backdrop_frame_count % 13:
         if current_backdrop_frame >= len(BACKGROUND_FRAMES) - 1:
             reversing = True
         elif current_backdrop_frame <= 0:

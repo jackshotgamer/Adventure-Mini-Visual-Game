@@ -39,20 +39,22 @@ class Explore(Event_Base.EventBase):
         from W_Main_File.Items import Inventory
         if State.state.player.meta_data.is_player:
             print(State.state.inventory.items)
+        self.yes = False
+        self.delta = time.time()
+        arcade.set_background_color((0, 0, 0))
 
     def update(self, delta_time: float):
+        self.delta = delta_time
         from W_Main_File.Views import Fading
         if State.state.player.hp <= 0:
             State.state.window.show_view(Fading.Fading((lambda: Purgatory_Screen.PurgatoryScreen('You Died', True)), 7, 4, should_reverse=False,
                                                        should_freeze=True, reset_pos=Vector(0, 0), render=lambda _: self.on_draw()))
             State.state.clear_current_floor_data()
-        if Action_Queue.action_queue:
-            action = Action_Queue.action_queue.popleft()
-            action()
+        self.check_action_queue()
         if self.should_transition_to_animation[0]:
             from W_Main_File.Views.Movement_Animator import MovementAnimator
             State.state.window.show_view(MovementAnimator(self.should_transition_to_animation[1],
-                                                          self.should_transition_to_animation[2], 18 if (State.state.window.width, State.state.window.height) == (1000, 800) else 18))
+                                                          self.should_transition_to_animation[2], 100 if (State.state.window.width, State.state.window.height) == (1000, 800) else 100))
             self.should_transition_to_animation[0] = False
             self.should_transition_to_animation[3]()
         else:
@@ -95,7 +97,7 @@ class Explore(Event_Base.EventBase):
         for x_off, y_off in State.state.generate_radius(State.state.render_radius):
             real_grid_pos = State.state.player.pos + (x_off, y_off)
             render_pos = Vector(center_screen.x + x_off * cell_render_size.x, center_screen.y + y_off * cell_render_size.y)
-            arcade.draw_texture_rectangle(render_pos.x, render_pos.y, cell_render_size.x, cell_render_size.y, State.state.tile_type_pos(*real_grid_pos))
+            arcade.draw_texture_rectangle(render_pos.x, render_pos.y, cell_render_size.x + 1, cell_render_size.y + 1, State.state.tile_type_pos(*real_grid_pos))
 
         for x_off, y_off in State.state.generate_radius(State.state.render_radius):
             real_grid_pos = State.state.player.pos + (x_off, y_off)
@@ -140,6 +142,8 @@ class Explore(Event_Base.EventBase):
         for tile, *args in render_queue:
             tile.on_render_foreground(*args)
         self.text_render()
+        # if State.state.preoccupied:
+        #     arcade.draw_text('Preoccupied', 800, 700, arcade.color.RED, 30)
         Inventory_GUI.render_inventory()
         self.button_manager.render()
         State.state.render_mouse()
@@ -169,11 +173,19 @@ class Explore(Event_Base.EventBase):
         thing_to_do_2 = (State.state.grid.get(*self.previous_pos, default="EmptyTile"))
         print(f'Current tile: {thing_to_do.__class__.__name__ if not thing_to_do.__class__.__name__ == "str" else "EmptyTile"}'
               f'\nPrevious tile: {thing_to_do_2.__class__.__name__ if not thing_to_do_2.__class__.__name__ == "str" else "EmptyTile"}\n')
+        print(f'X: {x}, Screen_X: {x / State.state.window.width}\nY: {y}, Screen_Y: {y / State.state.window.height}\n')
+
+    def check_action_queue(self):
+        while Action_Queue.action_queue:
+            action = Action_Queue.action_queue.popleft()
+            action()
 
     def on_key_press(self, symbol: int, modifiers: int):
         super().on_key_press(symbol, modifiers)
         if symbol == arcade.key.B:
             State.state.player.hp -= State.state.player.max_hp
+        if symbol == arcade.key.L:
+            self.yes = True
         if symbol == arcade.key.I:
             if modifiers & arcade.key.MOD_SHIFT:
                 for num in range(0, 10):
@@ -214,7 +226,7 @@ class Explore(Event_Base.EventBase):
                     State.state.grid.add(loot)
                 elif (
                         not State.state.grid.get(new_player_pos.x, new_player_pos.y)
-                        and random.random() < 0.05
+                        and random.random() < 1
                         and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in {'1'}
                         and new_player_pos.tuple() not in State.state.grid.visited_tiles
                 ):
@@ -235,8 +247,8 @@ class Explore(Event_Base.EventBase):
                     State.state.grid.add(trap)
 
                 State.state.grid.add_visited_tile(new_player_pos)
-
             self.should_transition_to_animation = [True, prior_player_pos, new_player_pos, after_update]
+            self.check_action_queue()
 
         else:
             if tile := State.state.grid.get(*State.state.player.pos):

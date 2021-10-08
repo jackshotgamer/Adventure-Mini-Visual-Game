@@ -11,6 +11,7 @@ import arcade
 
 
 def play_button(ui_manager: UIManager):
+    State.state.clear_current_floor_data()
     ui_manager.purge_ui_elements()
     State.state.player.hp = State.state.player.max_hp
     explore = Exploration.Explore()
@@ -68,9 +69,9 @@ class ResetCharacterView(Event_Base.EventBase):
         self.message = message
         self.ui_manager = gui.UIManager()
         self.ui_manager.purge_ui_elements()
-        self.button_manager.append('Confirm2', 'Confirm?', Vector.Vector(State.state.screen_center.x - 100, State.state.screen_center.y), Vector.Vector(200, 50),
+        self.button_manager.append('Confirm2', 'Confirm?', Vector.Vector(State.state.screen_center.x - 100, State.state.screen_center.y), Vector.Vector(199, 50),
                                    on_click=partial(confirm_func, message))
-        self.button_manager.append('Deny2', 'Deny?', Vector.Vector(State.state.screen_center.x + 100, State.state.screen_center.y), Vector.Vector(200, 50),
+        self.button_manager.append('Deny2', 'Deny?', Vector.Vector(State.state.screen_center.x + 100, State.state.screen_center.y), Vector.Vector(199, 50),
                                    on_click=partial(deny_func, message))
 
     def on_draw(self):
@@ -94,9 +95,11 @@ class PurgatoryScreen(Event_Base.EventBase):
         self.current_window_size = Vector.Vector(State.state.window.width, State.state.window.height)
         self.buttons()
         if increment_death:
+            print('hi')
             State.state.player.deaths += 1
             from W_Main_File.Utilities import Seeding
             Seeding.set_world_seed_from_player_name()
+            State.state.clear_current_floor_data(should_clear_grid=False)
 
     def on_draw(self):
         super().on_draw()

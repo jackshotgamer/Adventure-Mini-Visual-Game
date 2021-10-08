@@ -75,4 +75,3 @@ class InventoryContainer:
             pathlib.Path('Inventory_Contents').mkdir()
         with open(f'Inventory_Contents/{file_path}', 'wb') as file:
             pickle.dump(self.items, file)
-        print('hi')

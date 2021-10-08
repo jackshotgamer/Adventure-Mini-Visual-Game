@@ -22,6 +22,7 @@ class MovementAnimator(Event_Base.EventBase):
         self.affected_tiles = self.get_affected_tiles()
         self.empty_tiles = self.get_empty_tiles()
         State.state.is_moving = True
+        self.enemy_tiles = []
 
     def get_affected_tiles(self):
         tile_pos = set()
@@ -80,7 +81,7 @@ class MovementAnimator(Event_Base.EventBase):
                     self.animation_steps)
             ) - first_tile[1]
 
-        for offset in State.state.generate_radius(3):
+        for offset in State.state.generate_radius(State.state.render_radius):
             # noinspection PyUnboundLocalVariable
             real_grid_pos = State.state.player.pos + offset
             render_pos = (center + (self.cell_render_size * offset)) + sprite_offset
@@ -123,6 +124,8 @@ class MovementAnimator(Event_Base.EventBase):
     # noinspection PyMethodMayBeStatic,PyProtectedMember
     def text_render(self):
         screen_percentage_of_default = (State.state.window.height / State.state.default_window_size.y)
+        # arcade.draw_rectangle_filled(State.state.window.width / 2, State.state.window.height * 0.8275, State.state.window.width * 0.333333334, State.state.window.height * 0.03125,
+        #                              arcade.color.BLACK)
         arcade.draw_text(f'Name: {State.state.player.name}', State.state.window.width * 0.275, State.state.window.height * 0.1625, arcade.color.LIGHT_GRAY,
                          font_size=(11 * screen_percentage_of_default), font_name='arial')
         arcade.draw_text(f'Hp: {int(State.state.player.hp)} / {int(State.state.player.max_hp)}', State.state.window.width * 0.475, State.state.window.height * 0.1625, arcade.color.LIGHT_GRAY,

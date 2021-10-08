@@ -6,10 +6,15 @@ from W_Main_File.Essentials import State
 from W_Main_File.Data import Tile, Sprites_, Enemy_Data
 import arcade
 import random
+import time
+
+"""
+self.combat.on_draw()
+self.combat = Combat.Combat(Enemy_Data.enemy_possibilities['Dragon']())
+"""
 
 
 class EnemyTile(Tile.Tile):
-
     def __init__(self, pos):
         from W_Main_File.Views import Exploration
         from W_Main_File.Views import Combat
@@ -19,6 +24,9 @@ class EnemyTile(Tile.Tile):
         self.explore = Exploration.Explore()
         self.current_opacity = 0
         self.combat = Combat.Combat(Enemy_Data.enemy_possibilities['Dragon']())
+        self.alpha = 0
+        self.dont_render_it = True
+        self.tomes = 0
 
     def on_enter(self):
         from W_Main_File.Views import Combat
@@ -30,10 +38,22 @@ class EnemyTile(Tile.Tile):
             Action_Queue.action_queue.append(
                 lambda: State.state.window.show_view(Fading.Fading(
                     lambda: self.combat,
-                    5, 5, should_reverse=True, should_freeze=True,
+                    1, 1, should_reverse=True, should_freeze=True,
                     render=self.fading_render
                 )
                 ))
+
+    def on_render(self, center, top_left, cell_size):
+        from W_Main_File.Views.Exploration import Explore
+        if (self.pos.x, self.pos.y) != (State.state.player.pos.x, State.state.player.pos.y):
+            self.dont_render_it = False
+        if self.fought and not self.dont_render_it:
+            if self.alpha < 225:
+                self.alpha = min(225, self.alpha + 2)
+            arcade.draw_texture_rectangle(center.x, center.y, State.state.cell_render_size.x * 0.96, State.state.cell_render_size.y * 0.76, Sprites_.knight_start_2,
+                                          alpha=self.alpha)
+            arcade.draw_texture_rectangle(center.x, center.y, State.state.cell_render_size.x * 0.50, State.state.cell_render_size.y * 0.50, Sprites_.Null,
+                                          alpha=self.alpha)
 
     def on_render_foreground(self, center, top_left, cell_size):
         if State.state.player.pos == self.pos:
@@ -75,12 +95,20 @@ class EnemyTile(Tile.Tile):
         return {
             'pos': self.pos,
             'fought': self.fought,
-            'combat': self.combat
+            'combat': self.combat.combatant.name
         }
 
     @classmethod
     def load_from_data(cls, persistent_data):
         tile = EnemyTile(persistent_data['pos'])
         tile.fought = persistent_data['fought']
-        tile.combat = persistent_data['combat']
+        tile.combat.combatant.name = persistent_data['combat']
+        if not tile.fought:
+            tile.dont_render_it = True
+        else:
+            tile.dont_render_it = False
         return tile
+
+    def on_exit(self):
+        super().on_exit()
+        State.state.preoccupied = False

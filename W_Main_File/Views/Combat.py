@@ -13,6 +13,12 @@ from W_Main_File.Utilities.Vector import Vector
 
 
 class Combat(Event_Base.EventBase):
+    sprite = {
+        'Witch': Sprites_.swamp_monster,
+        'Dragon': Sprites_.swamp_monster,
+        'Ogre': Sprites_.swamp_monster,
+    }
+
     def __init__(self, combatant: Enemy_Data.EnemyData):
         super().__init__()
         self.combatant = combatant
@@ -36,14 +42,14 @@ class Combat(Event_Base.EventBase):
         arcade.draw_texture_rectangle(State.state.window.width / 1.3, State.state.window.height / 1.4, 170, 65, Sprites_.black_circle_sprite, alpha=100)
         arcade.draw_arc_outline(State.state.window.width / 1.3, State.state.window.height / 1.4, 250, 100, (125, 0, 0), 0, 180, 15)
         arcade.draw_arc_outline(State.state.window.width / 1.3, State.state.window.height / 1.4, 250, 100, (150, 0, 0), 180, 360, 15)
-        arcade.draw_texture_rectangle(State.state.window.width / 1.3, (State.state.window.height / 1.4) + 65, 150, 150, Sprites_.swamp_monster)
+        arcade.draw_texture_rectangle(State.state.window.width / 1.3, (State.state.window.height / 1.4) + 65, 150, 150, self.sprite[self.combatant.name])
 
         arcade.draw_ellipse_filled(State.state.window.width / 5, State.state.window.height / 2.4, 250, 100, (90, 0, 0))
         arcade.draw_texture_rectangle(State.state.window.width / 5, State.state.window.height / 2.4, 140, 65, Sprites_.black_circle_sprite, alpha=100)
         arcade.draw_arc_outline(State.state.window.width / 5, State.state.window.height / 2.4, 250, 100, (125, 0, 0), 0, 180, 15)
         arcade.draw_arc_outline(State.state.window.width / 5, State.state.window.height / 2.4, 250, 100, (150, 0, 0), 180, 360, 15)
         if not self.key_:
-            arcade.draw_texture_rectangle(State.state.window.width / 5, (State.state.window.height / 2.4) + 65, 150, 150, Sprites_.knight_start)
+            arcade.draw_texture_rectangle(State.state.window.width / 5, (State.state.window.height / 2.4) + 65, 150, 150, Sprites_.knight_start_2)
         else:
             arcade.draw_texture_rectangle(State.state.window.width / 5, (State.state.window.height / 2.4) + 65, 150, 150, Sprites_.knight_start_flipped)
 
@@ -105,6 +111,7 @@ class Combat(Event_Base.EventBase):
             self.on_draw()
         elif state_ == 'reversing':
             self.explore.on_draw()
+        arcade.set_background_color((0, 0, 0))
 
     def flee(self):
         from W_Main_File.Views import Fading
@@ -112,6 +119,7 @@ class Combat(Event_Base.EventBase):
             State.state.player.hp = 1
         else:
             State.state.player.hp -= int(State.state.player.max_hp * 0.25)
-        State.state.window.show_view(Fading.Fading(lambda: self.explore, 7, 4, should_reverse=True,
+        self.change_background_colour()
+        State.state.window.show_view(Fading.Fading(lambda: self.explore, 1, 1, should_reverse=True,
                                                    should_freeze=True, halfway_func=self.change_background_colour, render=lambda _: self.fading_render(_)))
         return

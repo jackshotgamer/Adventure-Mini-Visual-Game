@@ -19,9 +19,9 @@ class LogOutView(Event_Base.EventBase):
         self.show_confirmation_screen = show_confirmation_screen
         self.show_warning_with_guest_and_player = show_warning_with_guest_and_player
         if self.show_confirmation_screen:
-            self.button_manager.append('Confirm1', 'Confirm?', Vector.Vector(State.state.screen_center.x - 100, State.state.screen_center.y), Vector.Vector(200, 50),
+            self.button_manager.append('Confirm1', 'Confirm?', Vector.Vector(State.state.screen_center.x - 100, State.state.screen_center.y), Vector.Vector(199, 50),
                                        on_click=on_confirm_func)
-            self.button_manager.append('Deny1', 'Deny?', Vector.Vector(State.state.screen_center.x + 100, State.state.screen_center.y), Vector.Vector(200, 50),
+            self.button_manager.append('Deny1', 'Deny?', Vector.Vector(State.state.screen_center.x + 100, State.state.screen_center.y), Vector.Vector(199, 50),
                                        on_click=self.on_deny_func)
 
     def update(self, delta_time: float):
