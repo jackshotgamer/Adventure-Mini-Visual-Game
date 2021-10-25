@@ -18,7 +18,7 @@ class State:
         self.window = None
         self.grid = Grid.Grid()
         self.cell_size = Vector.Vector(100, 100)
-        self.render_radius = 3
+        self.render_radius = 2
         self.default_window_size = Vector.Vector(1000, 800)
         self.pw = ''
         self.texture_mapping = {}

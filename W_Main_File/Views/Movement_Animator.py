@@ -63,7 +63,7 @@ class MovementAnimator(Event_Base.EventBase):
 
     @property
     def cell_render_size(self):
-        return State.state.cell_size * ((State.state.window.width / State.state.default_window_size.x), (State.state.window.height / State.state.default_window_size.y))
+        return State.state.cell_size * ((State.state.window.width / State.state.default_window_size.xf), (State.state.window.height / State.state.default_window_size.yf))
 
     def on_draw(self):
         arcade.start_render()
@@ -81,49 +81,49 @@ class MovementAnimator(Event_Base.EventBase):
                     self.animation_steps)
             ) - first_tile[1]
 
-        for offset in State.state.generate_radius(State.state.render_radius):
+        for offset in State.state.generate_radius(3):
             # noinspection PyUnboundLocalVariable
             real_grid_pos = State.state.player.pos + offset
             render_pos = (center + (self.cell_render_size * offset)) + sprite_offset
-            arcade.draw_texture_rectangle(render_pos.x, render_pos.y, self.cell_render_size.x, self.cell_render_size.y, State.state.tile_type_pos(*real_grid_pos))
+            arcade.draw_texture_rectangle(render_pos.xf, render_pos.yf, self.cell_render_size.xf, self.cell_render_size.yf, State.state.tile_type_pos(*real_grid_pos))
 
         for tile, start, end in self.affected_tiles:
             tile_center = Vector.Vector(*arcade.lerp_vec(start, end, self.current_steps / self.animation_steps))
-            tile.on_render(tile_center, tile_center + (-(self.cell_render_size.x / 2), self.cell_render_size.y / 2), self.cell_render_size)
+            tile.on_render(tile_center, tile_center + (-(self.cell_render_size.xf / 2), self.cell_render_size.yf / 2), self.cell_render_size)
 
         for start, end in self.empty_tiles:
             tile_center = Vector.Vector(*arcade.lerp_vec(start, end, self.current_steps / self.animation_steps))
-            arcade.draw_rectangle_outline(tile_center.x, tile_center.y, self.cell_render_size.x, self.cell_render_size.y, (120, 120, 120))
+            arcade.draw_rectangle_outline(tile_center.xf, tile_center.yf, self.cell_render_size.xf, self.cell_render_size.yf, (120, 120, 120))
 
-        # arcade.draw_circle_filled(center.x, center.y, 25, arcade.color.AERO_BLUE)
-        arcade.draw_rectangle_filled(center.x, center.y - (State.state.window.height * 0.3375), State.state.window.width * 0.625, State.state.window.height * 0.0475, (0, 0, 0))
-        arcade.draw_rectangle_filled(center.x, center.y + (State.state.window.height * 0.3375), State.state.window.width * 0.625, State.state.window.height * 0.0475, (0, 0, 0))
-        arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y,
-                                      State.state.cell_render_size.x * 0.95, State.state.cell_render_size.y * 0.95, Sprites_.black_circle_sprite, 0, 75)
-        arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y,
-                                      State.state.cell_render_size.x * 0.95, State.state.cell_render_size.y * 0.95, Sprites_.black_circle_square_sprite, 0, 100)
-        arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y,
-                                      State.state.cell_render_size.x * 0.95, State.state.cell_render_size.y * 0.95, Sprites_.black_square_circle_square_sprite, 0, 125)
-        screen_percentage_of_default = (State.state.window.height / State.state.default_window_size.y)
-        arcade.draw_text(f'Floor: {int(State.state.player.floor)}', State.state.window.width * 0.5, (State.state.window.height * 0.5) - (self.cell_render_size.y * .37), arcade.color.LIGHT_GRAY,
+        # arcade.draw_circle_filled(center.xf, center.yf, 25, arcade.color.AERO_BLUE)
+        arcade.draw_rectangle_filled(center.xf, center.yf - (State.state.window.height * 0.3375), State.state.window.width * 0.625, State.state.window.height * 0.0475, (0, 0, 0))
+        arcade.draw_rectangle_filled(center.xf, center.yf + (State.state.window.height * 0.3375), State.state.window.width * 0.625, State.state.window.height * 0.0475, (0, 0, 0))
+        arcade.draw_texture_rectangle(State.state.screen_center.xf, State.state.screen_center.yf,
+                                      State.state.cell_render_size.xf * 0.95, State.state.cell_render_size.yf * 0.95, Sprites_.black_circle_sprite, 0, 75)
+        arcade.draw_texture_rectangle(State.state.screen_center.xf, State.state.screen_center.yf,
+                                      State.state.cell_render_size.xf * 0.95, State.state.cell_render_size.yf * 0.95, Sprites_.black_circle_square_sprite, 0, 100)
+        arcade.draw_texture_rectangle(State.state.screen_center.xf, State.state.screen_center.yf,
+                                      State.state.cell_render_size.xf * 0.95, State.state.cell_render_size.yf * 0.95, Sprites_.black_square_circle_square_sprite, 0, 125)
+        screen_percentage_of_default = (State.state.window.height / State.state.default_window_size.yf)
+        arcade.draw_text(f'Floor: {int(State.state.player.floor)}', State.state.window.width * 0.5, (State.state.window.height * 0.5) - (self.cell_render_size.yf * .37), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=(12 * screen_percentage_of_default), anchor_x='center', anchor_y='center')
-        arcade.draw_text(str(State.state.player.pos.tuple()), State.state.window.width * 0.5, (State.state.window.height * 0.5) + (self.cell_render_size.y * .37), arcade.color.LIGHT_GRAY,
+        arcade.draw_text(str(State.state.player.pos.tuple()), State.state.window.width * 0.5, (State.state.window.height * 0.5) + (self.cell_render_size.yf * .37), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=(12 * screen_percentage_of_default), anchor_x='center', anchor_y='center')
         Sprites_.draw_backdrop()
         Sprites_.draw_character()
-        arcade.draw_rectangle_outline(center.x, center.y, State.state.window.width * 0.5, State.state.window.height * 0.625, (120, 120, 120), 4)
+        arcade.draw_rectangle_outline(center.xf, center.yf, State.state.window.width * 0.5, State.state.window.height * 0.625, (120, 120, 120), 4)
         from W_Main_File.Views import Exploration
         arcade.draw_text(f'FPS = {Exploration.Explore.fps:.1f}', 2, self.window.height - 22, arcade.color.GREEN,
                          font_name='arial', font_size=14)
         for tile, start, end in self.affected_tiles:
             tile_center = Vector.Vector(*arcade.lerp_vec(start, end, self.current_steps / self.animation_steps))
-            tile.on_render_foreground(tile_center, tile_center + (-(self.cell_render_size.x / 2), self.cell_render_size.y / 2), self.cell_render_size)
+            tile.on_render_foreground(tile_center, tile_center + (-(self.cell_render_size.xf / 2), self.cell_render_size.yf / 2), self.cell_render_size)
         self.text_render()
         self.button_manager.render()
 
     # noinspection PyMethodMayBeStatic,PyProtectedMember
     def text_render(self):
-        screen_percentage_of_default = (State.state.window.height / State.state.default_window_size.y)
+        screen_percentage_of_default = (State.state.window.height / State.state.default_window_size.yf)
         # arcade.draw_rectangle_filled(State.state.window.width / 2, State.state.window.height * 0.8275, State.state.window.width * 0.333333334, State.state.window.height * 0.03125,
         #                              arcade.color.BLACK)
         arcade.draw_text(f'Name: {State.state.player.name}', State.state.window.width * 0.275, State.state.window.height * 0.1625, arcade.color.LIGHT_GRAY,
@@ -143,14 +143,14 @@ class MovementAnimator(Event_Base.EventBase):
         cell_size = State.state.cell_size
         for x_off in range(~ inner_radius, inner_radius + 2):
             render = (Vector.Vector(x_off, inner_radius + 1) * cell_size) + State.state.screen_center
-            arcade.draw_rectangle_filled(render.x, render.y, cell_size.x - 1, cell_size.y - 1, arcade.color.BLACK)
+            arcade.draw_rectangle_filled(render.xf, render.yf, cell_size.xf - 1, cell_size.yf - 1, arcade.color.BLACK)
 
             render = (Vector.Vector(x_off, -(inner_radius + 1)) * cell_size) + State.state.screen_center
-            arcade.draw_rectangle_filled(render.x, render.y, cell_size.x - 1, cell_size.y - 1, arcade.color.BLACK)
+            arcade.draw_rectangle_filled(render.xf, render.yf, cell_size.xf - 1, cell_size.yf - 1, arcade.color.BLACK)
 
         for y_off in range(~ inner_radius, inner_radius + 2):
             render = (Vector.Vector(inner_radius + 1, y_off) * cell_size) + State.state.screen_center
-            arcade.draw_rectangle_filled(render.x, render.y, cell_size.x - 1, cell_size.y - 1, arcade.color.BLACK)
+            arcade.draw_rectangle_filled(render.xf, render.yf, cell_size.xf - 1, cell_size.yf - 1, arcade.color.BLACK)
 
             render = (Vector.Vector(-(inner_radius + 1), y_off) * cell_size) + State.state.screen_center
-            arcade.draw_rectangle_filled(render.x, render.y, cell_size.x - 1, cell_size.y - 1, arcade.color.BLACK)
+            arcade.draw_rectangle_filled(render.xf, render.yf, cell_size.xf - 1, cell_size.yf - 1, arcade.color.BLACK)
