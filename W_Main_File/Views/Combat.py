@@ -27,13 +27,13 @@ class Combat(Event_Base.EventBase):
         self.truthy = False
         self.truthy2 = False
         self.key_ = False
+        self.is_turn = True
         self.symbol2 = arcade.key.D
+        self.current_window_size = Vector(State.state.window.width, State.state.window.height)
         from W_Main_File.Tiles import Enemy
         from W_Main_File.Views import Exploration
         self.explore = Exploration.Explore()
-        screen_percentage_of_default = (State.state.window.height / State.state.default_window_size.y)
-        self.button_manager.append('Flee', f'Flee from {self.combatant.name}', Vector((State.state.window.width * 0.13), (State.state.window.height * 0.06875)),
-                                   Vector((State.state.window.width * 0.2), (State.state.window.height * 0.0625)), text_size=(16 * screen_percentage_of_default), on_click=self.flee)
+        self.buttons()
 
     def on_draw(self):
         arcade.set_background_color((18, 18, 18))
@@ -53,8 +53,11 @@ class Combat(Event_Base.EventBase):
         else:
             arcade.draw_texture_rectangle(State.state.window.width / 5, (State.state.window.height / 2.4) + 65, 150, 150, Sprites_.knight_start_flipped)
 
-        arcade.draw_rectangle_filled(State.state.window.width / 2, (State.state.window.height / 2.4) - (100 + 125), State.state.window.width, 225, (200, 200, 200))
-        arcade.draw_rectangle_outline(State.state.window.width / 2, ((State.state.window.height / 2.4) - (100 + 125)) + 6, State.state.window.width - 10, 230 - 10, (100, 100, 100), 10)
+        arcade.draw_rectangle_filled(State.state.window.width / 2,
+                                     (State.state.window.height / 2.4) - ((State.state.window.height * 0.125) + (State.state.window.height * 0.15625)),
+                                     State.state.window.width, State.state.window.height * 0.2875, (200, 200, 200))
+        arcade.draw_rectangle_outline(State.state.window.width / 2, ((State.state.window.height / 2.4) - ((State.state.window.height * 0.125) + (State.state.window.height * 0.15625))) + 6,
+                                      State.state.window.width - 10, State.state.window.height * 0.2875 - 10, (100, 100, 100), 10)
         # 100, 480
         arcade.draw_text(f'{State.state.player.hp} / {State.state.player.max_hp}\nHealth', State.state.window.width / 5,
                          State.state.window.height * 0.61, (255 - int(self.colour * 255), int(self.colour * 255), 0), 20, 150, 'center', anchor_x='center', anchor_y='center')
@@ -67,7 +70,22 @@ class Combat(Event_Base.EventBase):
         arcade.set_background_color((0, 0, 0))
         self.truthy = self.truthy
 
+    def check_if_resized(self):
+        if self.current_window_size.x == State.state.window.width and self.current_window_size.y == State.state.window.height:
+            return
+        else:
+            self.buttons()
+            self.current_window_size = Vector(State.state.window.width, State.state.window.height)
+
+    def
+
+    def buttons(self):
+        screen_percentage_of_default = (State.state.window.height / State.state.default_window_size.y)
+        self.button_manager.append('Flee', f'Flee from {self.combatant.name}', Vector((State.state.window.width * 0.13), (State.state.window.height * 0.06875)),
+                                   Vector((State.state.window.width * 0.2), (State.state.window.height * 0.0625)), text_size=(16 * screen_percentage_of_default), on_click=self.flee)
+
     def update(self, delta_time: float):
+        self.check_if_resized()
         self.colour = State.state.player.hp / State.state.player.max_hp
         self.colour2 = self.combatant.hp / self.combatant.max_hp
         if State.state.player.hp <= 0:
