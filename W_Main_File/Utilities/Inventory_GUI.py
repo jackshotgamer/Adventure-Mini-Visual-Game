@@ -61,7 +61,17 @@ def is_inv():
         return False
 
 
-def render_inventory():
+def inventory_nw():
+    return Vector(((State.state.window.width * 0.25) + (State.state.cell_render_size.x / 2)) - ((State.state.window.width * 0.095) / 2),
+                  ((State.state.window.height * 0.8125) - (State.state.cell_render_size.y / 2)) + ((State.state.window.height * 0.11875) / 2))
+
+
+def inventory_se():
+    return Vector(((State.state.window.width * 0.75) - (State.state.cell_render_size.x / 2)) + ((State.state.window.width * 0.095) / 2),
+                  ((State.state.window.height * 0.1875) + (State.state.cell_render_size.y / 2)) - ((State.state.window.height * 0.11875) / 2))
+
+
+def render_inventory(mouse_pos: Vector):
     if _inventory_toggle:
         import numpy as np
         arcade.draw_rectangle_filled(State.state.screen_center.x, State.state.screen_center.y, State.state.window.width * 0.5, State.state.window.height * 0.625, (20, 20, 20))
@@ -74,10 +84,6 @@ def render_inventory():
         screen_percentage_of_default = (State.state.window.height / State.state.default_window_size.y)
         arcade.draw_text(f'Page:\n{State.state.current_page + 1}/{State.state.inventory.page_count + 1}', State.state.screen_center.x, State.state.screen_center.y * .25, arcade.color.LIGHT_GRAY,
                          font_size=(11 * screen_percentage_of_default), width=int(State.state.window.width * .05), align='center', font_name='arial', anchor_x='center', anchor_y='center')
-        from W_Main_File.Items import All_Items
-        if not State.state.inventory.items:
-            knife = All_Items.rusty_knife
-            State.state.inventory.add_item(knife)
         items = State.state.inventory.items
         origin_x, origin_y = (State.state.window.width * 0.25) + (State.state.cell_render_size.x / 2), (State.state.window.height * 0.8125) - (State.state.cell_render_size.y / 2)
         if items:
@@ -94,29 +100,62 @@ def render_inventory():
                 y = index // 5
                 if item is not None:
                     sprite = Sprites_.get_sprite_from_id(item.id_)
-                    arcade.draw_rectangle_outline(((State.state.window.width * 0.25) + (State.state.cell_render_size.x / 2)) - ((State.state.window.width * 0.095) / 2),
-                                                  ((State.state.window.height * 0.8125) - (State.state.cell_render_size.y / 2)) + ((State.state.window.height * 0.11875) / 2),
-                                                  State.state.window.width * 0.095, State.state.window.height * 0.11875, arcade.color.LIGHT_GRAY, 1)
+                    # arcade.draw_rectangle_outline(inventory_nw().x, inventory_nw().y, State.state.window.width * 0.095, State.state.window.height * 0.11875, arcade.color.LIGHT_GRAY, 1)
                     arcade.draw_texture_rectangle((x * State.state.cell_render_size.x) + origin_x, ((y * -State.state.cell_render_size.y) + origin_y),
-                                                  99, 99, sprite, alpha=200 if sprite == Sprites_.Null else 255)
+                                                  100, 100, sprite, alpha=200 if sprite == Sprites_.Null else 255)
+        State.state.render_mouse()
+        show_tooltips(mouse_pos)
         if len(items) > 25:
             pass
+    else:
+        State.state.render_mouse()
 
 
-def show_tooltips(mouse_x, mouse_y):
+def sprite_from_text_image(image, key_: str = "Key"):
+    text_sprite = arcade.Sprite()
+    text_sprite._texture = arcade.Texture(key_)
+    text_sprite.texture.image = image
+    text_sprite.width = image.width
+    text_sprite.height = image.height
+    return text_sprite
+
+
+def show_tooltips(mouse_pos: Vector):
     items = State.state.inventory.items
-    mouse_pos = Vector(mouse_x, mouse_y)
-    if items:
-        origin_x = ((State.state.window.width * 0.25) + (State.state.cell_render_size.x / 2)) - ((State.state.window.width * 0.095) / 2)
-        origin_y = ((State.state.window.height * 0.8125) - (State.state.cell_render_size.y / 2)) + ((State.state.window.height * 0.11875) / 2)
-        item_length = len(items)
-        inventory_contents = []
-        for index, item in enumerate(range(0, item_length)):
-            if index > State.state.inventory.page_size - 1:
-                break
-            inventory_contents.append(State.state.inventory.get_item(index, State.state.current_page))
-        for index, item in enumerate(inventory_contents):
-            if index > 24:
-                break
-
-
+    if not items:
+        return
+    origin_pos_nw = inventory_nw()
+    origin_pos_se = inventory_se()
+    origin_pos_sw = Vector(origin_pos_nw.x, origin_pos_se.y)
+    origin_pos_ne = Vector(origin_pos_se.x, origin_pos_nw.y)
+    if not ((origin_pos_sw.x < mouse_pos.x < origin_pos_ne.x) and (origin_pos_sw.y < mouse_pos.y < origin_pos_ne.y)):
+        return
+    # arcade.draw_text
+    mouse_pos_local = Vector(mouse_pos.x - origin_pos_nw.x, mouse_pos.y - origin_pos_nw.y)
+    box_pos_int = Vector(int(mouse_pos_local.x / State.state.cell_render_size.x), int(mouse_pos_local.y / State.state.cell_render_size.y))
+    grid_pos = Vector((origin_pos_nw.x + (box_pos_int.x * State.state.cell_render_size.x)) + (State.state.cell_render_size.x / 2),
+                      (origin_pos_nw.y + (box_pos_int.y * State.state.cell_render_size.y)) - (State.state.cell_render_size.y / 2))
+    from W_Main_File.Items.Inventory import InventoryContainer
+    from W_Main_File.Data import Item
+    item: Item.Item = State.state.inventory.get_item(abs(box_pos_int.y * 5) + box_pos_int.x, State.state.current_page)
+    if item is not None:
+        if item.type_ is Item.ItemType.Weapon:
+            item: Item.Weapon
+            if item.has_elemental_damage:
+                element_type = item.element_type().name.replace('_', ' ')
+                text_image = arcade.get_text_image(f'Name: {item.name}\n Type: {item.type_.name}\nDamage: {item.min_attack}'
+                                                   f'-{item.max_attack}\nSpeed: {item.speed}\nElement: {element_type.title()}', arcade.color.GREEN, 14)
+            else:
+                text_image = arcade.get_text_image(f'Name: {item.name}\n Type: {item.type_.name}\nDamage: {item.min_attack}-{item.max_attack}\nSpeed: {item.speed}', arcade.color.GREEN, 14)
+        else:
+            text_image = arcade.get_text_image(f'Name: {item.name}\n Type: {item.type_.name}', arcade.color.GREEN, 14)
+    else:
+        text_image = arcade.get_text_image('', (20, 20, 20), 1)
+    image = sprite_from_text_image(text_image)
+    offset = 10
+    if item is not None:
+        tooltip_center = Vector(mouse_pos.x + ((image.width / 2) + offset), mouse_pos.y - ((image.height / 2) + offset))
+        arcade.draw_line(grid_pos.x, grid_pos.y, (tooltip_center.x - ((image.width + 20) / 2)), (tooltip_center.y + ((image.height + 20) / 2)), arcade.color.PINK, 3)
+        arcade.draw_rectangle_filled(tooltip_center.x, tooltip_center.y, image.width + 20, image.height + 20, (40, 40, 40))
+        arcade.draw_rectangle_outline(tooltip_center.x, tooltip_center.y, image.width + 20, image.height + 20, (40, 150, 40), 2)
+    arcade.draw_texture_rectangle(mouse_pos.x + ((image.width / 2) + offset), mouse_pos.y - ((image.height / 2) + offset), image.width, image.height, image.texture)

@@ -46,6 +46,10 @@ class Explore(Event_Base.EventBase):
         #                            Vector((State.state.window.width * 0.875),
         #                                   (State.state.screen_center.y - (State.state.window.height * 0.3125)) + (State.state.cell_render_size.y - (State.state.window.height * 0.03))),
         #                            Vector((State.state.window.width * 0.2), (State.state.window.height * 0.0625)), on_click=lambda:self.on_key_press(arcade.key.W, 0))
+        if Event_Base.symbols:
+            syms = (list(Event_Base.symbols & {arcade.key.A, arcade.key.D, arcade.key.W, arcade.key.S}))
+            if syms:
+                self.on_key_press(syms[0], Event_Base.held_modifiers)
 
     def update(self, delta_time: float):
         self.delta = delta_time
@@ -148,9 +152,10 @@ class Explore(Event_Base.EventBase):
         self.text_render()
         # if State.state.preoccupied:
         #     arcade.draw_text('Preoccupied', 800, 700, arcade.color.RED, 30)
-        Inventory_GUI.render_inventory()
         self.button_manager.render()
-        State.state.render_mouse()
+        Inventory_GUI.render_inventory(Vector(self.window._mouse_x, self.window._mouse_y))
+        if not Inventory_GUI._inventory_toggle:
+            State.state.render_mouse()
 
     # noinspection PyMethodMayBeStatic
     def text_render(self):
@@ -223,27 +228,27 @@ class Explore(Event_Base.EventBase):
                 if (
                         not State.state.grid.get(new_player_pos.x, new_player_pos.y)
                         and random.random() < 0.02
-                        and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in {'1', '2'}
+                        and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in Sprites_.loot_options
                         and new_player_pos.tuple() not in State.state.grid.visited_tiles
                 ):
                     loot = Loot_Functions.LootTile(new_player_pos)
                     State.state.grid.add(loot)
                 elif (
                         not State.state.grid.get(new_player_pos.x, new_player_pos.y)
-                        and random.random() < 1
-                        and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in {'1'}
+                        and random.random() < 0.05
+                        and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in Sprites_.enemy_options
                         and new_player_pos.tuple() not in State.state.grid.visited_tiles
                 ):
                     enemy = Enemy.EnemyTile(new_player_pos)
                     State.state.grid.add(enemy)
                 elif (
-                        State.state.get_tile_id(Vector(new_player_pos.x, new_player_pos.y)) == '10'
+                        State.state.get_tile_id(Vector(new_player_pos.x, new_player_pos.y)) == Sprites_.trapdoor_options
                         and not State.state.grid.get(new_player_pos.x, new_player_pos.y)
                 ):
                     trapdoor = Trapdoor_Functions.TrapdoorTile(Vector(new_player_pos.x, new_player_pos.y))
                     State.state.grid.add(trapdoor)
                 elif (
-                        State.state.get_tile_id(Vector(new_player_pos.x, new_player_pos.y)) in ('0.5', '1.5')
+                        State.state.get_tile_id(Vector(new_player_pos.x, new_player_pos.y)) in Sprites_.trap_options
                         and not State.state.grid.get(new_player_pos.x, new_player_pos.y)
                 ):
                     trap = Trap_Functions.TrapTile(new_player_pos)

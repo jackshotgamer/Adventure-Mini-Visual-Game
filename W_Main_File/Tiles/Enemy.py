@@ -23,7 +23,7 @@ class EnemyTile(Tile.Tile):
         self.called_on_enter = False
         self.explore = Exploration.Explore()
         self.current_opacity = 0
-        self.combat = Combat.Combat(Enemy_Data.enemy_possibilities['Dragon']())
+        self.combat = Combat.Combat()
         self.alpha = 0
         self.dont_render_it = True
         self.tomes = 0
@@ -63,14 +63,10 @@ class EnemyTile(Tile.Tile):
             if Inventory_GUI.is_inv():
                 return
             if self.fought:
-                if len(self.combat.combatant.name) < 7:
-                    arcade.draw_rectangle_filled(center.x, center.y * 1.018, cell_size.x * 2.1, cell_size.y * 0.2, (0, 0, 0, self.current_opacity))
-                    arcade.draw_rectangle_filled(center.x, center.y * 0.9786, cell_size.x * 1.45, cell_size.y * 0.118, (0, 0, 0, self.current_opacity))
-                else:
-                    arcade.draw_rectangle_filled(center.x, center.y * 1.018, cell_size.x * 2.3, cell_size.y * 0.2, (0, 0, 0, self.current_opacity))
-                    arcade.draw_rectangle_filled(center.x, center.y * 0.9786, cell_size.x * 1.45, cell_size.y * 0.118, (0, 0, 0, self.current_opacity))
+                arcade.draw_rectangle_filled(center.x, center.y * 1.018, cell_size.x * 2.3, cell_size.y * 0.2, (0, 0, 0, self.current_opacity))
+                arcade.draw_rectangle_filled(center.x, center.y * 0.9786, cell_size.x * 1.45, cell_size.y * 0.118, (0, 0, 0, self.current_opacity))
 
-                arcade.draw_text(f'You have already fought this {self.combat.combatant.name}.\nKeep searching for more!', center.x, center.y,
+                arcade.draw_text(f'You have already fought this enemy!.\nKeep searching for more!', center.x, center.y,
                                  (255, 200, 0), align='center', anchor_x='center', anchor_y='center', font_size=11)
 
     def fading_render(self, state_):
@@ -95,14 +91,12 @@ class EnemyTile(Tile.Tile):
         return {
             'pos': self.pos,
             'fought': self.fought,
-            'combat': self.combat.combatant.name
         }
 
     @classmethod
     def load_from_data(cls, persistent_data):
         tile = EnemyTile(persistent_data['pos'])
         tile.fought = persistent_data['fought']
-        tile.combat.combatant.name = persistent_data['combat']
         if not tile.fought:
             tile.dont_render_it = True
         else:

@@ -6,7 +6,7 @@ from W_Main_File.Utilities.Vector import Vector
 from collections import namedtuple
 from W_Main_File.Essentials import Button_Sprite_Manager, State
 
-symbols = []
+symbols = set()
 held_modifiers = 0
 
 
@@ -32,7 +32,8 @@ class EventBase(arcade.View):
     def on_key_press(self, symbol: int, modifiers: int):
         global symbols
         global held_modifiers
-        symbols.append(symbol)
+        symbols.add(symbol)
+        print(symbols, self.__class__)
         held_modifiers |= modifiers
 
     def on_key_release(self, _symbol: int, _modifiers: int):
@@ -40,6 +41,7 @@ class EventBase(arcade.View):
         global held_modifiers
         if _symbol in symbols:
             symbols.remove(_symbol)
+        print(symbols, self.__class__)
         held_modifiers &= _modifiers
 
 

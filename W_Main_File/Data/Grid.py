@@ -22,6 +22,7 @@ class Grid:
 
     def add_visited_tile(self, vector):
         from W_Main_File.Essentials import State
-        if (vector.x, vector.y) in self.interactable_tiles or State.state.tile_type_pos(vector.x, vector.y) == '0':
+        from W_Main_File.Data.Sprites_ import excluded_tiles
+        if (vector.x, vector.y) in self.interactable_tiles or State.state.tile_type_pos(vector.x, vector.y) in excluded_tiles:
             return
         self.visited_tiles.add(vector.tuple())

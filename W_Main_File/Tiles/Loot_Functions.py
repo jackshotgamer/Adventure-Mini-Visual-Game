@@ -42,7 +42,7 @@ class LootTile(Tile.Tile):
         self.weapon_sprite_pos = Vector.Vector(0, -15)
         self.waiting = 0
         self.given_item = False
-        self.table = LootTable(('Broken_Stick', 8), ('Rusty_Knife', 2000))  # , ('Iron Knife', 5), ('Iron Short-sword', 4), ('Iron Broad-sword', 1))
+        self.table = LootTable(('Broken_Stick', 8), ('Rusty_Knife', 8))  # , ('Iron Knife', 5), ('Iron Short-sword', 4), ('Iron Broad-sword', 1))
 
         self.loot_result = ''
 
@@ -93,7 +93,7 @@ class LootTile(Tile.Tile):
         from W_Main_File.Utilities import Inventory_GUI
         if Inventory_GUI.is_inv():
             return
-        multipler_speed = 5
+        multipler_speed = 1
         self.current_opacity = min(200, self.current_opacity + 4)
         if self.opening:
             self.alpha = min(255, self.alpha + (2 * multipler_speed))

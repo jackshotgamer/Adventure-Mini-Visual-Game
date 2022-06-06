@@ -1,13 +1,44 @@
 from arcade import load_texture
 from pathlib import Path
 from W_Main_File.Essentials import State
+import random
 
-plains_sprite = load_texture(Path('Sprites') / 'Plains_Tile_0.png')
+billhook = load_texture(Path('Sprites') / 'Billhook.png')
+black_rapier = load_texture(Path('Sprites') / 'Black_Rapier_1.png')
+dane_axe = load_texture(Path('Sprites') / 'Dane_Axe.png')
+death_knight = load_texture(Path('Sprites') / 'Death_Knight.png')
+desert_plains_01 = load_texture(Path('Sprites') / 'desert_plains_1.png')
+devouring_horror = load_texture(Path('Sprites') / 'Devouering_Horror.png')
+golden_serpent = load_texture(Path('Sprites') / 'Golden_Serpent.png')
+iron_sword = load_texture(Path('Sprites') / 'iron_sword.png')
+offspring_of_shub_niggurath = load_texture(Path('Sprites') / 'offspring_of_shub_niggurath.png')
+partisan = load_texture(Path('Sprites') / 'Partisan.png')
+purgatory_dragon_skeleton = load_texture(Path('Sprites') / 'Purgatory_dragon_skelleton.png')
+saber = load_texture(Path('Sprites') / 'saber.png')
+snow_plains = load_texture(Path('Sprites') / 'snow_plains.png')
+spear = load_texture(Path('Sprites') / 'spear.png')
+troglodyte = load_texture(Path('Sprites') / 'Troglodyte.png')
+troglodyte_hellebardier = load_texture(Path('Sprites') / 'Troglodyte_Hellebardier.png')
+
+plains_sprite_01 = load_texture(Path('Sprites') / 'Plains_Tile_01.png')
+plains_sprite_02 = load_texture(Path('Sprites') / 'Plains_Tile_02.png')
+plains_sprite_03 = load_texture(Path('Sprites') / 'Plains_Tile_03.png')
+plains_sprite_04 = load_texture(Path('Sprites') / 'Plains_Tile_04.png')
+purgatory_plain_01 = load_texture(Path('Sprites') / 'Purgatory_plain2.png')
+purgatory_plain_02 = load_texture(Path('Sprites') / 'Purgatory_plain_2.png')
+purgatory_mountain_01 = load_texture(Path('Sprites') / 'Purgatory_mountain_1.png')
+purgatory_mountain_02 = load_texture(Path('Sprites') / 'Purgatory_mountains2.png')
 plains_trap_sprite = load_texture(Path('Sprites') / 'Plains_Tile_0_TRAP.png')
-forest_sprite = load_texture(Path('Sprites') / 'Forest_Tile_2.0.png')
+forest_sprite_1 = load_texture(Path('Sprites') / 'Forest_Tile_2.png')
+forest_sprite_11 = load_texture(Path('Sprites') / 'Forest_Tile_2.1.png')
+forest_sprite_12 = load_texture(Path('Sprites') / 'Forest_Tile_2.2.png')
 forest_trap_sprite = load_texture(Path('Sprites') / 'Forest_Tile_2.0_TRAP.png')
-mountain_sprite = load_texture(Path('Sprites') / 'Mountain_Tile_1.png')
+mountain_sprite_1 = load_texture(Path('Sprites') / 'Mountain_Tile_1.png')
+mountain_sprite_2 = load_texture(Path('Sprites') / 'Mountain_Tile_2.png')
+mountain_sprite_3 = load_texture(Path('Sprites') / 'Mountain_Tile_3.png')
+mountain_sprite_4 = load_texture(Path('Sprites') / 'Mountain_Tile_4.png')
 village_sprite = load_texture(Path('Sprites') / 'Village_Tile_1.png')
+village_sprite_02 = load_texture(Path('Sprites') / 'village_2_plains.png')
 trapdoor_sprite = load_texture(Path('Sprites') / 'Trapdoor_Tile_0.png')
 home_sprite = load_texture(Path('Sprites') / 'Home_Tile.png')
 chest_sprite = load_texture(Path('Sprites') / 'Chest_0.png')
@@ -15,6 +46,7 @@ chest_body_sprite = load_texture(Path('Sprites') / 'Chest_Body_0.png')
 trap_alert = load_texture(Path('Sprites') / 'Trap_Alert_0.png')
 stick_sprite = load_texture(Path('Sprites') / 'Stick_Weapon_1.png')
 rusty_knife_sprite = load_texture(Path('Sprites') / 'Rusty_Knife_1.png')
+black_rapier_sprite = load_texture(Path('Sprites') / 'Black_Rapier_1.png')
 blank_button_dark = load_texture(Path('Sprites') / 'Button_Square_(No Decor)_0Dark.png')
 blank_button_light = load_texture(Path('Sprites') / 'Button_Square_(No Decor)_1Light.png')
 blank_button_light_middle = load_texture(Path('Sprites') / 'Button_Square_(No Decor)_2LightMiddle.png')
@@ -37,6 +69,8 @@ black_square_circle_square_sprite = load_texture(Path('Sprites') / 'Black_Square
 
 sprite_id_to_texture = {
     'rusty_knifeDefaultWeapon': rusty_knife_sprite,
+    'null_weapon_1SpecialWeapon': black_rapier_sprite,
+    'null_weapon_2SpecialWeapon': black_rapier_sprite,
     'Null': Null,
 }
 
@@ -45,29 +79,57 @@ def get_sprite_from_id(id_):
     return sprite_id_to_texture.get(id_, Null)
 
 
-# 0 = Plains
-# 0.5 = Plains TRAP
-# 1 = Forest
-# 1.5 = Forest TRAP
-# 2 = Mountain
-# 4 = Village
-# 9 = House
-
 # 3 = Desert
 # 5 = Taiga
 # 6 = Jungle
 # 7 = Arctic
 # 8 = Cave
 
-sprite_alias = {
-    '0': plains_sprite,
-    '0.5': plains_trap_sprite,
-    '1': forest_sprite,
-    '1.5': forest_trap_sprite,
-    '2': mountain_sprite,
-    '4': village_sprite,
-    '10': trapdoor_sprite
-}
+weights, sprite_alias = (
+    (
+        11,
+        11,
+        11,
+        11,
+        1.1,
+        7,
+        7,
+        7,
+        1.1,
+        2,
+        2,
+        3,
+        3,
+        0.8,
+        0.8,
+        1),
+    {
+        '0.1': plains_sprite_01,
+        '0.2': plains_sprite_02,
+        '0.3': plains_sprite_03,
+        '0.4': plains_sprite_04,
+        '0.5': plains_trap_sprite,
+        '1': forest_sprite_1,
+        '1.1': forest_sprite_11,
+        '1.2': forest_sprite_12,
+        '1.5': forest_trap_sprite,
+        '2': mountain_sprite_1,
+        '2.1': mountain_sprite_2,
+        '2.2': mountain_sprite_3,
+        '2.3': mountain_sprite_4,
+        '4': village_sprite,
+        '4.1': village_sprite_02,
+        '10': trapdoor_sprite
+    }
+)
+
+
+loot_options = {'1', '1.1', '1.2', '2', '2.1', '2.2', '2.3'}
+enemy_options = {'1', '1.1', '1.2'}
+trapdoor_options = '10'
+trap_options = ('0.5', '1.5')
+excluded_tiles = ('0.1', '0.2', '0.3', '0.4')
+
 
 CHEST_OPENING_FRAMES = [
     load_texture(Path('Chest_Opening_Frames') / 'chest_sprite_0.png'),

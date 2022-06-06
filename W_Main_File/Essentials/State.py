@@ -43,7 +43,7 @@ class State:
         xy = f'{int(x)} {int(y)}'
         if xy not in self.texture_mapping:
             rnjesus = Seeding.seed_for_vector(poss)
-            sprite_textures = rnjesus.choices(tuple(Sprites_.sprite_alias), k=1, weights=(45, 1.1, 35, 1.1, 15, 1.5, 1))
+            sprite_textures = rnjesus.choices(tuple(Sprites_.sprite_alias), k=1, weights=Sprites_.weights)
             # 20, 15, 10, 5, 3,
             self.texture_mapping[xy] = rnjesus.choice(sprite_textures)
             self.is_new_tile = True

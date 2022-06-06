@@ -26,6 +26,12 @@ class Vector(np.ndarray):
     def is_near(self, other: 'Vector', tolerance=.01):
         return abs(other.xf - self.xf) <= tolerance and abs(other.yf - self.yf) <= tolerance
 
+    def abs_diff(self, other: 'Vector'):
+        return abs(other.xf - self.xf) + abs(other.yf - self.yf)
+
+    def abs_diff_tuple(self, other: 'Vector'):
+        return Vector(abs(other.xf - self.xf), abs(other.yf - self.yf))
+
     @property
     def x(self):
         return int(self[0])
@@ -41,6 +47,15 @@ class Vector(np.ndarray):
     @property
     def yf(self):
         return self[1]
+
+    @property
+    def length(self):
+        return (self.xf ** 2 + self.yf ** 2) ** .5
+
+    @property
+    def normalized(self):
+        length = self.length
+        return Vector(self.xf / length, self.yf / length)
 
     def __iadd__(self, other) -> 'Vector':
         return super().__add__(other)

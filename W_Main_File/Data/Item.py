@@ -14,6 +14,7 @@ class ItemType(Enum):
 
 
 class DamageType(IntFlag):
+    No = 0
     Blunt = auto()
     Piercing = auto()
     Cutting = auto()
@@ -25,8 +26,24 @@ class DamageType(IntFlag):
     Air_Elemental = auto()
     Void_Elemental = auto()
 
-    Any_Elemental = Water_Elemental | Earth_Elemental | Fire_Elemental | Air_Elemental
-    Any_Basic = Blunt | Piercing | Cutting
+    # Armour
+        # Water: Increase HP
+            # Set: Heal 1 hp for every 5 damage dealt
+        # Earth: Increase Percentage Damage Reduction
+            # Set: Take no damage every third hit
+        # Fire: Increase Debuff Reduction
+            # Set: Deal DOT fire damage
+        # Air: Increase Evasion
+            # Set: Increase movement speed based on proximity to enemies, up to x2.5
+        # Void: All four
+            # Set: twice per fight, unleash a wave of damage that does your maximum damage to all enemies,
+            # halves their movement speed for 15 seconds, and gives them DOT 5% health every second for 5 seconds, makes you invulnerable for 3 seconds,
+            # and gives you 25% health back over 15 seconds
+    # Weapons
+        # Water:
+
+    Any_Elemental = Water_Elemental | Earth_Elemental | Fire_Elemental | Air_Elemental | Void_Elemental
+    Any_Basic = Blunt | Piercing | Cutting | Spectral | Null
 
     # blunt 0b1
     # Piercing 0b11
@@ -64,6 +81,12 @@ class Weapon(Item):
 
     def use_special(self, target: HpEntity.HpEntity):
         pass
+
+    def element_type(self):
+        if self.has_elemental_damage:
+            return self.damage_type & DamageType.Any_Elemental
+        else:
+            return DamageType.No
 
     def damage_inflicted(self, target: HpEntity):
         damage = random.randint(self.min_attack, self.max_attack)

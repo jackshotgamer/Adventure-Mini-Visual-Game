@@ -3,7 +3,6 @@ import arcade.gui
 
 from W_Main_File.Data import Sprites_
 from W_Main_File.Utilities.Vector import Vector
-from collections import namedtuple
 
 
 class Button:
@@ -71,6 +70,8 @@ class ButtonManager:
                 button.text, button.center.x, button.center.y, button.text_colour, font_size=button.text_size,
                 width=button.size.x, font_name='arial', anchor_x='center', anchor_y='center', align='center'
             )
+        from W_Main_File.Essentials.State import state
+        state.render_mouse()
 
     def remove(self, id_):
         if id_ in self.buttons:

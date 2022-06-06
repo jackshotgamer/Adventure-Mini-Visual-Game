@@ -4,7 +4,7 @@ from urllib.parse import quote
 
 from W_Main_File.Essentials import State, Button_Sprite_Manager
 from W_Main_File.Utilities import Vector, Seeding, Floor_Data_Saving, Button_Functions
-import requests
+from requests import get
 import time
 import sys
 # noinspection PyPackages
@@ -14,7 +14,6 @@ from . import Event_Base
 class CursorPriorityManager(gui.UIManager):
     def on_draw(self):
         super().on_draw()
-        State.state.render_mouse()
 
 
 class PlayerSelect(Event_Base.EventBase):
@@ -36,7 +35,7 @@ class PlayerSelect(Event_Base.EventBase):
         if not (player_username and player_password):
             return
 
-        json_ = requests.get(f'http://localhost:666/save_data?name={quote(player_username)}&pw={quote(player_password)}').json()
+        json_ = get(f'http://localhost:666/save_data?name={quote(player_username)}&pw={quote(player_password)}').json()
         if not json_['error']:
             state_player = State.state.player
             state_player.name = json_['player_name']
@@ -73,7 +72,8 @@ class PlayerSelect(Event_Base.EventBase):
     def on_update(self, delta_time: float):
         self.check_if_resized()
 
-    def exit_button(self):
+    @staticmethod
+    def exit_button():
         sys.exit()
 
     def buttons(self):
@@ -134,7 +134,10 @@ class PlayerSelect(Event_Base.EventBase):
         arcade.draw_text('PASSWORD:', center_screen.x - self.password.width + 43, self.password.center_y, arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=20, anchor_x='center', anchor_y='center')
         if self.incorrect_password_end > time.time():
-            arcade.draw_text('Incorrect Password', State.state.screen_center.x, State.state.screen_center.y - 100, arcade.color.RED, font_name='arial', font_size=20, anchor_x='center', anchor_y='center')
+            arcade.draw_text('Incorrect Password', State.state.screen_center.x, State.state.screen_center.y - 100, arcade.color.RED, font_name='arial', font_size=20, anchor_x='center',
+                             anchor_y='center')
+        State.state.render_mouse()
+
 
 # noinspection PyUnresolvedReferences,PyProtectedMember,PyAttributeOutsideInit
 class LimitText(gui.elements.inputbox._KeyAdapter):
