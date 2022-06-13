@@ -102,7 +102,8 @@ weights, sprite_alias = (
         3,
         0.8,
         0.8,
-        1),
+        1
+    ),
     {
         '0.1': plains_sprite_01,
         '0.2': plains_sprite_02,

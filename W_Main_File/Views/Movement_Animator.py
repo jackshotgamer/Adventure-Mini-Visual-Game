@@ -137,20 +137,3 @@ class MovementAnimator(Event_Base.EventBase):
         arcade.draw_text(f'xp: {int(State.state.player.xp)}', State.state.window.width * 0.565, State.state.window.height * 0.8125, arcade.color.LIGHT_GRAY,
                          font_size=(14 * screen_percentage_of_default), font_name='arial')
         State.state.render_mouse()
-
-    @staticmethod
-    def draw_edges(inner_radius):
-        cell_size = State.state.cell_size
-        for x_off in range(~ inner_radius, inner_radius + 2):
-            render = (Vector.Vector(x_off, inner_radius + 1) * cell_size) + State.state.screen_center
-            arcade.draw_rectangle_filled(render.xf, render.yf, cell_size.xf - 1, cell_size.yf - 1, arcade.color.BLACK)
-
-            render = (Vector.Vector(x_off, -(inner_radius + 1)) * cell_size) + State.state.screen_center
-            arcade.draw_rectangle_filled(render.xf, render.yf, cell_size.xf - 1, cell_size.yf - 1, arcade.color.BLACK)
-
-        for y_off in range(~ inner_radius, inner_radius + 2):
-            render = (Vector.Vector(inner_radius + 1, y_off) * cell_size) + State.state.screen_center
-            arcade.draw_rectangle_filled(render.xf, render.yf, cell_size.xf - 1, cell_size.yf - 1, arcade.color.BLACK)
-
-            render = (Vector.Vector(-(inner_radius + 1), y_off) * cell_size) + State.state.screen_center
-            arcade.draw_rectangle_filled(render.xf, render.yf, cell_size.xf - 1, cell_size.yf - 1, arcade.color.BLACK)

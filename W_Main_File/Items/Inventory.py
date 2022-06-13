@@ -3,6 +3,9 @@ if TYPE_CHECKING:
     from W_Main_File.Data import Item
 from typing import Union
 from W_Main_File.Essentials import State
+from pathlib import Path
+import pickle
+
 
 
 class InventoryContainer:
@@ -60,18 +63,18 @@ class InventoryContainer:
                             return self.items[index1]
 
     def load(self, file_path):
-        import pathlib
-        import pickle
-        if not pathlib.Path(f'Inventory_Contents/{file_path}').exists():
-            with open(f'Inventory_Contents/{file_path}', 'wb') as file:
+        from W_Main_File.Essentials.State import state
+        if not (state.player_data_path/file_path).exists():
+            (state.player_data_path / file_path).mkdir()
+        if not (state.player_data_path/file_path/'inv').exists():
+            with open((state.player_data_path/file_path/'inv'), 'wb') as file:
                 pickle.dump([], file)
-        with open(f'Inventory_Contents/{file_path}', 'rb') as file:
+        with open((state.player_data_path/file_path/'inv'), 'rb') as file:
             self.items = pickle.load(file)
 
     def save(self, file_path):
-        import pathlib
-        import pickle
-        if not pathlib.Path('Inventory_Contents').exists():
-            pathlib.Path('Inventory_Contents').mkdir()
-        with open(f'Inventory_Contents/{file_path}', 'wb') as file:
+        from W_Main_File.Essentials.State import state
+        if not (state.player_data_path/file_path).exists():
+            (state.player_data_path/file_path).mkdir()
+        with open((state.player_data_path/file_path/'inv'), 'wb') as file:
             pickle.dump(self.items, file)

@@ -3,7 +3,7 @@ venv/
 __pycache__/
 Player_Saves.sqlite
 Weapon_Templates.py
-Interactable_Tiles/
+PLAYERDATA/
 Character_Data_Files/
 Inventory_Contents/
 Excuses_Folder.md

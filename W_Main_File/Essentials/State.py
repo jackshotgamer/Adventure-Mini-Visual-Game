@@ -6,12 +6,31 @@ from typing import List, Dict, Any, Union, Type
 import arcade
 
 from W_Main_File.Data import HpEntity, Grid, Sprites_, Meta_Data
-from W_Main_File.Items import Inventory
 from W_Main_File.Utilities import Vector, Seeding
 
 
+class CacheState:
+    def __init__(self):
+        self._values = {}
+
+    def __getattr__(self, item):
+        return self._values[item]
+
+    def __setattr__(self, key, value):
+        if key == '_values':
+            self.__dict__[key] = value
+            return
+        self._values[key] = value
+
+    def __delattr__(self, item):
+        del self._values[item]
+
+    def clear(self):
+        self._values.clear()
+
+
 class State:
-    Textures_folder = pathlib.Path('Interactable_Tiles')
+    player_data_path = pathlib.Path('PLAYERDATA/')
 
     def __init__(self):
         self.player = HpEntity.HpEntity('', Vector.Vector(0, 0), 1000, 1000, 0, 0, 1, 1, Meta_Data.MetaData(is_player=True))
@@ -20,9 +39,9 @@ class State:
         self.cell_size = Vector.Vector(100, 100)
         self.render_radius = 2
         self.default_window_size = Vector.Vector(1000, 800)
-        self.pw = ''
         self.texture_mapping = {}
-        self.inventory = Inventory.InventoryContainer()
+        from W_Main_File.Items.Inventory import InventoryContainer
+        self.inventory = InventoryContainer()
         self.current_page = 0
         self.is_new_tile = False
         self.is_moving = False
@@ -91,3 +110,4 @@ class State:
 
 
 state = State()
+cache_state = CacheState()

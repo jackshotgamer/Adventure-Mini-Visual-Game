@@ -5,7 +5,7 @@ from W_Main_File.Utilities import Vector, Seeding
 
 
 class FloorSaveManager:
-    interactable_tiles = pathlib.Path('./Interactable_Tiles')
+    interactable_tiles = pathlib.Path('./PLAYERDATA')
 
     @classmethod
     def floor_save(cls):
