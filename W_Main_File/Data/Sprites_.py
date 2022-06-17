@@ -206,7 +206,7 @@ def update_character():
     character_frame_count += 1
     if character_frame_count > 18:
         character_frame_count = 1
-    if not character_frame_count % 3:
+    if not character_frame_count % 4:
         if current_character_frame >= len(CHARACTER_FRAMES) - 1:
             current_character_frame = -1
         current_character_frame += 1

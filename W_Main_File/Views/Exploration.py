@@ -3,7 +3,7 @@ import arcade.gui
 from arcade import key
 
 from W_Main_File.Utilities import Button_Functions, Action_Queue
-from W_Main_File.Views import Purgatory_Screen, Event_Base
+from W_Main_File.Views import Purgatory_Screen, Event_Base, TileRenderer
 from W_Main_File.Data import Sprites_
 from W_Main_File.Essentials import State
 import time
@@ -42,6 +42,7 @@ class Explore(Event_Base.EventBase):
         self.yfes = False
         self.delta = time.time()
         arcade.set_background_color((0, 0, 0))
+        self.tile_renderer = TileRenderer.TileRenderer(State.state.render_radius)
         # self.button_manager.append('Up', 'Up',
         #                            Vector((State.state.window.width * 0.875),
         #                                   (State.state.screen_center.y - (State.state.window.height * 0.3125)) + (State.state.cell_render_size.y - (State.state.window.height * 0.03))),
@@ -59,24 +60,31 @@ class Explore(Event_Base.EventBase):
                                                        should_freeze=True, reset_pos=Vector(0, 0), render=lambda _: self.on_draw()))
             State.state.clear_current_floor_data()
         self.check_action_queue()
-        if self.should_transition_to_animation[0]:
-            from W_Main_File.Views.Movement_Animator import MovementAnimator
-            State.state.window.show_view(MovementAnimator(self.should_transition_to_animation[1],
-                                                          self.should_transition_to_animation[2], 18 if (State.state.window.width, State.state.window.height) == (1000, 800) else 18))
-            self.should_transition_to_animation[0] = False
-            self.should_transition_to_animation[3]()
-        else:
-            Sprites_.update_backdrop()
-            self.check_if_resized()
-            if Explore.last_update == 0 or time.time() - Explore.last_update > 0.5:
-                Explore.fps = 1 / delta_time
-                Explore.last_update = time.time()
+        # if self.should_transition_to_animation[0]:
+        #     TO DO
+        #     self.should_transition_to_animation[0] = False
+        #     self.should_transition_to_animation[3]()
+        # else:
+        Sprites_.update_backdrop()
+        self.check_if_resized()
+        if Explore.last_update == 0 or time.time() - Explore.last_update > 0.5:
+            Explore.fps = 1 / delta_time
+            Explore.last_update = time.time()
 
-            for x_off, y_off in State.state.generate_radius(State.state.render_radius):
-                real_grid_pos = State.state.player.pos + (x_off, y_off)
+        for x_off, y_off in State.state.generate_radius(State.state.render_radius):
+            real_grid_pos = State.state.player.pos + (x_off, y_off)
 
-                if tile := State.state.grid.get(*real_grid_pos):
-                    tile.on_update(delta_time)
+            if tile := State.state.grid.get(*real_grid_pos):
+                tile.on_update(delta_time)
+        if State.state.preoccupied:
+            return
+        for symbol in Event_Base.symbols:
+            if symbol in self.key_offset:
+                # TODO rounding issues
+                State.state.player.pos = (State.state.camera_pos / State.state.cell_render_size)
+                State.state.camera_pos += (Vector(*self.key_offset[symbol]) * self.movement_speed) * self.delta
+        if any(symbol for symbol in Event_Base.symbols if symbol in self.key_offset):
+            Sprites_.update_character()
 
     def check_if_resized(self):
         if self.current_window_size.xf == State.state.window.width and self.current_window_size.yf == State.state.window.height:
@@ -96,59 +104,48 @@ class Explore(Event_Base.EventBase):
         key.D: (1, 0)
     }
 
+    movement_speed = 200
+
     # noinspection PyProtectedMember
     def on_draw(self):
         arcade.start_render()
         center_screen = State.state.screen_center
-        render_queue = []
         cell_render_size = (State.state.cell_size * ((State.state.window.width / State.state.default_window_size.xf), (State.state.window.height / State.state.default_window_size.y)))
-        for x_off, y_off in State.state.generate_radius(State.state.render_radius):
-            real_grid_pos = State.state.player.pos + (x_off, y_off)
-            render_pos = Vector(center_screen.xf + x_off * cell_render_size.xf, center_screen.yf + y_off * cell_render_size.yf)
-            arcade.draw_texture_rectangle(render_pos.xf, render_pos.yf, cell_render_size.xf, cell_render_size.yf, State.state.tile_type_pos(*real_grid_pos))
-
-        for x_off, y_off in State.state.generate_radius(State.state.render_radius):
-            real_grid_pos = State.state.player.pos + (x_off, y_off)
-            render_pos = Vector(center_screen.xf + x_off * cell_render_size.xf, center_screen.yf + y_off * cell_render_size.yf)
-
-            if tile := State.state.grid.get(*real_grid_pos):
-                render_queue.append((tile, render_pos, render_pos + (-(cell_render_size.xf / 2), cell_render_size.yf / 2), cell_render_size))
-            else:
-                arcade.draw_rectangle_outline(render_pos.xf, render_pos.yf, cell_render_size.xf, cell_render_size.yf, (120, 120, 120))
-
-        for tile, *args in render_queue:
-            tile.on_render(*args)
-
+        # TODO fix stuff around here
+        self.tile_renderer.on_draw(State.state.render_radius)
+        self.tile_renderer.on_draw_tile()
         arcade.draw_texture_rectangle(State.state.screen_center.xf, State.state.screen_center.yf,
-                                      State.state.cell_render_size.xf * 0.95, State.state.cell_render_size.yf * 0.95, Sprites_.black_circle_sprite, 0, 75)
+                                      State.state.cell_render_size.xf * 0.73, State.state.cell_render_size.yf * 0.88, Sprites_.black_circle_sprite, 0, 75)
         arcade.draw_texture_rectangle(State.state.screen_center.xf, State.state.screen_center.yf,
-                                      State.state.cell_render_size.xf * 0.95, State.state.cell_render_size.yf * 0.95, Sprites_.black_circle_square_sprite, 0, 100)
+                                      State.state.cell_render_size.xf * 0.73, State.state.cell_render_size.yf * 0.88, Sprites_.black_circle_square_sprite, 0, 100)
         arcade.draw_texture_rectangle(State.state.screen_center.xf, State.state.screen_center.yf,
-                                      State.state.cell_render_size.xf * 0.95, State.state.cell_render_size.yf * 0.95, Sprites_.black_square_circle_square_sprite, 0, 125)
+                                      State.state.cell_render_size.xf * 0.73, State.state.cell_render_size.yf * 0.88, Sprites_.black_square_circle_square_sprite, 0, 125)
 
         arcade.draw_rectangle_filled(center_screen.xf, center_screen.yf - (State.state.window.height * 0.3375), State.state.window.width * 0.625, State.state.window.height * 0.0475, (0, 0, 0))
+        arcade.draw_rectangle_filled(center_screen.xf, center_screen.yf + (State.state.window.height * 0.3375), State.state.window.width * 0.625, State.state.window.height * 0.0475, (0, 0, 0))
         # arcade.draw_circle_filled(center_screen.xf, center_screen.yf, 25, arcade.color.AERO_BLUE)
         screen_percentage_of_default = (State.state.window.height / State.state.default_window_size.y)
         arcade.draw_text(f'Floor: {int(State.state.player.floor)}', State.state.window.width * 0.5,
                          (State.state.window.height * 0.5) - (cell_render_size.yf * .37), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=(12 * screen_percentage_of_default), anchor_x='center', anchor_y='center')
-        arcade.draw_text(str(State.state.player.pos.tuple()), State.state.window.width * 0.5,
+        arcade.draw_text(str((round(State.state.player.pos.xf), round(State.state.player.pos.yf))), State.state.window.width * 0.5,
                          (State.state.window.height * 0.5) + (cell_render_size.yf * .37), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=(12 * screen_percentage_of_default), anchor_x='center', anchor_y='center')
+        if not any(symbol for symbol in Event_Base.symbols if symbol in self.key_offset):
+            if Explore.symbol_ == arcade.key.D:
+                arcade.draw_texture_rectangle(State.state.screen_center.xf, State.state.screen_center.yf,
+                                              State.state.cell_render_size.yf * 0.75, State.state.cell_render_size.yf * 0.75, Sprites_.knight_start_2)
+            elif Explore.symbol_ == arcade.key.A:
+                arcade.draw_texture_rectangle(State.state.screen_center.xf, State.state.screen_center.yf,
+                                              State.state.cell_render_size.yf * 0.75, State.state.cell_render_size.yf * 0.75, Sprites_.knight_start_flipped)
+        else:
+            Sprites_.draw_character()
         Sprites_.draw_backdrop()
         arcade.draw_rectangle_outline(center_screen.xf, center_screen.yf, State.state.window.width * 0.5, State.state.window.height * 0.625, (120, 120, 120), 4)
-
-        if Explore.symbol_ == arcade.key.D:
-            arcade.draw_texture_rectangle(State.state.screen_center.xf, State.state.screen_center.yf,
-                                          State.state.cell_render_size.yf * 0.75, State.state.cell_render_size.yf * 0.75, Sprites_.knight_start_2)
-        elif Explore.symbol_ == arcade.key.A:
-            arcade.draw_texture_rectangle(State.state.screen_center.xf, State.state.screen_center.yf,
-                                          State.state.cell_render_size.yf * 0.75, State.state.cell_render_size.yf * 0.75, Sprites_.knight_start_flipped)
         from W_Main_File.Utilities import Inventory_GUI
         arcade.draw_text(f'FPS = {self.fps:.1f}', 2, self.window.height - 22, arcade.color.GREEN,
                          font_name='arial', font_size=14)
-        for tile, *args in render_queue:
-            tile.on_render_foreground(*args)
+        self.tile_renderer.on_draw_foreground()
         self.text_render()
         # if State.state.preoccupied:
         #     arcade.draw_text('Preoccupied', 800, 700, arcade.color.RED, 30)
@@ -207,20 +204,20 @@ class Explore(Event_Base.EventBase):
         if symbol in self.key_offset:
             if symbol in (arcade.key.A, arcade.key.D):
                 self.__class__.symbol_ = symbol
+
             if State.state.preoccupied:
                 return
             self.__class__.previous_pos = State.state.player.pos
             State.state.moves_since_texture_save += 1
-            offset = Vector(*self.key_offset[symbol])
+            offset = (Vector(*self.key_offset[symbol]) * self.movement_speed) * self.delta
             prior_player_pos = State.state.player.pos
             new_player_pos = prior_player_pos + offset
-
-            if tile := State.state.grid.get(*prior_player_pos):
-                if not tile.can_player_move():
-                    return
-                tile.on_exit()
-            if tile := State.state.grid.get(*new_player_pos):
-                tile.on_enter()
+            # if tile := State.state.grid.get(*prior_player_pos):
+            #     if not tile.can_player_move():
+            #         return
+            #     tile.on_exit()
+            # if tile := State.state.grid.get(*new_player_pos):
+            #     tile.on_enter()
 
             def after_update():
                 State.state.player.pos = new_player_pos

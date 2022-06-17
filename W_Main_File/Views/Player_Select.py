@@ -69,6 +69,9 @@ class PlayerSelect(Event_Base.EventBase):
         from W_Main_File.Utilities import Inventory_GUI
         Inventory_GUI._inventory_toggle = False
         State.state.preoccupied = False
+        State.cache_state.clear()
+        State.state.camera_pos = Vector.Vector(0, 0)
+        State.state.render_radius = 3
         from W_Main_File.Views import Exploration
         self.ui_manager.purge_ui_elements()
         Seeding.set_world_seed_from_player_name()
@@ -126,6 +129,9 @@ class PlayerSelect(Event_Base.EventBase):
         from W_Main_File.Utilities import Inventory_GUI
         Inventory_GUI._inventory_toggle = False
         State.state.preoccupied = False
+        State.cache_state.clear()
+        State.state.camera_pos = Vector.Vector(0, 0)
+        State.state.render_radius = 3
         import os
         if os.path.exists(f'Interactable_Tiles/Guest/'):
             shutil.rmtree(f'Interactable_Tiles/Guest/')

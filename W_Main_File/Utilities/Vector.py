@@ -32,6 +32,9 @@ class Vector(np.ndarray):
     def abs_diff_tuple(self, other: 'Vector'):
         return Vector(abs(other.xf - self.xf), abs(other.yf - self.yf))
 
+    def rounded(self):
+        return Vector(round(self.xf), round(self.yf))
+
     @property
     def x(self):
         return int(self[0])

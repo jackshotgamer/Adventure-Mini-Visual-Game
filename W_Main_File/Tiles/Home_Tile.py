@@ -17,7 +17,7 @@ class HomeTile(Tile.Tile):
         arcade.draw_texture_rectangle(center.x, center.y, State.state.window.width * 0.097, State.state.window.height * 0.12125, Sprites_.home_sprite)
 
     def on_render_foreground(self, center, top_left, cell_size):
-        if State.state.player.pos == self.pos:
+        if State.state.player.pos.rounded() == self.pos:
             from W_Main_File.Utilities import Inventory_GUI
             if Inventory_GUI.is_inv():
                 return

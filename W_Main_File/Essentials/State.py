@@ -14,7 +14,7 @@ class CacheState:
         self._values = {}
 
     def __getattr__(self, item):
-        return self._values[item]
+        return self._values.get(item)
 
     def __setattr__(self, key, value):
         if key == '_values':
@@ -23,7 +23,8 @@ class CacheState:
         self._values[key] = value
 
     def __delattr__(self, item):
-        del self._values[item]
+        if item in self._values:
+            del self._values[item]
 
     def clear(self):
         self._values.clear()
@@ -34,10 +35,11 @@ class State:
 
     def __init__(self):
         self.player = HpEntity.HpEntity('', Vector.Vector(0, 0), 1000, 1000, 0, 0, 1, 1, Meta_Data.MetaData(is_player=True))
+        self.camera_pos = Vector.Vector(0, 0)
         self.window = None
         self.grid = Grid.Grid()
         self.cell_size = Vector.Vector(100, 100)
-        self.render_radius = 2
+        self.render_radius = 3
         self.default_window_size = Vector.Vector(1000, 800)
         self.texture_mapping = {}
         from W_Main_File.Items.Inventory import InventoryContainer
@@ -48,6 +50,14 @@ class State:
         self.moves_since_texture_save = 0
         self._preoccupied = False
         # Meta_Data.is_me = True
+
+    @property
+    def grid_camera_pos(self):
+        return (self.camera_pos / self.cell_render_size).rounded()
+
+    @property
+    def grid_camera_pos_raw(self):
+        return self.camera_pos / self.cell_render_size
 
     @property
     def preoccupied(self):
@@ -81,7 +91,7 @@ class State:
 
     @property
     def cell_render_size(self):
-        return self.cell_size * ((self.window.width / self.default_window_size.x), (self.window.height / self.default_window_size.y))
+        return self.cell_size * ((self.window.width / self.default_window_size.xf), (self.window.height / self.default_window_size.yf))
 
     @staticmethod
     def generate_radius(radius):
