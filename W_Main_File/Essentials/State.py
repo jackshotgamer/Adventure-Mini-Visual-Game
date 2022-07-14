@@ -65,6 +65,11 @@ class State:
 
     @preoccupied.setter
     def preoccupied(self, value):
+        if self._preoccupied == value:
+            return
+        from W_Main_File.Views import Event_Base
+        Event_Base.symbols.clear()
+        Event_Base.held_modifiers = 0
         self._preoccupied = value
 
     def tile_type_pos(self, x, y):

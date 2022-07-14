@@ -63,7 +63,7 @@ class TrapdoorTile(Tile.Tile):
             if State.state.is_moving:
                 return
             arcade.draw_rectangle_filled(center.x, center.y, cell_size.x * 1.65, cell_size.y * 0.2, (0, 0, 0, self.current_opacity))
-            arcade.draw_text(f'Press E to Enter Portal!', State.state.screen_center.x, State.state.screen_center.y, (255, 69, 0, 220),
+            arcade.draw_text(f'Press E to Enter Portal!', center.x, center.y, (255, 69, 0, 220),
                              12, anchor_x='center', anchor_y='center')
 
     def on_update(self, delta_time):

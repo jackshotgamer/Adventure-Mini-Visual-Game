@@ -42,7 +42,7 @@ def confirm_func(message):
     state = State.state.player
     State.state.clear_current_floor_data()
     import shutil
-    shutil.rmtree(f'Interactable_Tiles/{State.state.player.name}')
+    shutil.rmtree(f'PLAYERDATA/{State.state.player.name}')
     state.pos = Vector.Vector(0, 0)
     state.max_hp = 1000
     state.hp = 1000

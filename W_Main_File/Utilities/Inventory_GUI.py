@@ -120,6 +120,13 @@ def sprite_from_text_image(image, key_: str = "Key"):
     return text_sprite
 
 
+def get_hovered_item(mouse_pos):
+    origin_pos_nw = inventory_nw()
+    mouse_pos_local = Vector(mouse_pos.x - origin_pos_nw.x, mouse_pos.y - origin_pos_nw.y)
+    box_pos_int = Vector(int(mouse_pos_local.x / State.state.cell_render_size.x), int(mouse_pos_local.y / State.state.cell_render_size.y))
+    return State.state.inventory.get_item(abs(box_pos_int.y * 5) + box_pos_int.x, State.state.current_page)
+
+
 def show_tooltips(mouse_pos: Vector):
     items = State.state.inventory.items
     if not items:
@@ -137,18 +144,19 @@ def show_tooltips(mouse_pos: Vector):
                       (origin_pos_nw.y + (box_pos_int.y * State.state.cell_render_size.y)) - (State.state.cell_render_size.y / 2))
     from W_Main_File.Items.Inventory import InventoryContainer
     from W_Main_File.Data import Item
-    item: Item.Item = State.state.inventory.get_item(abs(box_pos_int.y * 5) + box_pos_int.x, State.state.current_page)
+    item: Item.Item = get_hovered_item(mouse_pos)
     if item is not None:
         if item.type_ is Item.ItemType.Weapon:
             item: Item.Weapon
             if item.has_elemental_damage:
                 element_type = item.element_type().name.replace('_', ' ')
-                text_image = arcade.get_text_image(f'Name: {item.name}\n Type: {item.type_.name}\nDamage: {item.min_attack}'
-                                                   f'-{item.max_attack}\nSpeed: {item.speed}\nElement: {element_type.title()}', arcade.color.GREEN, 14)
+                text_image = arcade.get_text_image(f'Name: {item.name}\nType: {item.type_.name}\nDamage: {item.min_attack}'
+                                                   f'-{item.max_attack}\nSpeed: {item.speed}\nRange: {item.range}\nElement: {element_type.title()}', arcade.color.GREEN, 14)
             else:
-                text_image = arcade.get_text_image(f'Name: {item.name}\n Type: {item.type_.name}\nDamage: {item.min_attack}-{item.max_attack}\nSpeed: {item.speed}', arcade.color.GREEN, 14)
+                text_image = arcade.get_text_image(f'Name: {item.name}\nType: {item.type_.name}\nDamage: {item.min_attack}-{item.max_attack}\nSpeed: {item.speed}\nRange: {item.range}',
+                                                   arcade.color.GREEN, 14)
         else:
-            text_image = arcade.get_text_image(f'Name: {item.name}\n Type: {item.type_.name}', arcade.color.GREEN, 14)
+            text_image = arcade.get_text_image(f'Name: {item.name}\nType: {item.type_.name}', arcade.color.GREEN, 14)
     else:
         text_image = arcade.get_text_image('', (20, 20, 20), 1)
     image = sprite_from_text_image(text_image)

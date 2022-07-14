@@ -127,7 +127,7 @@ weights, sprite_alias = (
 
 loot_options = {'1', '1.1', '1.2', '2', '2.1', '2.2', '2.3'}
 enemy_options = {'1', '1.1', '1.2'}
-trapdoor_options = '10'
+trapdoor_options = ('10', )
 trap_options = ('0.5', '1.5')
 excluded_tiles = ('0.1', '0.2', '0.3', '0.4')
 

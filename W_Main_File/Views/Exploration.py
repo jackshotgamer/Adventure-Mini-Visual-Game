@@ -2,7 +2,7 @@ import arcade
 import arcade.gui
 from arcade import key
 
-from W_Main_File.Utilities import Button_Functions, Action_Queue
+from W_Main_File.Utilities import Button_Functions, Action_Queue, Custom_Menu
 from W_Main_File.Views import Purgatory_Screen, Event_Base, TileRenderer
 from W_Main_File.Data import Sprites_
 from W_Main_File.Essentials import State
@@ -37,8 +37,6 @@ class Explore(Event_Base.EventBase):
         if not State.state.grid.get(2, 0):
             State.state.grid.add(Loot_Functions.LootTile(Vector(2, 0)))
         from W_Main_File.Items import Inventory
-        if State.state.player.meta_data.is_player:
-            print(State.state.inventory.items)
         self.yfes = False
         self.delta = time.time()
         arcade.set_background_color((0, 0, 0))
@@ -51,6 +49,10 @@ class Explore(Event_Base.EventBase):
             syms = (list(Event_Base.symbols & {arcade.key.A, arcade.key.D, arcade.key.W, arcade.key.S}))
             if syms:
                 self.on_key_press(syms[0], Event_Base.held_modifiers)
+        State.cache_state.prior_player_grid_pos = State.state.player.pos.rounded()
+        State.cache_state.prior_camera_pos = State.state.camera_pos
+        State.cache_state.trap_additive_distance = 0
+        self.menu_manager = Custom_Menu.MenuManager()
 
     def update(self, delta_time: float):
         self.delta = delta_time
@@ -78,13 +80,46 @@ class Explore(Event_Base.EventBase):
                 tile.on_update(delta_time)
         if State.state.preoccupied:
             return
-        for symbol in Event_Base.symbols:
+        run_once = False
+        for symbol in tuple(Event_Base.symbols):
             if symbol in self.key_offset:
-                # TODO rounding issues
-                State.state.player.pos = (State.state.camera_pos / State.state.cell_render_size)
+                State.state.player.pos = (State.state.camera_pos / State.state.cell_render_size).rounded()
                 State.state.camera_pos += (Vector(*self.key_offset[symbol]) * self.movement_speed) * self.delta
+                if (State.state.texture_mapping[f'{State.state.player.pos.x} {State.state.player.pos.y}']) in Sprites_.trap_options:
+                    if not isinstance(State.state.grid.get(*State.state.player.pos), Trap_Functions.TrapTile):
+                        tile = Trap_Functions.TrapTile(State.state.player.pos)
+                        State.state.grid.add(tile)
+                    else:
+                        tile = State.state.grid.get(*State.state.player.pos)
+                    if State.cache_state.trap_additive_distance > 75:
+                        State.cache_state.trap_additive_distance = 0
+                        Action_Queue.action_queue.append(tile.on_enter)
+                    elif not run_once:
+                        State.cache_state.trap_additive_distance += ((Vector(*self.key_offset[symbol]) * self.movement_speed) * self.delta).distance()
+                    print(State.cache_state.trap_additive_distance)
+                elif State.cache_state.trap_additive_distance:
+                    State.cache_state.trap_additive_distance = 0
+                if (State.state.texture_mapping[f'{State.state.player.pos.x} {State.state.player.pos.y}']) in Sprites_.trapdoor_options:
+                    if not isinstance(State.state.grid.get(*State.state.player.pos), Trapdoor_Functions.TrapdoorTile):
+                        if not State.state.grid.get(*State.state.player.pos):
+                            State.state.grid.add(Trapdoor_Functions.TrapdoorTile(State.state.player.pos))
+                if State.state.player.pos.tuple() != State.cache_state.prior_player_grid_pos.tuple():
+                    if tile := State.state.grid.get(*State.cache_state.prior_player_grid_pos.tuple()):
+                        if not tile.can_player_move():
+                            break
+                        tile.on_exit()
+                    if tile := State.state.grid.get(*State.state.player.pos):
+                        if State.state.get_tile_id(State.state.player.pos) not in Sprites_.trap_options:
+                            Action_Queue.action_queue.append(tile.on_enter)
+                self.gen_new_inter_tiles(symbol)
+                run_once = True
+        if Action_Queue.action_queue:
+            Action_Queue.action_queue.popleft()()
+
         if any(symbol for symbol in Event_Base.symbols if symbol in self.key_offset):
             Sprites_.update_character()
+        State.cache_state.prior_player_grid_pos = State.state.player.pos
+        State.cache_state.prior_camera_pos = State.state.camera_pos
 
     def check_if_resized(self):
         if self.current_window_size.xf == State.state.window.width and self.current_window_size.yf == State.state.window.height:
@@ -128,7 +163,7 @@ class Explore(Event_Base.EventBase):
         arcade.draw_text(f'Floor: {int(State.state.player.floor)}', State.state.window.width * 0.5,
                          (State.state.window.height * 0.5) - (cell_render_size.yf * .37), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=(12 * screen_percentage_of_default), anchor_x='center', anchor_y='center')
-        arcade.draw_text(str((round(State.state.player.pos.xf), round(State.state.player.pos.yf))), State.state.window.width * 0.5,
+        arcade.draw_text(str(State.state.player.pos), State.state.window.width * 0.5,
                          (State.state.window.height * 0.5) + (cell_render_size.yf * .37), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=(12 * screen_percentage_of_default), anchor_x='center', anchor_y='center')
         if not any(symbol for symbol in Event_Base.symbols if symbol in self.key_offset):
@@ -151,7 +186,9 @@ class Explore(Event_Base.EventBase):
         #     arcade.draw_text('Preoccupied', 800, 700, arcade.color.RED, 30)
         self.button_manager.render()
         Inventory_GUI.render_inventory(Vector(self.window._mouse_x, self.window._mouse_y))
-        if not Inventory_GUI._inventory_toggle:
+        self.menu_manager.display_menu('Inv_Item_Menu')
+        arcade.draw_point(State.state.screen_center.x, State.state.screen_center.y, arcade.color.RED, 4)
+        if not Inventory_GUI.is_inv():
             State.state.render_mouse()
 
     # noinspection PyMethodMayBeStatic
@@ -175,11 +212,14 @@ class Explore(Event_Base.EventBase):
 
     def on_mouse_press(self, x: float, y: float, button: int, modifiers: int):
         super().on_mouse_press(x, y, button, modifiers)
-        thing_to_do = (State.state.grid.get(*State.state.player.pos, default="EmptyTile"))
-        thing_to_do_2 = (State.state.grid.get(*self.previous_pos, default="EmptyTile"))
-        print(f'Current tile: {thing_to_do.__class__.__name__ if not thing_to_do.__class__.__name__ == "str" else "EmptyTile"}'
-              f'\nPrevious tile: {thing_to_do_2.__class__.__name__ if not thing_to_do_2.__class__.__name__ == "str" else "EmptyTile"}\n')
-        print(f'X: {x}, Screen_X: {x / State.state.window.width}\nY: {y}, Screen_Y: {y / State.state.window.height}\n')
+        if button == arcade.MOUSE_BUTTON_RIGHT:
+            from W_Main_File.Utilities import Inventory_GUI
+            if Inventory_GUI.is_inv():
+                item = Inventory_GUI.get_hovered_item(Vector(x, y))
+                self.menu_manager.make_menu('Inv_Item_Menu', Vector(x, y), '', 'Title', {'Obj_1': '1', 'Obj_2': '2', 'Obj_3': '3'}, True)
+                # TODO
+        else:
+            self.menu_manager.remove_menu('Inv_Item_Menu')
 
     def check_action_queue(self):
         while Action_Queue.action_queue:
@@ -209,22 +249,43 @@ class Explore(Event_Base.EventBase):
                 return
             self.__class__.previous_pos = State.state.player.pos
             State.state.moves_since_texture_save += 1
-            offset = (Vector(*self.key_offset[symbol]) * self.movement_speed) * self.delta
+            offset = ((Vector(*self.key_offset[symbol]) * self.movement_speed) * self.delta / State.state.cell_render_size).rounded()
             prior_player_pos = State.state.player.pos
             new_player_pos = prior_player_pos + offset
-            # if tile := State.state.grid.get(*prior_player_pos):
-            #     if not tile.can_player_move():
-            #         return
-            #     tile.on_exit()
-            # if tile := State.state.grid.get(*new_player_pos):
-            #     tile.on_enter()
+            prev_tile = State.state.grid.get(*prior_player_pos)
+            new_tile = State.state.grid.get(*new_player_pos)
+            if prev_tile and not new_tile:
+                if not prev_tile.can_player_move():
+                    return
+                prev_tile.on_exit()
+            if new_tile != prev_tile and new_tile:
+                new_tile.on_enter()
 
-            def after_update():
+        else:
+            if tile := State.state.grid.get(*State.state.player.pos):
+                tile.key_down(symbol, modifiers)
+
+    def gen_new_inter_tiles(self, symbol):
+        self.__class__.previous_pos = State.state.player.pos
+        State.state.moves_since_texture_save += 1
+        offset = ((Vector(*self.key_offset[symbol]) * self.movement_speed) * self.delta / State.state.cell_render_size).rounded()
+        prior_player_pos = State.state.player.pos
+        new_player_pos = prior_player_pos + offset
+        prev_tile = State.state.grid.get(*prior_player_pos)
+        new_tile = State.state.grid.get(*new_player_pos)
+        if prev_tile and not new_tile:
+            if not prev_tile.can_player_move():
+                return
+            prev_tile.on_exit()
+        if new_tile != prev_tile and new_tile:
+            new_tile.on_enter()
+
+        def after_update():
+            if State.state.player.pos.tuple() not in State.state.grid.visited_tiles:
                 State.state.player.pos = new_player_pos
-
                 if (
                         not State.state.grid.get(new_player_pos.x, new_player_pos.y)
-                        and random.random() < 0.02
+                        and random.random() < 0.2
                         and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in Sprites_.loot_options
                         and new_player_pos.tuple() not in State.state.grid.visited_tiles
                 ):
@@ -244,19 +305,7 @@ class Explore(Event_Base.EventBase):
                 ):
                     trapdoor = Trapdoor_Functions.TrapdoorTile(Vector(new_player_pos.x, new_player_pos.y))
                     State.state.grid.add(trapdoor)
-                elif (
-                        State.state.get_tile_id(Vector(new_player_pos.x, new_player_pos.y)) in Sprites_.trap_options
-                        and not State.state.grid.get(new_player_pos.x, new_player_pos.y)
-                ):
-                    trap = Trap_Functions.TrapTile(new_player_pos)
-                    trap.on_enter()
-                    State.state.grid.add(trap)
-
                 State.state.grid.add_visited_tile(new_player_pos)
 
-            self.should_transition_to_animation = [True, prior_player_pos, new_player_pos, after_update]
-            self.check_action_queue()
-
-        else:
-            if tile := State.state.grid.get(*State.state.player.pos):
-                tile.key_down(symbol, modifiers)
+        after_update()
+        self.check_action_queue()

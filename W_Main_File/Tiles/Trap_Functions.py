@@ -1,4 +1,5 @@
-import arcade, random
+import arcade
+import random
 
 from W_Main_File.Data import Tile, Sprites_
 from W_Main_File.Essentials import State

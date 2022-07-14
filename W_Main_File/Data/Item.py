@@ -67,11 +67,12 @@ class Item:
 
 
 class Weapon(Item):
-    def __init__(self, name, id_, min_attack, max_attack, speed, damage_type: Union[int, DamageType], has_special_move: bool):
+    def __init__(self, name, id_, min_attack, max_attack, speed, range_, damage_type: Union[int, DamageType], has_special_move: bool):
         super().__init__(name, id_, ItemType.Weapon)
         self.min_attack = min_attack
         self.max_attack = max_attack
         self.speed = speed
+        self.range = range_
         self.damage_type = damage_type
         self.has_elemental_damage = bool(self.damage_type & DamageType.Any_Elemental)
         self.has_special_move = has_special_move

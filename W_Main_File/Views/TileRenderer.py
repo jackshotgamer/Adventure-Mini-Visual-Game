@@ -18,7 +18,7 @@ class TileRenderer:
         for offset in State.state.generate_radius(self.render_radius):
             tile_pos.add(State.state.grid_camera_pos + offset)
         return [
-            (tile, ((pos - (State.state.grid_camera_pos_raw - pos)) * State.state.cell_render_size) + center)
+            (tile, ((pos - State.state.grid_camera_pos_raw) * State.state.cell_render_size) + center)
             for pos in tile_pos if (tile := grid.get(*pos))
         ]
 

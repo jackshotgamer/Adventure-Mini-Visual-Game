@@ -35,6 +35,9 @@ class Vector(np.ndarray):
     def rounded(self):
         return Vector(round(self.xf), round(self.yf))
 
+    def distance(self):
+        return ((self.xf**2)+(self.yf**2))**.5
+
     @property
     def x(self):
         return int(self[0])

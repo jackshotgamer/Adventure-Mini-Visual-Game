@@ -33,7 +33,6 @@ class EventBase(arcade.View):
         global symbols
         global held_modifiers
         symbols.add(symbol)
-        print(symbols, self.__class__)
         held_modifiers |= modifiers
 
     def on_key_release(self, _symbol: int, _modifiers: int):
@@ -41,7 +40,6 @@ class EventBase(arcade.View):
         global held_modifiers
         if _symbol in symbols:
             symbols.remove(_symbol)
-        print(symbols, self.__class__)
         held_modifiers &= _modifiers
 
 

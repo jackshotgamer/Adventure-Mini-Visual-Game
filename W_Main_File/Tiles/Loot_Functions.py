@@ -53,12 +53,13 @@ class LootTile(Tile.Tile):
         if State.state.player.pos == self.pos and not self.opening:
             if State.state.is_moving:
                 return
-            arcade.draw_rectangle_filled(center.x, center.y, State.state.cell_render_size.x * 1, State.state.cell_render_size.y * 0.2, (0, 0, 0, self.current_opacity))
+            arcade.draw_rectangle_filled(center.x, center.y, State.state.cell_render_size.x * 1,
+                                         State.state.cell_render_size.y * 0.2, (0, 0, 0, self.current_opacity))
             if not self.looted:
-                arcade.draw_text(f'Press E to Loot!', State.state.screen_center.x, State.state.screen_center.y, (255, 69, 0, 220),
+                arcade.draw_text(f'Press E to Loot!', center.x, center.y, (255, 69, 0, 220),
                                  12, anchor_x='center', anchor_y='center')
             else:
-                arcade.draw_text(f'Looted.', State.state.screen_center.x, State.state.screen_center.y, (255, 0, 0, 220),
+                arcade.draw_text(f'Looted.', center.x, center.y, (255, 0, 0, 220),
                                  12, anchor_x='center', anchor_y='center')
         elif State.state.player.pos == self.pos and self.opening:
             arcade.draw_rectangle_filled(State.state.screen_center.x, State.state.screen_center.y - (State.state.cell_render_size.y * 1.5),
@@ -119,7 +120,8 @@ class LootTile(Tile.Tile):
                 self.waiting += (1 * multipler_speed)
                 if self.waiting >= 60:
                     self.opening = False
-                    State.state.preoccupied = False
+                    if State.state.preoccupied:
+                        State.state.preoccupied = False
 
     def on_enter(self):
         self.current_opacity = 0
