@@ -1,11 +1,11 @@
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from W_Main_File.Data import Item
 from typing import Union
 from W_Main_File.Essentials import State
 from pathlib import Path
 import pickle
-
 
 
 class InventoryContainer:
@@ -37,6 +37,12 @@ class InventoryContainer:
             if 0 <= index1 < len(self.items):
                 self.items[index1] = None
 
+    def remove_item_not_index(self, item):
+        if self.items:
+            if item in self.items:
+                index = self.items.index(item)
+                self.items[index] = None
+
     def count_items(self, id_):
         if isinstance(id_, str):
             if self.items:
@@ -64,17 +70,17 @@ class InventoryContainer:
 
     def load(self, file_path):
         from W_Main_File.Essentials.State import state
-        if not (state.player_data_path/file_path).exists():
+        if not (state.player_data_path / file_path).exists():
             (state.player_data_path / file_path).mkdir()
-        if not (state.player_data_path/file_path/'inv').exists():
-            with open((state.player_data_path/file_path/'inv'), 'wb') as file:
+        if not (state.player_data_path / file_path / 'inv').exists():
+            with open((state.player_data_path / file_path / 'inv'), 'wb') as file:
                 pickle.dump([], file)
-        with open((state.player_data_path/file_path/'inv'), 'rb') as file:
+        with open((state.player_data_path / file_path / 'inv'), 'rb') as file:
             self.items = pickle.load(file)
 
     def save(self, file_path):
         from W_Main_File.Essentials.State import state
-        if not (state.player_data_path/file_path).exists():
-            (state.player_data_path/file_path).mkdir()
-        with open((state.player_data_path/file_path/'inv'), 'wb') as file:
+        if not (state.player_data_path / file_path).exists():
+            (state.player_data_path / file_path).mkdir()
+        with open((state.player_data_path / file_path / 'inv'), 'wb') as file:
             pickle.dump(self.items, file)

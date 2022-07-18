@@ -4,7 +4,7 @@ from arcade import key
 
 from W_Main_File.Utilities import Button_Functions, Action_Queue, Custom_Menu
 from W_Main_File.Views import Purgatory_Screen, Event_Base, TileRenderer
-from W_Main_File.Data import Sprites_
+from W_Main_File.Data import Sprites_, Item
 from W_Main_File.Essentials import State
 import time
 import random
@@ -186,9 +186,17 @@ class Explore(Event_Base.EventBase):
         #     arcade.draw_text('Preoccupied', 800, 700, arcade.color.RED, 30)
         self.button_manager.render()
         Inventory_GUI.render_inventory(Vector(self.window._mouse_x, self.window._mouse_y))
-        self.menu_manager.display_menu('Inv_Item_Menu')
+        if menu := self.menu_manager.display_menu('Inv_Item_Menu'):
+            arcade.draw_line(menu.pos.x+10, menu.pos.y-3, menu.pos.x+10, menu.pos.y - (25 * 1), arcade.color.RED, 3)
+            arcade.draw_line(menu.pos.x + 10, menu.pos.y - (25 * 1), menu.pos.x + 10, menu.pos.y - (25 * 2), arcade.color.WHITE, 3)
+            arcade.draw_line(menu.pos.x + 10, menu.pos.y - (25 * 2), menu.pos.x + 10, menu.pos.y - (25 * 3), arcade.color.RED, 3)
+            arcade.draw_line(menu.pos.x + 10, menu.pos.y - (25 * 3), menu.pos.x + 10, menu.pos.y - (25 * 4), arcade.color.WHITE, 3)
+            arcade.draw_line(menu.pos.x + 10, menu.pos.y - (25 * 4), menu.pos.x + 10, menu.pos.y - (25 * 5), arcade.color.RED, 3)
         arcade.draw_point(State.state.screen_center.x, State.state.screen_center.y, arcade.color.RED, 4)
-        if not Inventory_GUI.is_inv():
+        if Inventory_GUI.is_inv():
+            if Inventory_GUI._menu_toggle:
+                State.state.render_mouse()
+        else:
             State.state.render_mouse()
 
     # noinspection PyMethodMayBeStatic
@@ -204,7 +212,6 @@ class Explore(Event_Base.EventBase):
                          font_size=(14 * screen_percentage_of_default), font_name='arial')
         arcade.draw_text(f'xp: {int(State.state.player.xp)}', State.state.window.width * 0.565, State.state.window.height * 0.8125, arcade.color.LIGHT_GRAY,
                          font_size=(14 * screen_percentage_of_default), font_name='arial')
-
     def on_key_release(self, symbol, mods):
         super().on_key_release(symbol, mods)
         if tile := State.state.grid.get(*State.state.player.pos):
@@ -212,14 +219,41 @@ class Explore(Event_Base.EventBase):
 
     def on_mouse_press(self, x: float, y: float, button: int, modifiers: int):
         super().on_mouse_press(x, y, button, modifiers)
+        from W_Main_File.Utilities import Inventory_GUI
         if button == arcade.MOUSE_BUTTON_RIGHT:
-            from W_Main_File.Utilities import Inventory_GUI
             if Inventory_GUI.is_inv():
+                Inventory_GUI._menu_toggle = True
                 item = Inventory_GUI.get_hovered_item(Vector(x, y))
-                self.menu_manager.make_menu('Inv_Item_Menu', Vector(x, y), '', 'Title', {'Obj_1': '1', 'Obj_2': '2', 'Obj_3': '3'}, True)
+                gvacfi = self.get_values_and_callbacks_from_item(item)
+                if gvacfi is not None:
+                    self.menu_manager.make_menu('Inv_Item_Menu', Vector(x, y), '', 'Title', gvacfi, True)
+                else:
+                    if self.menu_manager.check_if_mouse_on_menu('Inv_Item_Menu', Vector(x, y)):
+                        self.menu_manager.remove_menu('Inv_Item_Menu')
                 # TODO
         else:
-            self.menu_manager.remove_menu('Inv_Item_Menu')
+            if not self.menu_manager.check_if_mouse_on_menu('Inv_Item_Menu', Vector(x, y)):
+                Inventory_GUI._menu_toggle = False
+                self.menu_manager.remove_menu('Inv_Item_Menu')
+        if button == arcade.MOUSE_BUTTON_LEFT:
+            if Inventory_GUI.is_inv() and self.menu_manager.check_if_mouse_on_menu('Inv_Item_Menu', Vector(x, y)):
+                menu = self.menu_manager.menus['Inv_Item_Menu']
+                rel_mouse_pos = Vector(x - menu.pos.x, abs(menu.pos.y - y))
+                gvacfi_2 = self.get_values_and_callbacks_from_item(Inventory_GUI.get_hovered_item(Vector(x, y)))
+
+
+    def get_values_and_callbacks_from_item(self, item: Item.Item):
+        if item:
+            if item.type_ == Item.ItemType.Weapon:
+                return {'trash': lambda: State.state.inventory.remove_item_not_index(item), 'sell': lambda: None}
+            elif item.type_ == Item.ItemType.Armour:
+                return {'trash': lambda: State.state.inventory.remove_item_not_index(item), 'sell': lambda: None}
+            elif item.type_ == Item.ItemType.Accessory:
+                return {'trash': lambda: State.state.inventory.remove_item_not_index(item), 'sell': lambda: None}
+            elif item.type_ == Item.ItemType.Consumable:
+                return {'trash': lambda: State.state.inventory.remove_item_not_index(item), 'sell': lambda: None}
+        else:
+            return None
 
     def check_action_queue(self):
         while Action_Queue.action_queue:

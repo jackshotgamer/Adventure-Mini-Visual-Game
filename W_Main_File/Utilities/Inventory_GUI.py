@@ -1,7 +1,10 @@
 import arcade
 import arcade.gui
 from arcade import key
+from typing import TYPE_CHECKING
 
+if TYPE_CHECKING:
+    from W_Main_File.Data.Item import Item
 from W_Main_File.Utilities import Button_Functions, Action_Queue
 from W_Main_File.Views import Purgatory_Screen, Event_Base
 from W_Main_File.Data import Sprites_
@@ -12,6 +15,7 @@ from W_Main_File.Tiles import Loot_Functions, Trapdoor_Functions, Trap_Functions
 from W_Main_File.Utilities.Vector import Vector
 
 _inventory_toggle = False
+_menu_toggle = False
 
 
 def show_inv(button_manager: 'Button_Sprite_Manager.ButtonManager'):
@@ -104,7 +108,8 @@ def render_inventory(mouse_pos: Vector):
                     arcade.draw_texture_rectangle((x * State.state.cell_render_size.x) + origin_x, ((y * -State.state.cell_render_size.y) + origin_y),
                                                   100, 100, sprite, alpha=200 if sprite == Sprites_.Null else 255)
         State.state.render_mouse()
-        show_tooltips(mouse_pos)
+        if not _menu_toggle:
+            show_tooltips(mouse_pos)
         if len(items) > 25:
             pass
     else:
@@ -120,7 +125,7 @@ def sprite_from_text_image(image, key_: str = "Key"):
     return text_sprite
 
 
-def get_hovered_item(mouse_pos):
+def get_hovered_item(mouse_pos) -> "Item":
     origin_pos_nw = inventory_nw()
     mouse_pos_local = Vector(mouse_pos.x - origin_pos_nw.x, mouse_pos.y - origin_pos_nw.y)
     box_pos_int = Vector(int(mouse_pos_local.x / State.state.cell_render_size.x), int(mouse_pos_local.y / State.state.cell_render_size.y))
