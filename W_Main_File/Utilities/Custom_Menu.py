@@ -1,3 +1,5 @@
+import typing
+
 import arcade
 from W_Main_File.Utilities import Vector
 from dataclasses import dataclass
@@ -8,10 +10,11 @@ class Menu:
     key: str
     pos: Vector.Vector
     offset: str
-    title: str
     values_and_callbacks: dict
     show: bool
-    image: arcade.sprite
+    widest_text: int
+    height_below_origin: int
+    image: list
 
 
 class MenuManager:
@@ -21,15 +24,22 @@ class MenuManager:
     def get_corners(self, mode: str, pos, size):
         pass
 
-    def make_menu(self, key, pos, offset: str, title: str, values_and_callbacks: dict, show: bool):
+    def make_menu(self, key, pos, offset: str, values_and_callbacks: dict, show: bool):
         if values_and_callbacks is not None:
-            joined_values_callbacks = '.\n.\n'.join(values_and_callbacks.keys()).upper()
-            text_image = arcade.get_text_image(f'{title.upper()}\n.\n.\n{joined_values_callbacks}', arcade.color.GREEN, 24)
             from W_Main_File.Utilities.Inventory_GUI import sprite_from_text_image
-            image = sprite_from_text_image(text_image)
-            self.menus[key] = (Menu(key, pos, offset, title, values_and_callbacks, show, image))
+            text_images = []
+            widest_text = 0
+            height_below_origin = 0
+            for index, key_ in enumerate(values_and_callbacks):
+                text_image_sprite = sprite_from_text_image(arcade.get_text_image(f'{key_}', arcade.color.GREEN, 24))
+                widest_text = max(widest_text, text_image_sprite.width)
+                height_below_origin += text_image_sprite.height
+                text_images.append((text_image_sprite, values_and_callbacks[key_], height_below_origin))
+            menus_assign = Menu(key, pos, offset, values_and_callbacks, show, widest_text, height_below_origin, text_images)
+            self.menus[key] = menus_assign
 
     def check_if_mouse_on_menu(self, key, mouse_pos: Vector.Vector):
+        # TODO No width object
         if key not in self.menus:
             return False
         menu = self.menus[key]
@@ -41,12 +51,16 @@ class MenuManager:
     def display_menu(self, key):
         if key in self.menus:
             menu = self.menus[key]
-            image = menu.image
+            images = menu.image
             if menu.show:
-                tooltip_center = Vector.Vector(menu.pos.x + (image.width / 2), menu.pos.y - (image.height / 2))
-                arcade.draw_rectangle_filled(tooltip_center.x, tooltip_center.y, image.width + 20, image.height + 20, (40, 40, 40))
-                arcade.draw_rectangle_outline(tooltip_center.x, tooltip_center.y, image.width + 20, image.height + 20, (40, 150, 40), 2)
-                arcade.draw_texture_rectangle(menu.pos.x + (image.width / 2), menu.pos.y - (image.height / 2), image.width, image.height, image.texture)
+                tooltip_center = Vector.Vector(menu.pos.x + (menu.widest_text / 2), menu.pos.y - (menu.height_below_origin / 2))
+                arcade.draw_rectangle_filled(tooltip_center.x, tooltip_center.y, menu.widest_text + 20, menu.height_below_origin + 20, (40, 40, 40))
+                arcade.draw_rectangle_outline(tooltip_center.x, tooltip_center.y, menu.widest_text + 20, menu.height_below_origin + 20, (40, 150, 40), 2)
+                image: tuple[arcade.Sprite, typing.Callable, float]
+                for image in images:
+                    # TODO Width is being weird
+                    arcade.draw_texture_rectangle(menu.pos.x + (menu.widest_text / 2), ((menu.pos.y - image[2]) + (image[0].height / 2)), menu.widest_text,
+                                                  image[0].height, image[0].texture)
             return menu
         else:
             return None

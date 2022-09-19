@@ -30,7 +30,7 @@ if mode == 'input':
         con.commit()
 elif mode == 'map':
     import arcade
-
+    import random
 
     class AndScene(arcade.View):
         def __init__(self):
@@ -39,14 +39,14 @@ elif mode == 'map':
             cursor = con.cursor()
             cursor.execute('select * from Clicks')
             for x_, y_ in cursor:
-                self.shapelist.append(arcade.create_ellipse(x_, y_, 20, 20, (255, 0, 0, 15)))
+                self.shapelist.append(arcade.create_ellipse(x_, y_, 15, 15, (255, 0, 0, 15)))
 
         def on_draw(self):
             arcade.start_render()
             self.shapelist.draw()
 
 
-    window = arcade.Window(800, 600, 'Heat map', fullscreen=True)
+    window = arcade.Window(800, 600, 'Heat map', fullscreen=False, resizable=True)
     window.show_view(AndScene())
     arcade.run()
 if mode == 'secret':

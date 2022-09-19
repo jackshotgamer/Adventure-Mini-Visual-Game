@@ -186,12 +186,7 @@ class Explore(Event_Base.EventBase):
         #     arcade.draw_text('Preoccupied', 800, 700, arcade.color.RED, 30)
         self.button_manager.render()
         Inventory_GUI.render_inventory(Vector(self.window._mouse_x, self.window._mouse_y))
-        if menu := self.menu_manager.display_menu('Inv_Item_Menu'):
-            arcade.draw_line(menu.pos.x+10, menu.pos.y-3, menu.pos.x+10, menu.pos.y - (25 * 1), arcade.color.RED, 3)
-            arcade.draw_line(menu.pos.x + 10, menu.pos.y - (25 * 1), menu.pos.x + 10, menu.pos.y - (25 * 2), arcade.color.WHITE, 3)
-            arcade.draw_line(menu.pos.x + 10, menu.pos.y - (25 * 2), menu.pos.x + 10, menu.pos.y - (25 * 3), arcade.color.RED, 3)
-            arcade.draw_line(menu.pos.x + 10, menu.pos.y - (25 * 3), menu.pos.x + 10, menu.pos.y - (25 * 4), arcade.color.WHITE, 3)
-            arcade.draw_line(menu.pos.x + 10, menu.pos.y - (25 * 4), menu.pos.x + 10, menu.pos.y - (25 * 5), arcade.color.RED, 3)
+        self.menu_manager.display_menu('Inv_Item_Menu')
         arcade.draw_point(State.state.screen_center.x, State.state.screen_center.y, arcade.color.RED, 4)
         if Inventory_GUI.is_inv():
             if Inventory_GUI._menu_toggle:
@@ -226,7 +221,7 @@ class Explore(Event_Base.EventBase):
                 item = Inventory_GUI.get_hovered_item(Vector(x, y))
                 gvacfi = self.get_values_and_callbacks_from_item(item)
                 if gvacfi is not None:
-                    self.menu_manager.make_menu('Inv_Item_Menu', Vector(x, y), '', 'Title', gvacfi, True)
+                    self.menu_manager.make_menu('Inv_Item_Menu', Vector(x, y), '', gvacfi, True)
                 else:
                     if self.menu_manager.check_if_mouse_on_menu('Inv_Item_Menu', Vector(x, y)):
                         self.menu_manager.remove_menu('Inv_Item_Menu')

@@ -75,6 +75,7 @@ class Fading(View):
             self.halfway_func()
             if self.reset_pos is not None:
                 State.state.player.pos = Vector.Vector(*self.reset_pos)
+                State.state.camera_pos = Vector.Vector(*(self.reset_pos * State.state.cell_render_size))
             if self.reset_floor_number is not None:
                 Floor_Data_Saving.FloorSaveManager.load_floor(self.reset_floor_number)
                 State.state.player.floor = self.reset_floor_number

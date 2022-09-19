@@ -73,6 +73,7 @@ class FloorSaveManager:
             return
         floor_file_path = cls.get_floor_file_path(floor_number, character_name)
         State.state.grid.visited_tiles.clear()
+        State.state.texture_mapping.clear()
         if not floor_file_path.exists():
             return False
         with open(floor_file_path, 'rb') as floor_file:
