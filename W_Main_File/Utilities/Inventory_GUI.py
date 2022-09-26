@@ -24,13 +24,16 @@ def show_inv(button_manager: 'Button_Sprite_Manager.ButtonManager'):
     _inventory_toggle = True
     button_manager.append('LeftArrow', '', Vector(State.state.screen_center.x - (State.state.screen_center.x * .1), State.state.screen_center.y * .25),
                           Vector(State.state.window.width * .05, State.state.window.height * .0625),
-                          Sprites_.arrow_button_dark_left, Sprites_.arrow_button_light_left, Sprites_.arrow_button_bright_left, on_click=page_left)
+                          Sprites_.arrow_button_dark_left, Sprites_.arrow_button_light_left, Sprites_.arrow_button_bright_left, on_click=lambda: Action_Queue.action_queue.append(page_left))
     button_manager.append('RightArrow', '', Vector(State.state.screen_center.x + (State.state.screen_center.x * .1), State.state.screen_center.y * .25),
                           Vector(State.state.window.width * .05, State.state.window.height * .06250),
-                          Sprites_.arrow_button_dark_right, Sprites_.arrow_button_light_right, Sprites_.arrow_button_bright_right, on_click=page_right)
+                          Sprites_.arrow_button_dark_right, Sprites_.arrow_button_light_right, Sprites_.arrow_button_bright_right, on_click=lambda: Action_Queue.action_queue.append(page_right))
 
 
 def page_left():
+    for item in State.state.inventory.get_items_on_page(State.state.current_page):
+        if item is not None:
+            item.selected = False
     from W_Main_File.Views import Event_Base
     if State.state.current_page > 0 and not Event_Base.held_modifiers & arcade.key.MOD_SHIFT:
         State.state.current_page -= 1
@@ -41,6 +44,9 @@ def page_left():
 
 
 def page_right():
+    for item in State.state.inventory.get_items_on_page(State.state.current_page):
+        if item is not None:
+            item.selected = False
     from W_Main_File.Views import Event_Base
     if State.state.current_page < State.state.inventory.page_count and not Event_Base.held_modifiers & arcade.key.MOD_SHIFT:
         State.state.current_page += 1
@@ -107,6 +113,9 @@ def render_inventory(mouse_pos: Vector):
                     # arcade.draw_rectangle_outline(inventory_nw().x, inventory_nw().y, State.state.window.width * 0.095, State.state.window.height * 0.11875, arcade.color.LIGHT_GRAY, 1)
                     arcade.draw_texture_rectangle((x * State.state.cell_render_size.x) + origin_x, ((y * -State.state.cell_render_size.y) + origin_y),
                                                   100, 100, sprite, alpha=200 if sprite == Sprites_.Null else 255)
+                    if item.selected:
+                        arcade.draw_rectangle_outline((x * State.state.cell_render_size.x) + origin_x, ((y * -State.state.cell_render_size.y) + origin_y),
+                                                      State.state.cell_render_size.x * 0.85, State.state.cell_render_size.y * 0.85, (200, 25, 25), 5)
         State.state.render_mouse()
         if not _menu_toggle:
             show_tooltips(mouse_pos)
@@ -125,11 +134,15 @@ def sprite_from_text_image(image, key_: str = "Key"):
     return text_sprite
 
 
-def get_hovered_item(mouse_pos) -> "Item":
+def get_hovered_item_index(mouse_pos):
     origin_pos_nw = inventory_nw()
     mouse_pos_local = Vector(mouse_pos.x - origin_pos_nw.x, mouse_pos.y - origin_pos_nw.y)
     box_pos_int = Vector(int(mouse_pos_local.x / State.state.cell_render_size.x), int(mouse_pos_local.y / State.state.cell_render_size.y))
-    return State.state.inventory.get_item(abs(box_pos_int.y * 5) + box_pos_int.x, State.state.current_page)
+    return abs(box_pos_int.y * 5) + box_pos_int.x
+
+
+def get_hovered_item(mouse_pos) -> "Item":
+    return State.state.inventory.get_item(get_hovered_item_index(mouse_pos), State.state.current_page)
 
 
 def show_tooltips(mouse_pos: Vector):
