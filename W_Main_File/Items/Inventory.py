@@ -13,12 +13,15 @@ class InventoryContainer:
         self.items = []
         self.page_size = page_size
 
-    def remove_empty_pages(self):
-        pass
-
     @property
     def page_count(self):
         return (len(self.items) // State.state.inventory.page_size) + (1 if (len(self.items) / State.state.inventory.page_size) % 1 else 0)
+
+    @staticmethod
+    def get_absolute_index(index, page_num=None):
+        if page_num is None:
+            page_num = State.state.current_page
+        return index+(page_num*25)
 
     def add_item(self, item: 'Item'):
         for index, item1 in enumerate(self.items):
@@ -28,7 +31,7 @@ class InventoryContainer:
         self.items.append(item)
         print(f'added, item: {item}')
 
-    def remove_item(self, index: int, page_num: int = None):
+    def remove_item(self, index: int, page_num: int = None, checks=True):
         if self.items:
             if page_num is not None:
                 index1 = index + (page_num * self.page_size)
@@ -36,12 +39,48 @@ class InventoryContainer:
                 index1 = index
             if 0 <= index1 < len(self.items):
                 self.items[index1] = None
+                if checks:
+                    self.clear_empty_pages()
+                    self.trim_inventory()
 
-    def remove_item_not_index(self, item):
+    def remove_item_not_index(self, item, checks=True):
         if self.items:
             if item in self.items:
                 index = self.items.index(item)
                 self.items[index] = None
+                if checks:
+                    self.clear_empty_pages()
+                    self.trim_inventory()
+
+    def remove_mass_items(self, indexes, checks=True):
+        for index in indexes:
+            self.remove_item(index, State.state.current_page, checks=False)
+        if checks:
+            self.clear_empty_pages()
+            self.trim_inventory()
+
+    def trim_inventory(self):
+        items_removed = 0
+        items_length = len(self.items)
+        for index, item in reversed(list(enumerate(self.items))):
+            if item is None:
+                del self.items[index]
+                items_removed += 1
+            else:
+                break
+        if State.state.current_page >= self.page_count:
+            if State.state.current_page != 0:
+                State.state.current_page = self.page_count - 1
+
+    def clear_empty_pages(self):
+        for page_num in reversed(range(self.page_count)):
+            if not any(self.get_items_on_page(page_num)):
+                if page_num == self.page_count-1:
+                    for index in reversed(range(page_num*25, (page_num*25)+(len(self.get_items_on_page(page_num))))):
+                        del self.items[index]
+                else:
+                    for index in reversed(range(page_num*25, (page_num*25)+25)):
+                        del self.items[index]
 
     def count_items(self, id_):
         if isinstance(id_, str):
@@ -67,6 +106,21 @@ class InventoryContainer:
                             index1 = index
                         if 0 <= index1 < len(self.items):
                             return self.items[index1]
+                    else:
+                        return None
+
+    def get_items_on_page(self, page_num=None):
+        if page_num is None:
+            page_num = State.state.current_page
+        if not isinstance(page_num, int) or not self.items or page_num > self.page_count:
+            return []
+        lower_upper_bound = [(page_num * 25), (page_num * 25) + 25]
+        if lower_upper_bound[1] > len(self.items) - 1:
+            lower_upper_bound[1] = len(self.items) - 1
+        items_to_return = []
+        for index in range(lower_upper_bound[0], lower_upper_bound[1]):
+            items_to_return.append(self.items[index])
+        return items_to_return
 
     def load(self, file_path):
         from W_Main_File.Essentials.State import state

@@ -224,6 +224,7 @@ def draw_character():
         frames = CHARACTER_FRAMES[current_character_frame]
     else:
         frames = FLIPPED_CHARACTER_FRAMES[current_character_frame]
-    arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y - 1,
-                                  State.state.cell_render_size.y * 0.75, State.state.cell_render_size.y * 0.75,
+    arcade.draw_texture_rectangle(((State.state.player.pos.xf * State.state.cell_render_size.xf) - State.state.camera_pos.xf)+State.state.screen_center.xf,
+                                  ((State.state.player.pos.yf * State.state.cell_render_size.yf) - State.state.camera_pos.yf)+State.state.screen_center.yf,
+                                  State.state.cell_render_size.yf * 0.75, State.state.cell_render_size.yf * 0.75,
                                   frames)

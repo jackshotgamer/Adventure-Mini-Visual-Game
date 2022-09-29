@@ -11,6 +11,7 @@ class ItemType(Enum):
     Armour = 2
     Consumable = 3
     Accessory = 4
+    Quest = 5
 
 
 class DamageType(IntFlag):
@@ -61,6 +62,7 @@ class Item:
         self.id_ = id_
         self.type_ = type_
         self.is_missingno = (id_ == 'MISSINGNO')
+        self.selected = False
 
     def __repr__(self):
         return f'<{self.__class__.__name__} name = {self.name!r}, id = {self.id_!r}, type = {self.type_!r}>'

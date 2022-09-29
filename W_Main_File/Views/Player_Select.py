@@ -43,13 +43,11 @@ class PlayerSelect(Event_Base.EventBase):
         import pickle
         if not (state.player_data_path / player / 'player').exists():
             self.player_data = PlayerDataTemplate('Guest', Vector.Vector(0, 0), 1000, 1000, 0, 0, 1, 1, 0)
-            print(self.player_data)
             return
         with open((state.player_data_path / player / 'player'), 'rb') as file:
             data = pickle.load(file)
             self.player_data = PlayerDataTemplate(data['character_name'], Vector.Vector(data['player_x'], data['player_y']), data['max_hp'], data['hp'], data['gold'], data['xp'], data['lvl'],
                                                   data['floor'], data['deaths'])
-        print(self.player_data)
 
     def enter_button(self):
         player_username = self.username.text.strip()

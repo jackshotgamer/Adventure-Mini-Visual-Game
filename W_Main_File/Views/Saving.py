@@ -31,7 +31,7 @@ class Saving(View):
 
 def save_player_data(file_path):
     player = State.state.player
-    data = {'character_name': player.name, 'player_x': player.pos.x, 'player_y': player.pos.y, 'camera_x': State.state.camera_pos.x, 'camera_y': State.state.camera_pos.y,
+    data = {'character_name': player.name, 'player_x': player.pos.x.rounded(), 'player_y': player.pos.y.rounded(), 'camera_x': State.state.camera_pos.x, 'camera_y': State.state.camera_pos.y,
             'hp': player.hp, 'max_hp': player.max_hp, 'gold': player.gold, 'xp': player.xp, 'lvl': player.lvl, 'floor': player.floor, 'deaths': player.deaths}
     from W_Main_File.Essentials.State import state
     if not (state.player_data_path / file_path).exists():

@@ -19,6 +19,7 @@ class TrapTile(Tile.Tile):
 
     def on_render_foreground(self, center, top_left, cell_size):
         if State.state.player.pos == self.pos and self.playing_alert:
+            print('playing animation!')
             if State.state.is_moving:
                 return
             from W_Main_File.Utilities import Inventory_GUI

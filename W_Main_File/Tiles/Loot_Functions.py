@@ -10,7 +10,7 @@ import random
 
 
 def is_opening_chest():
-    if tile := State.state.grid.get(*State.state.player.pos):
+    if tile := State.state.grid.get(*State.state.player.pos.rounded()):
         if isinstance(tile, LootTile):
             return tile.opening
 
@@ -50,7 +50,7 @@ class LootTile(Tile.Tile):
         from W_Main_File.Utilities import Inventory_GUI
         if Inventory_GUI.is_inv():
             return
-        if State.state.player.pos == self.pos and not self.opening:
+        if State.state.player.pos.rounded() == self.pos and not self.opening:
             if State.state.is_moving:
                 return
             arcade.draw_rectangle_filled(center.x, center.y, State.state.cell_render_size.x * 1,
@@ -61,7 +61,7 @@ class LootTile(Tile.Tile):
             else:
                 arcade.draw_text(f'Looted.', center.x, center.y, (255, 0, 0, 220),
                                  12, anchor_x='center', anchor_y='center')
-        elif State.state.player.pos == self.pos and self.opening:
+        elif State.state.player.pos.rounded() == self.pos and self.opening:
             arcade.draw_rectangle_filled(State.state.screen_center.x, State.state.screen_center.y - (State.state.cell_render_size.y * 1.5),
                                          (State.state.window.width * 0.3), (State.state.window.height * 0.25), (0, 0, 0, self.alpha))
             if self.alpha < 255:
@@ -84,8 +84,8 @@ class LootTile(Tile.Tile):
     def get_item_from_loot_result(self):
         dict_ = {
             'Rusty_Knife': All_Items.rusty_knife,
-            'Nullifier': All_Items.null_weapon_1,
-            'Disannull': All_Items.null_weapon_2
+            'Nullifier': All_Items.nullifier,
+            'Disannull': All_Items.disannull
         }
         if not self.loot_result == 'Broken_Stick':
             return dict_[self.loot_result]

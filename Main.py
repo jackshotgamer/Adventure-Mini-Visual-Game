@@ -18,6 +18,7 @@ if State.state.player.floor == 1:
 window = arcade.Window(width=1000, height=800, resizable=True, title='Adventure Mini-Game', antialiasing=False)
 window.set_min_size(1000, 800)
 State.state.window = window
+State.state.window.center_window()
 window.show_view(Player_Select.PlayerSelect())
 State.state.player.meta_data.is_me = True
 State.state.grid.add(Trapdoor_Functions.TrapdoorTile(Vector.Vector(-1, 0)))

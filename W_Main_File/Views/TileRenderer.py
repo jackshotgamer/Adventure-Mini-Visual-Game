@@ -15,10 +15,13 @@ class TileRenderer:
     def get_tiles_in_render_range(self, grid):
         tile_pos = set()
         center = State.state.screen_center
+        from W_Main_File.Tiles import Trap_Functions
         for offset in State.state.generate_radius(self.render_radius):
-            tile_pos.add(State.state.grid_camera_pos + offset)
+            if isinstance(grid.get(*(State.state.player.pos.rounded() + offset)), Trap_Functions.TrapTile):
+                print(f'Trap pos: {State.state.player.pos.rounded() + offset}')
+            tile_pos.add(State.state.player.pos.rounded() + offset)
         return [
-            (tile, ((pos - State.state.grid_camera_pos_raw) * State.state.cell_render_size) + center)
+            (tile, ((pos - State.state.player.pos) * State.state.cell_render_size) + center)
             for pos in tile_pos if (tile := grid.get(*pos))
         ]
 
@@ -42,4 +45,5 @@ class TileRenderer:
     def on_draw_foreground(self, grid=None):
         grid = grid or State.state.grid
         for tile, pos in self.get_tiles_in_render_range(grid):
+            arcade.draw_point(pos.x, pos.y, arcade.color.BLUE if tile.__class__.__name__ == 'TrapTile' else arcade.color.GOLD, 9)
             tile.on_render_foreground(pos, pos + (-(State.state.cell_render_size.xf / 2), State.state.cell_render_size.yf / 2), State.state.cell_render_size)

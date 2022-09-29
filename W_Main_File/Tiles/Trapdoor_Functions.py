@@ -43,7 +43,6 @@ class TrapdoorTile(Tile.Tile):
     def after_fadein(self):
         from W_Main_File.Utilities import Floor_Data_Saving, Seeding
         Floor_Data_Saving.FloorSaveManager.floor_save()
-        print(State.state.player.floor)
         explore = Exploration.Explore()
         fade_to_explore = Fading.Fading(Exploration.Explore, 7, 2,
                                         should_reverse=False,
@@ -59,7 +58,7 @@ class TrapdoorTile(Tile.Tile):
         from W_Main_File.Utilities import Inventory_GUI
         if Inventory_GUI.is_inv():
             return
-        if State.state.player.pos == self.pos:
+        if State.state.player.pos.rounded() == self.pos:
             if State.state.is_moving:
                 return
             arcade.draw_rectangle_filled(center.x, center.y, cell_size.x * 1.65, cell_size.y * 0.2, (0, 0, 0, self.current_opacity))

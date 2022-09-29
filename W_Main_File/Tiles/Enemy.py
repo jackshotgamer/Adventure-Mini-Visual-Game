@@ -56,7 +56,7 @@ class EnemyTile(Tile.Tile):
                                           alpha=self.alpha)
 
     def on_render_foreground(self, center, top_left, cell_size):
-        if State.state.player.pos == self.pos:
+        if State.state.player.pos.rounded() == self.pos:
             if State.state.is_moving:
                 return
             from W_Main_File.Utilities import Inventory_GUI
