@@ -85,7 +85,7 @@ def render_inventory(mouse_pos: Vector):
     if _inventory_toggle:
         import numpy as np
         arcade.draw_rectangle_filled(State.state.screen_center.x, State.state.screen_center.y, State.state.window.width * 0.5, State.state.window.height * 0.625, (20, 20, 20))
-        arcade.draw_rectangle_outline(State.state.screen_center.x, State.state.screen_center.y, State.state.window.width * 0.5, State.state.window.height * 0.625, (90, 90, 90), 6)
+        arcade.draw_rectangle_outline(State.state.screen_center.x, State.state.screen_center.y, State.state.window.width * 0.5, State.state.window.height * 0.625, (90, 90, 90), 4)
         for y in np.arange((State.state.window.height * 0.1875), (State.state.window.height * 0.8125), State.state.cell_render_size.y):
             arcade.draw_line(State.state.window.width * 0.25, y, State.state.window.width * 0.75, y, (90, 90, 90), 2)
         for x in np.arange((State.state.window.width * 0.25), (State.state.window.width * 0.75), State.state.cell_render_size.x):
@@ -109,10 +109,10 @@ def render_inventory(mouse_pos: Vector):
                 x = index % 5
                 y = index // 5
                 if item is not None:
-                    sprite = Sprites_.get_sprite_from_id(item.id_)
+                    sprite = item.sprite
                     # arcade.draw_rectangle_outline(inventory_nw().x, inventory_nw().y, State.state.window.width * 0.095, State.state.window.height * 0.11875, arcade.color.LIGHT_GRAY, 1)
                     arcade.draw_texture_rectangle((x * State.state.cell_render_size.x) + origin_x, ((y * -State.state.cell_render_size.y) + origin_y),
-                                                  100, 100, sprite, alpha=200 if sprite == Sprites_.Null else 255)
+                                                  100, 100, sprite, alpha=100 if sprite == Sprites_.Null else 255)
                     if item.selected:
                         arcade.draw_rectangle_outline((x * State.state.cell_render_size.x) + origin_x, ((y * -State.state.cell_render_size.y) + origin_y),
                                                       State.state.cell_render_size.x * 0.85, State.state.cell_render_size.y * 0.85, (200, 25, 25), 5)

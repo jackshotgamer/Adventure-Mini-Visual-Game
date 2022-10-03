@@ -1,7 +1,6 @@
 from typing import Tuple
 import collections
 
-from W_Main_File.Items import All_Items
 from W_Main_File.Utilities import Vector
 from W_Main_File.Essentials import State
 from W_Main_File.Data import Tile, Sprites_, Item
@@ -83,9 +82,9 @@ class LootTile(Tile.Tile):
 
     def get_item_from_loot_result(self):
         dict_ = {
-            'Rusty_Knife': All_Items.rusty_knife,
-            'Nullifier': All_Items.nullifier,
-            'Disannull': All_Items.disannull
+            'Rusty_Knife': Sprites_.item_dict['rusty_knife'],
+            'Nullifier': Sprites_.item_dict['nullifier'],
+            'Disannull': Sprites_.item_dict['disannull']
         }
         if not self.loot_result == 'Broken_Stick':
             return dict_[self.loot_result]

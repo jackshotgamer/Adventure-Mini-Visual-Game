@@ -3,7 +3,7 @@ import random
 from enum import Enum, IntFlag, auto
 from typing import Union
 
-from W_Main_File.Data import HpEntity, Sprites_
+from W_Main_File.Data import HpEntity
 
 
 class ItemType(Enum):
@@ -28,20 +28,20 @@ class DamageType(IntFlag):
     Void_Elemental = auto()
 
     # Armour
-        # Water: Increase HP
-            # Set: Heal 1 hp for every 5 damage dealt
-        # Earth: Increase Percentage Damage Reduction
-            # Set: Take no damage every third hit
-        # Fire: Increase Debuff Reduction
-            # Set: Deal DOT fire damage
-        # Air: Increase Evasion
-            # Set: Increase movement speed based on proximity to enemies, up to x2.5
-        # Void: All four
-            # Set: twice per fight, unleash a wave of damage that does your maximum damage to all enemies,
-            # halves their movement speed for 15 seconds, and gives them DOT 5% health every second for 5 seconds, makes you invulnerable for 3 seconds,
-            # and gives you 25% health back over 15 seconds
+    # Water: Increase HP
+    # Set: Heal 1 hp for every 5 damage dealt
+    # Earth: Increase Percentage Damage Reduction
+    # Set: Take no damage every third hit
+    # Fire: Increase Debuff Reduction
+    # Set: Deal DOT fire damage
+    # Air: Increase Evasion
+    # Set: Increase movement speed based on proximity to enemies, up to x2.5
+    # Void: All four
+    # Set: twice per fight, unleash a wave of damage that does your maximum damage to all enemies,
+    # halves their movement speed for 15 seconds, and gives them DOT 5% health every second for 5 seconds, makes you invulnerable for 3 seconds,
+    # and gives you 25% health back over 15 seconds
     # Weapons
-        # Water:
+    # Water:
 
     Any_Elemental = Water_Elemental | Earth_Elemental | Fire_Elemental | Air_Elemental | Void_Elemental
     Any_Basic = Blunt | Piercing | Cutting | Spectral | Null
@@ -57,10 +57,11 @@ class DamageType(IntFlag):
 
 
 class Item:
-    def __init__(self, name, id_, type_: ItemType):
+    def __init__(self, name, id_, type_: ItemType, sprite):
         self.name = name
         self.id_ = id_
         self.type_ = type_
+        self.sprite = sprite
         self.is_missingno = (id_ == 'MISSINGNO')
         self.selected = False
 
@@ -69,8 +70,8 @@ class Item:
 
 
 class Weapon(Item):
-    def __init__(self, name, id_, min_attack, max_attack, speed, range_, damage_type: Union[int, DamageType], has_special_move: bool):
-        super().__init__(name, id_, ItemType.Weapon)
+    def __init__(self, name, id_, min_attack, max_attack, speed, range_, damage_type: Union[int, DamageType], has_special_move: bool, sprite):
+        super().__init__(name, id_, ItemType.Weapon, sprite)
         self.min_attack = min_attack
         self.max_attack = max_attack
         self.speed = speed

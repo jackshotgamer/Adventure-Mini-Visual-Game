@@ -345,14 +345,8 @@ class Explore(Event_Base.EventBase):
         if symbol == arcade.key.L:
             self.yes = True
         if symbol == arcade.key.I:
-            if modifiers & arcade.key.MOD_SHIFT:
-                for num in range(0, 10):
-                    from W_Main_File.Items import All_Items
-                    State.state.inventory.add_item(random.choice((All_Items.rusty_knife, All_Items.nullifier, All_Items.disannull)))
-            else:
-                for num in range(0, 3):
-                    from W_Main_File.Items import All_Items
-                    State.state.inventory.add_item(random.choice((All_Items.rusty_knife, All_Items.nullifier, All_Items.disannull)))
+            for num in range(0, 10 if modifiers & arcade.key.MOD_SHIFT else 3):
+                State.state.inventory.add_item(random.choice(tuple(item() for item in Sprites_.item_dict.values())))
         if symbol in self.key_offset:
             if symbol in (arcade.key.A, arcade.key.D):
                 self.__class__.symbol_ = symbol

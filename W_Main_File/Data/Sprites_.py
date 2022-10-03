@@ -1,22 +1,26 @@
 from arcade import load_texture
 from pathlib import Path
+from collections import OrderedDict
 from W_Main_File.Essentials import State
-import random
+from W_Main_File.Data import Item
 
-billhook = load_texture(Path('Sprites') / 'Billhook.png')
 black_rapier = load_texture(Path('Sprites') / 'Black_Rapier_1.png')
 dane_axe = load_texture(Path('Sprites') / 'Dane_Axe.png')
+billhook = load_texture(Path('Sprites') / 'Billhook.png')
+iron_sword = load_texture(Path('Sprites') / 'iron_sword.png')
+spear = load_texture(Path('Sprites') / 'spear.png')
+saber = load_texture(Path('Sprites') / 'saber.png')
+partisan = load_texture(Path('Sprites') / 'Partisan.png')
+horseman_blade = load_texture(Path('Sprites') / 'Horsemans_Blade.png')
+pole = load_texture(Path('Sprites') / 'pole.png')
+metal_mace = load_texture(Path('Sprites') / 'metal_mace.png')
 death_knight = load_texture(Path('Sprites') / 'Death_Knight.png')
 desert_plains_01 = load_texture(Path('Sprites') / 'desert_plains_1.png')
 devouring_horror = load_texture(Path('Sprites') / 'Devouering_Horror.png')
 golden_serpent = load_texture(Path('Sprites') / 'Golden_Serpent.png')
-iron_sword = load_texture(Path('Sprites') / 'iron_sword.png')
 offspring_of_shub_niggurath = load_texture(Path('Sprites') / 'offspring_of_shub_niggurath.png')
-partisan = load_texture(Path('Sprites') / 'Partisan.png')
 purgatory_dragon_skeleton = load_texture(Path('Sprites') / 'Purgatory_dragon_skelleton.png')
-saber = load_texture(Path('Sprites') / 'saber.png')
 snow_plains = load_texture(Path('Sprites') / 'snow_plains.png')
-spear = load_texture(Path('Sprites') / 'spear.png')
 troglodyte = load_texture(Path('Sprites') / 'Troglodyte.png')
 troglodyte_hellebardier = load_texture(Path('Sprites') / 'Troglodyte_Hellebardier.png')
 
@@ -67,17 +71,34 @@ black_circle_sprite = load_texture(Path('Sprites') / 'Black_Circle.png')
 black_circle_square_sprite = load_texture(Path('Sprites') / 'Black_Circle_Square.png')
 black_square_circle_square_sprite = load_texture(Path('Sprites') / 'Black_Square_Square_Circle.png')
 
-sprite_id_to_texture = {
-    'rusty_knifeDefaultWeapon': rusty_knife_sprite,
-    'null_weapon_1SpecialWeapon': black_rapier_sprite,
-    'null_weapon_2SpecialWeapon': black_rapier_sprite,
-    'Null': Null,
-}
-
-
-def get_sprite_from_id(id_):
-    return sprite_id_to_texture.get(id_, Null)
-
+item_dict = OrderedDict(
+    rusty_knife=lambda: Item.Weapon('Rusty Knife', 'rusty_knifeDefaultWeapon',
+                                    6, 10, 9, 1, Item.DamageType.Cutting, False, rusty_knife_sprite),
+    nullifier=lambda: Item.Weapon('Nullifier', 'null_weapon_1SpecialWeapon',
+                                  0, 200, 10, 10, Item.DamageType.Null | Item.DamageType.Void_Elemental, True, Null),
+    disannull=lambda: Item.Weapon('Disannull', 'null_weapon_2SpecialWeapon',
+                                  100, 100, 10, 10, Item.DamageType.Null | Item.DamageType.Void_Elemental, True, Null),
+    black_rapier=lambda: Item.Weapon('Black Rapier', 'black_rapierSpecialWeapon',
+                                     30, 90, 8, 3, Item.DamageType.Cutting, True, black_rapier),
+    billhook=lambda: Item.Weapon('Billhook', 'billhookDefaultWeapon',
+                                 10, 40, 4, 6, Item.DamageType.Piercing, False, billhook),
+    iron_sword=lambda: Item.Weapon('Iron Sword', 'iron_swordDefaultWeapon',
+                                   25, 35, 7, 3, Item.DamageType.Cutting, False, iron_sword),
+    spear=lambda: Item.Weapon('Spear', 'spearDefaultWeapon',
+                              35, 40, 5, 6, Item.DamageType.Piercing, False, spear),
+    saber=lambda: Item.Weapon('Saber', 'saberDefaultWeapon',
+                              30, 40, 6, 3, Item.DamageType.Cutting, False, saber),
+    partisan=lambda: Item.Weapon('Partisan', 'partisanDefaultWeapon',
+                                 30, 45, 4, 6, Item.DamageType.Cutting, False, partisan),
+    horseman_blade=lambda: Item.Weapon('Horseman\'s Blade', 'horseman_bladeBossWeapon',
+                                       50, 70, 5, 4, Item.DamageType.Cutting | Item.DamageType.Spectral, False, horseman_blade),
+    dane_axe=lambda: Item.Weapon('Dane Axe', 'dane_axeDefaultWeapon',
+                                 65, 70, 2, 5, Item.DamageType.Cutting, False, dane_axe),
+    pole=lambda: Item.Weapon('Pole', 'poleDefaultWeapon',
+                             5, 25, 8, 5, Item.DamageType.Cutting, False, pole),
+    metal_mace=lambda: Item.Weapon('Solid Metal Mace', 'metal_maceDefaultWeapon',
+                                   15, 50, 2, 2, Item.DamageType.Blunt, False, metal_mace),
+)
 
 # 3 = Desert
 # 5 = Taiga
@@ -124,13 +145,11 @@ weights, sprite_alias = (
     }
 )
 
-
 loot_options = {'1', '1.1', '1.2', '2', '2.1', '2.2', '2.3'}
 enemy_options = {'1', '1.1', '1.2'}
-trapdoor_options = ('10', )
+trapdoor_options = ('10',)
 trap_options = ('0.5', '1.5')
 excluded_tiles = ('0.1', '0.2', '0.3', '0.4')
-
 
 CHEST_OPENING_FRAMES = [
     load_texture(Path('Chest_Opening_Frames') / 'chest_sprite_0.png'),
@@ -224,7 +243,7 @@ def draw_character():
         frames = CHARACTER_FRAMES[current_character_frame]
     else:
         frames = FLIPPED_CHARACTER_FRAMES[current_character_frame]
-    arcade.draw_texture_rectangle(((State.state.player.pos.xf * State.state.cell_render_size.xf) - State.state.camera_pos.xf)+State.state.screen_center.xf,
-                                  ((State.state.player.pos.yf * State.state.cell_render_size.yf) - State.state.camera_pos.yf)+State.state.screen_center.yf,
+    arcade.draw_texture_rectangle(((State.state.player.pos.xf * State.state.cell_render_size.xf) - State.state.camera_pos.xf) + State.state.screen_center.xf,
+                                  ((State.state.player.pos.yf * State.state.cell_render_size.yf) - State.state.camera_pos.yf) + State.state.screen_center.yf,
                                   State.state.cell_render_size.yf * 0.75, State.state.cell_render_size.yf * 0.75,
                                   frames)

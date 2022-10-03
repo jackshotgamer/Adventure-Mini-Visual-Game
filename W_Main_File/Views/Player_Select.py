@@ -69,6 +69,7 @@ class PlayerSelect(Event_Base.EventBase):
         State.state.preoccupied = False
         State.cache_state.clear()
         State.state.render_radius = 3
+        State.state.current_page = 0
         from W_Main_File.Views import Exploration
         self.ui_manager.purge_ui_elements()
         Seeding.set_world_seed_from_player_name()
@@ -79,6 +80,7 @@ class PlayerSelect(Event_Base.EventBase):
             from W_Main_File.Tiles import Home_Tile
             State.state.grid.add(Home_Tile.HomeTile(Vector.Vector(0, 0)))
         Floor_Data_Saving.FloorSaveManager.load_floor(state_player.floor, force_load=True)
+        self.render_mouse = False
         State.state.window.show_view(Exploration.Explore())
 
     def on_update(self, delta_time: float):
@@ -129,16 +131,19 @@ class PlayerSelect(Event_Base.EventBase):
         State.cache_state.clear()
         State.state.camera_pos = Vector.Vector(0, 0)
         State.state.render_radius = 3
+        State.state.current_page = 0
         import os
         if os.path.exists(f'Interactable_Tiles/Guest/'):
             shutil.rmtree(f'Interactable_Tiles/Guest/')
         from W_Main_File.Views import Exploration
         self.ui_manager.purge_ui_elements()
         Seeding.set_world_seed_from_player_name()
+        self.render_mouse = False
         State.state.window.show_view(Exploration.Explore())
 
     # noinspection PyProtectedMember
     def on_draw(self):
+        self.render_mouse = True
         super().on_draw()
         center_screen = Vector.Vector(self.window.width / 2, self.window.height / 2)
         arcade.draw_text('USERNAME:', center_screen.x - self.username.width + 45, self.username.center_y, arcade.color.LIGHT_GRAY,

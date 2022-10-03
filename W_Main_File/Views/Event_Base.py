@@ -14,6 +14,7 @@ class EventBase(arcade.View):
     def __init__(self):
         super().__init__()
         self.button_manager = Button_Sprite_Manager.ButtonManager()
+        self.render_mouse = False
 
     def on_mouse_motion(self, x: float, y: float, dx: float, dy: float):
         self.button_manager.check_hovered(x, y)
@@ -28,6 +29,8 @@ class EventBase(arcade.View):
     def on_draw(self):
         arcade.start_render()
         self.button_manager.render()
+        if self.render_mouse:
+            State.state.render_mouse()
 
     def on_key_press(self, symbol: int, modifiers: int):
         global symbols
