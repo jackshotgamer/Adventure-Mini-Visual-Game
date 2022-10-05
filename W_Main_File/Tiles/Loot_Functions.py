@@ -49,6 +49,7 @@ class LootTile(Tile.Tile):
         from W_Main_File.Utilities import Inventory_GUI
         if Inventory_GUI.is_inv():
             return
+        # todo: detection not working properly, rounding problem?
         if State.state.player.pos.rounded() == self.pos and not self.opening:
             if State.state.is_moving:
                 return
@@ -82,9 +83,9 @@ class LootTile(Tile.Tile):
 
     def get_item_from_loot_result(self):
         dict_ = {
-            'Rusty_Knife': Sprites_.item_dict['rusty_knife'],
-            'Nullifier': Sprites_.item_dict['nullifier'],
-            'Disannull': Sprites_.item_dict['disannull']
+            'Rusty_Knife': Sprites_.item_dict['rusty_knife'](),
+            'Nullifier': Sprites_.item_dict['nullifier'](),
+            'Disannull': Sprites_.item_dict['disannull']()
         }
         if not self.loot_result == 'Broken_Stick':
             return dict_[self.loot_result]
@@ -93,7 +94,7 @@ class LootTile(Tile.Tile):
         from W_Main_File.Utilities import Inventory_GUI
         if Inventory_GUI.is_inv():
             return
-        multipler_speed = 1
+        multipler_speed = 2
         self.current_opacity = min(200, self.current_opacity + 4)
         if self.opening:
             self.alpha = min(255, self.alpha + (2 * multipler_speed))

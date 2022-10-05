@@ -1,10 +1,16 @@
 from arcade import load_texture
 from pathlib import Path
 from collections import OrderedDict
+
+from W_Main_File.Data.Item import ItemType
 from W_Main_File.Essentials import State
 from W_Main_File.Data import Item
 
 black_rapier = load_texture(Path('Sprites') / 'Black_Rapier_1.png')
+dark_bident = load_texture(Path('Sprites') / 'dark_bident.png')
+moon_axe = load_texture(Path('Sprites') / 'moon_axe.png')
+steel_billhook = load_texture(Path('Sprites') / 'steel_Billhook.png')
+steel_sword = load_texture(Path('Sprites') / 'steel_sword.png')
 dane_axe = load_texture(Path('Sprites') / 'Dane_Axe.png')
 billhook = load_texture(Path('Sprites') / 'Billhook.png')
 iron_sword = load_texture(Path('Sprites') / 'iron_sword.png')
@@ -89,15 +95,23 @@ item_dict = OrderedDict(
     saber=lambda: Item.Weapon('Saber', 'saberDefaultWeapon',
                               30, 40, 6, 3, Item.DamageType.Cutting, False, saber),
     partisan=lambda: Item.Weapon('Partisan', 'partisanDefaultWeapon',
-                                 30, 45, 4, 6, Item.DamageType.Cutting, False, partisan),
+                                 30, 45, 4, 6, Item.DamageType.Piercing, False, partisan),
     horseman_blade=lambda: Item.Weapon('Horseman\'s Blade', 'horseman_bladeBossWeapon',
                                        50, 70, 5, 4, Item.DamageType.Cutting | Item.DamageType.Spectral, False, horseman_blade),
     dane_axe=lambda: Item.Weapon('Dane Axe', 'dane_axeDefaultWeapon',
                                  65, 70, 2, 5, Item.DamageType.Cutting, False, dane_axe),
     pole=lambda: Item.Weapon('Pole', 'poleDefaultWeapon',
-                             5, 25, 8, 5, Item.DamageType.Cutting, False, pole),
+                             5, 25, 8, 5, Item.DamageType.Blunt, False, pole),
     metal_mace=lambda: Item.Weapon('Solid Metal Mace', 'metal_maceDefaultWeapon',
                                    15, 50, 2, 2, Item.DamageType.Blunt, False, metal_mace),
+    dark_bident=lambda: Item.Weapon('Dark Bident', 'dark_bidentDefaultWeapon',
+                                    10, 40, 7, 7, Item.DamageType.Piercing, False, dark_bident),
+    moon_axe=lambda: Item.Weapon('Moon Axe', 'moon_axeDefaultWeapon',
+                                 50, 80, 4, 5, Item.DamageType.Cutting, False, moon_axe),
+    steel_billhook=lambda: Item.Weapon('Steel Billhook', 'steel_billhookDefaultWeapon',
+                                       20, 50, 4, 6, Item.DamageType.Piercing, False, steel_billhook),
+    steel_sword=lambda: Item.Weapon('Steel Sword', 'steel_swordDefaultWeapon',
+                                    35, 45, 7, 3, Item.DamageType.Cutting, False, steel_sword),
 )
 
 # 3 = Desert
@@ -152,47 +166,20 @@ trap_options = ('0.5', '1.5')
 excluded_tiles = ('0.1', '0.2', '0.3', '0.4')
 
 CHEST_OPENING_FRAMES = [
-    load_texture(Path('Chest_Opening_Frames') / 'chest_sprite_0.png'),
-    load_texture(Path('Chest_Opening_Frames') / 'chest_sprite_1.png'),
-    load_texture(Path('Chest_Opening_Frames') / 'chest_sprite_2.png'),
-    load_texture(Path('Chest_Opening_Frames') / 'chest_sprite_3.png'),
-    load_texture(Path('Chest_Opening_Frames') / 'chest_sprite_4.png'),
-    load_texture(Path('Chest_Opening_Frames') / 'chest_sprite_5.png'),
-    load_texture(Path('Chest_Opening_Frames') / 'chest_sprite_6.png'),
-    load_texture(Path('Chest_Opening_Frames') / 'chest_sprite_7.png'),
-    load_texture(Path('Chest_Opening_Frames') / 'chest_sprite_8.png')
+    load_texture(Path('Chest_Opening_Frames') / f'chest_sprite_{num}.png') for num in range(0, 9)
 ]
 
 BACKGROUND_FRAMES = [
-    load_texture(Path('Background_Frames') / 'backdrop_1.png'),
-    load_texture(Path('Background_Frames') / 'backdrop_2.png'),
-    load_texture(Path('Background_Frames') / 'backdrop_3.png'),
-    load_texture(Path('Background_Frames') / 'backdrop_4.png'),
-    load_texture(Path('Background_Frames') / 'backdrop_5.png'),
-    load_texture(Path('Background_Frames') / 'backdrop_6.png'),
-    load_texture(Path('Background_Frames') / 'backdrop_7.png')
+    load_texture(Path('Background_Frames') / f'backdrop_{num}.png') for num in range(1, 8)
+
 ]
 
 CHARACTER_FRAMES = [
-    load_texture(Path('Sprites') / 'Knight_Sprite_1_2.png'),
-    load_texture(Path('Sprites') / 'Knight_Sprite_2_2.png'),
-    load_texture(Path('Sprites') / 'Knight_Sprite_3_2.png'),
-    load_texture(Path('Sprites') / 'Knight_Sprite_4.png'),
-    load_texture(Path('Sprites') / 'Knight_Sprite_5.png'),
-    load_texture(Path('Sprites') / 'Knight_Sprite_6.png'),
-    load_texture(Path('Sprites') / 'Knight_Sprite_7.png'),
-    load_texture(Path('Sprites') / 'Knight_Sprite_8.png'),
+    load_texture(Path('Sprites') / f'Knight_Sprite_{num}.png') for num in range(1, 9)
 ]
 
 FLIPPED_CHARACTER_FRAMES = [
-    load_texture(Path('Sprites') / 'Knight_Sprite_1_2_Flipped.png'),
-    load_texture(Path('Sprites') / 'Knight_Sprite_2_2_Flipped.png'),
-    load_texture(Path('Sprites') / 'Knight_Sprite_3_2_Flipped.png'),
-    load_texture(Path('Sprites') / 'Knight_Sprite_4_Flipped.png'),
-    load_texture(Path('Sprites') / 'Knight_Sprite_5_Flipped.png'),
-    load_texture(Path('Sprites') / 'Knight_Sprite_6_Flipped.png'),
-    load_texture(Path('Sprites') / 'Knight_Sprite_7_Flipped.png'),
-    load_texture(Path('Sprites') / 'Knight_Sprite_8_Flipped.png'),
+    load_texture(Path('Sprites') / f'Knight_Sprite_{num}_Flipped.png') for num in range(1, 9)
 ]
 
 current_backdrop_frame = 0

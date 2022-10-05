@@ -18,10 +18,11 @@ class TileRenderer:
         from W_Main_File.Tiles import Trap_Functions
         for offset in State.state.generate_radius(self.render_radius):
             if isinstance(grid.get(*(State.state.player.pos.rounded() + offset)), Trap_Functions.TrapTile):
-                print(f'Trap pos: {State.state.player.pos.rounded() + offset}')
-            tile_pos.add(State.state.player.pos.rounded() + offset)
+                pass
+                # print(f'Trap pos: {State.state.player.pos.rounded() + offset}')
+            tile_pos.add((State.state.player.pos.rounded() + offset))
         return [
-            (tile, ((pos - State.state.player.pos) * State.state.cell_render_size) + center)
+            (tile, ((pos * State.state.cell_render_size) + center) - State.state.camera_pos)
             for pos in tile_pos if (tile := grid.get(*pos))
         ]
 

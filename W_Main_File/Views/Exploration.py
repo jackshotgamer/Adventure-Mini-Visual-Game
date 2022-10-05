@@ -88,8 +88,9 @@ class Explore(Event_Base.EventBase):
                 State.state.camera_pos += (Vector(*self.key_offset[symbol]) * self.movement_speed) * self.delta
                 rounded_player_pos = State.state.player.pos.rounded()
                 if (State.state.texture_mapping[f'{rounded_player_pos.x} {rounded_player_pos.y}']) in Sprites_.trap_options:
-                    if not isinstance(State.state.grid.get(*State.state.player.pos), Trap_Functions.TrapTile):
-                        tile = Trap_Functions.TrapTile(State.state.player.pos)
+                    print('True')
+                    if not isinstance(State.state.grid.get(*State.state.player.pos.rounded()), Trap_Functions.TrapTile):
+                        tile = Trap_Functions.TrapTile(State.state.player.pos.rounded())
                         State.state.grid.add(tile)
                     else:
                         tile = State.state.grid.get(*State.state.player.pos.rounded())
@@ -336,6 +337,9 @@ class Explore(Event_Base.EventBase):
         super().on_key_press(symbol, modifiers)
         if symbol == arcade.key.P:
             print(State.state.grid.get(*State.state.player.pos.rounded()))
+            print(State.state.player.pos)
+            print(State.state.player.pos.rounded())
+            print(State.state.texture_mapping[f'{State.state.player.pos.rounded().x} {State.state.player.pos.rounded().y}'])
         if symbol == arcade.key.C:
             State.state.camera_pos -= State.state.camera_pos
         if symbol == arcade.key.R:
@@ -376,7 +380,7 @@ class Explore(Event_Base.EventBase):
         State.state.moves_since_texture_save += 1
         offset = ((Vector(*self.key_offset[symbol]) * self.movement_speed) * self.delta / State.state.cell_render_size).rounded()
         prior_player_pos = State.state.player.pos
-        new_player_pos = (prior_player_pos + offset)
+        new_player_pos = (prior_player_pos + offset).rounded()
         prev_tile = State.state.grid.get(*prior_player_pos.rounded())
         new_tile = State.state.grid.get(*new_player_pos.rounded())
         if prev_tile and not new_tile:
@@ -388,10 +392,10 @@ class Explore(Event_Base.EventBase):
 
         def after_update():
             if State.state.player.pos.rounded().tuple() not in State.state.grid.visited_tiles:
-                State.state.player.pos = new_player_pos
+                State.state.player.pos = (prior_player_pos + offset)
                 if (
                         not State.state.grid.get(new_player_pos.x, new_player_pos.y)
-                        and random.random() < 0.8
+                        and random.random() < 0.05
                         and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in Sprites_.loot_options
                         and new_player_pos.tuple() not in State.state.grid.visited_tiles
                 ):
