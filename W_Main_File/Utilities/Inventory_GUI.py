@@ -113,6 +113,8 @@ def render_inventory(mouse_pos: Vector):
                     # arcade.draw_rectangle_outline(inventory_nw().x, inventory_nw().y, State.state.window.width * 0.095, State.state.window.height * 0.11875, arcade.color.LIGHT_GRAY, 1)
                     arcade.draw_texture_rectangle((x * State.state.cell_render_size.x) + origin_x, ((y * -State.state.cell_render_size.y) + origin_y),
                                                   100, 100, sprite, alpha=100 if sprite == Sprites_.Null else 255)
+                    if State.state.debug_mode:
+                        arcade.draw_point((x * State.state.cell_render_size.x) + origin_x, ((y * -State.state.cell_render_size.y) + origin_y), arcade.color.GREEN, 4)
                     if item.selected:
                         arcade.draw_rectangle_outline((x * State.state.cell_render_size.x) + origin_x, ((y * -State.state.cell_render_size.y) + origin_y),
                                                       State.state.cell_render_size.x * 0.85, State.state.cell_render_size.y * 0.85, (200, 25, 25), 5)

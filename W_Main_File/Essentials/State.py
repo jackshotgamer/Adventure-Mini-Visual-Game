@@ -49,6 +49,7 @@ class State:
         self.is_moving = False
         self.moves_since_texture_save = 0
         self._preoccupied = False
+        self.debug_mode = False
         # Meta_Data.is_me = True
 
     @property
@@ -58,6 +59,10 @@ class State:
     @property
     def grid_camera_pos_raw(self):
         return self.camera_pos / self.cell_render_size
+
+    @property
+    def pos_of_player_on_screen(self):
+        return ((self.player.pos * self.cell_render_size) - self.camera_pos) + self.screen_center
 
     @property
     def preoccupied(self):

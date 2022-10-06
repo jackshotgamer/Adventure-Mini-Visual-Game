@@ -6,6 +6,7 @@ class Tile:
 
     def __init__(self, pos):
         self.pos = pos
+        self.truthy = pos
 
     def on_enter(self):
         pass
@@ -32,7 +33,7 @@ class Tile:
         pass
 
     def can_player_move(self):
-        if self.pos == self.pos:
+        if self.truthy == self.truthy:
             return True
         else:
             print('WHAT\nWARNING: Computer have become sentient, this is not a drill, i repeat, this is not a drill!')

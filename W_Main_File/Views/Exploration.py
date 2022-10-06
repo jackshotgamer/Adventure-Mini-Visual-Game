@@ -87,6 +87,7 @@ class Explore(Event_Base.EventBase):
                 State.state.player.pos += ((Vector(*self.key_offset[symbol]) * self.movement_speed) * self.delta) / State.state.cell_render_size
                 State.state.camera_pos += (Vector(*self.key_offset[symbol]) * self.movement_speed) * self.delta
                 rounded_player_pos = State.state.player.pos.rounded()
+                State.state.tile_type_pos(*rounded_player_pos)
                 if (State.state.texture_mapping[f'{rounded_player_pos.x} {rounded_player_pos.y}']) in Sprites_.trap_options:
                     print('True')
                     if not isinstance(State.state.grid.get(*State.state.player.pos.rounded()), Trap_Functions.TrapTile):
@@ -102,10 +103,6 @@ class Explore(Event_Base.EventBase):
                     print(State.cache_state.trap_additive_distance)
                 elif State.cache_state.trap_additive_distance:
                     State.cache_state.trap_additive_distance = 0
-                if (State.state.texture_mapping[f'{State.state.player.pos.x} {State.state.player.pos.y}']) in Sprites_.trapdoor_options:
-                    if not isinstance(State.state.grid.get(*State.state.player.pos.rounded()), Trapdoor_Functions.TrapdoorTile):
-                        if not State.state.grid.get(*State.state.player.pos.rounded()):
-                            State.state.grid.add(Trapdoor_Functions.TrapdoorTile(State.state.player.pos.rounded()))
                 if State.state.player.pos.rounded().tuple() != State.cache_state.prior_player_grid_pos.tuple():
                     if tile := State.state.grid.get(*State.cache_state.prior_player_grid_pos.rounded().tuple()):
                         if not tile.can_player_move():
@@ -131,7 +128,7 @@ class Explore(Event_Base.EventBase):
         }
         for symbol1 in Event_Base.symbols:
             if symbol1 in corresponding_directions:
-                State.state.camera_pos += (corresponding_directions[symbol1]*2.5)
+                State.state.camera_pos += (corresponding_directions[symbol1] * 2.5)
 
     def check_if_resized(self):
         if self.current_window_size.xf == State.state.window.width and self.current_window_size.yf == State.state.window.height:
@@ -156,8 +153,7 @@ class Explore(Event_Base.EventBase):
     # noinspection PyProtectedMember
     def on_draw(self):
         arcade.start_render()
-        char_draw_pos = Vector(((State.state.player.pos.xf * State.state.cell_render_size.xf) - State.state.camera_pos.xf) + State.state.screen_center.xf,
-                               ((State.state.player.pos.yf * State.state.cell_render_size.yf) - State.state.camera_pos.yf) + State.state.screen_center.yf)
+        char_draw_pos = State.state.pos_of_player_on_screen
         center_screen = State.state.screen_center
         cell_render_size = (State.state.cell_size * ((State.state.window.width / State.state.default_window_size.xf), (State.state.window.height / State.state.default_window_size.y)))
         # TODO fix stuff around here
@@ -173,8 +169,6 @@ class Explore(Event_Base.EventBase):
                                       ((State.state.player.pos.yf * State.state.cell_render_size.yf) - State.state.camera_pos.yf) + State.state.screen_center.yf,
                                       State.state.cell_render_size.xf * 0.73, State.state.cell_render_size.yf * 0.88, Sprites_.black_square_circle_square_sprite, 0, 125)
 
-        arcade.draw_rectangle_filled(center_screen.xf, center_screen.yf - (State.state.window.height * 0.3375), State.state.window.width * 0.625, State.state.window.height * 0.0475, (0, 0, 0))
-        arcade.draw_rectangle_filled(center_screen.xf, center_screen.yf + (State.state.window.height * 0.3375), State.state.window.width * 0.625, State.state.window.height * 0.0475, (0, 0, 0))
         # arcade.draw_circle_filled(center_screen.xf, center_screen.yf, 25, arcade.color.AERO_BLUE)
         screen_percentage_of_default = (State.state.window.height / State.state.default_window_size.y)
         arcade.draw_text(f'Floor: {int(State.state.player.floor)}', char_draw_pos.xf,
@@ -195,12 +189,17 @@ class Explore(Event_Base.EventBase):
         else:
             Sprites_.draw_character()
         self.tile_renderer.on_draw_foreground()
-        Sprites_.draw_backdrop()
-        arcade.draw_rectangle_outline(center_screen.xf, center_screen.yf, State.state.window.width * 0.5, State.state.window.height * 0.625, (120, 120, 120), 4)
-        from W_Main_File.Utilities import Inventory_GUI
+        arcade.draw_rectangle_filled(center_screen.xf, center_screen.yf - (State.state.window.height * 0.3375), State.state.window.width * 0.625, State.state.window.height * 0.0475, (0, 0, 0))
+        arcade.draw_rectangle_filled(center_screen.xf, center_screen.yf + (State.state.window.height * 0.3375), State.state.window.width * 0.625, State.state.window.height * 0.0475, (0, 0, 0))
         arcade.draw_text(f'FPS = {self.fps:.1f}', 2, self.window.height - 22, arcade.color.GREEN,
                          font_name='arial', font_size=14)
         self.text_render(char_draw_pos)
+        Sprites_.draw_backdrop()
+        arcade.draw_rectangle_outline(center_screen.xf, center_screen.yf, State.state.window.width * 0.5, State.state.window.height * 0.625, (120, 120, 120), 4)
+        from W_Main_File.Utilities import Inventory_GUI
+        if State.state.debug_mode:
+            arcade.draw_point(center_screen.x, center_screen.y, arcade.color.RED, 3)
+            arcade.draw_point(State.state.pos_of_player_on_screen.xf, State.state.pos_of_player_on_screen.yf, arcade.color.RED, 3)
         # if State.state.preoccupied:
         #     arcade.draw_text('Preoccupied', 800, 700, arcade.color.RED, 30)
         self.button_manager.render()
@@ -340,6 +339,7 @@ class Explore(Event_Base.EventBase):
             print(State.state.player.pos)
             print(State.state.player.pos.rounded())
             print(State.state.texture_mapping[f'{State.state.player.pos.rounded().x} {State.state.player.pos.rounded().y}'])
+            print(State.state.get_tile_id(State.state.player.pos.rounded()), State.state.grid.get(*State.state.player.pos.rounded()))
         if symbol == arcade.key.C:
             State.state.camera_pos -= State.state.camera_pos
         if symbol == arcade.key.R:
@@ -347,7 +347,7 @@ class Explore(Event_Base.EventBase):
         if symbol == arcade.key.B:
             State.state.player.hp -= State.state.player.max_hp
         if symbol == arcade.key.L:
-            self.yes = True
+            State.state.debug_mode = not State.state.debug_mode
         if symbol == arcade.key.I:
             for num in range(0, 10 if modifiers & arcade.key.MOD_SHIFT else 3):
                 State.state.inventory.add_item(random.choice(tuple(item() for item in Sprites_.item_dict.values())))
@@ -391,30 +391,38 @@ class Explore(Event_Base.EventBase):
             new_tile.on_enter()
 
         def after_update():
-            if State.state.player.pos.rounded().tuple() not in State.state.grid.visited_tiles:
+            if new_player_pos.rounded().tuple() not in State.state.grid.visited_tiles:
                 State.state.player.pos = (prior_player_pos + offset)
+                if State.state.debug_mode:
+                    print(f'Activated: {State.state.player.pos.rounded()} Tile: {State.state.get_tile_id(State.state.player.pos.rounded())}')
                 if (
-                        not State.state.grid.get(new_player_pos.x, new_player_pos.y)
+                        not State.state.grid.get(*State.state.player.pos.rounded())
                         and random.random() < 0.05
                         and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in Sprites_.loot_options
                         and new_player_pos.tuple() not in State.state.grid.visited_tiles
                 ):
                     loot = Loot_Functions.LootTile(new_player_pos)
                     State.state.grid.add(loot)
+                    if State.state.debug_mode:
+                        print('Loot')
                 elif (
-                        not State.state.grid.get(new_player_pos.x, new_player_pos.y)
+                        not State.state.grid.get(*State.state.player.pos.rounded())
                         and random.random() < 0.0
                         and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in Sprites_.enemy_options
                         and new_player_pos.tuple() not in State.state.grid.visited_tiles
                 ):
                     enemy = Enemy.EnemyTile(new_player_pos)
                     State.state.grid.add(enemy)
+                    if State.state.debug_mode:
+                        print('Enemy')
                 elif (
-                        State.state.get_tile_id(Vector(new_player_pos.x, new_player_pos.y)) == Sprites_.trapdoor_options
-                        and not State.state.grid.get(new_player_pos.x, new_player_pos.y)
+                        State.state.get_tile_id(State.state.player.pos.rounded()) in Sprites_.trapdoor_options
+                        and not State.state.grid.get(*State.state.player.pos.rounded())
                 ):
                     trapdoor = Trapdoor_Functions.TrapdoorTile(Vector(new_player_pos.x, new_player_pos.y))
                     State.state.grid.add(trapdoor)
+                    if State.state.debug_mode:
+                        print('Trapdoor')
                 State.state.grid.add_visited_tile(new_player_pos)
 
         after_update()

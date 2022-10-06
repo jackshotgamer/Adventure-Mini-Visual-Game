@@ -46,5 +46,6 @@ class TileRenderer:
     def on_draw_foreground(self, grid=None):
         grid = grid or State.state.grid
         for tile, pos in self.get_tiles_in_render_range(grid):
-            arcade.draw_point(pos.x, pos.y, arcade.color.BLUE if tile.__class__.__name__ == 'TrapTile' else arcade.color.GOLD, 9)
+            if State.state.debug_mode:
+                arcade.draw_point(pos.x, pos.y, arcade.color.BLUE if tile.__class__.__name__ == 'TrapTile' else arcade.color.GOLD, 9)
             tile.on_render_foreground(pos, pos + (-(State.state.cell_render_size.xf / 2), State.state.cell_render_size.yf / 2), State.state.cell_render_size)

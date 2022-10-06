@@ -49,7 +49,6 @@ class LootTile(Tile.Tile):
         from W_Main_File.Utilities import Inventory_GUI
         if Inventory_GUI.is_inv():
             return
-        # todo: detection not working properly, rounding problem?
         if State.state.player.pos.rounded() == self.pos and not self.opening:
             if State.state.is_moving:
                 return

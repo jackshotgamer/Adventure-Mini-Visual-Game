@@ -29,7 +29,8 @@ class InventoryContainer:
                 self.items[index] = item
                 return
         self.items.append(item)
-        print(f'added, item: {item}')
+        if State.state.debug_mode:
+            print(f'added, item: {item}')
 
     def remove_item(self, index: int, page_num: int = None, checks=True):
         if self.items:
