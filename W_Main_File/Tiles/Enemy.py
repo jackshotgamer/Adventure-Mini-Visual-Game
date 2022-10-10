@@ -48,12 +48,14 @@ class EnemyTile(Tile.Tile):
         if (self.pos.x, self.pos.y) != (State.state.player.pos.x, State.state.player.pos.y):
             self.dont_render_it = False
         if self.fought and not self.dont_render_it:
-            if self.alpha < 225:
-                self.alpha = min(225, self.alpha + 2)
-            arcade.draw_texture_rectangle(center.x, center.y, State.state.cell_render_size.x * 0.96, State.state.cell_render_size.y * 0.76, Sprites_.knight_start_2,
+            if self.alpha < 210:
+                self.alpha = min(210, self.alpha + 1)
+            arcade.draw_texture_rectangle(center.x, center.y, State.state.cell_render_size.x * 0.73, State.state.cell_render_size.yf * 0.88, Sprites_.black_square_circle_square_sprite,
+                                          alpha=int(self.alpha / 1.68))
+            arcade.draw_texture_rectangle(center.x, center.y, State.state.cell_render_size.x * 0.75, State.state.cell_render_size.y * 0.75, Sprites_.knight_start_2,
                                           alpha=self.alpha)
             arcade.draw_texture_rectangle(center.x, center.y, State.state.cell_render_size.x * 0.50, State.state.cell_render_size.y * 0.50, Sprites_.Null,
-                                          alpha=self.alpha)
+                                          alpha=int(self.alpha / 1.5))
 
     def on_render_foreground(self, center, top_left, cell_size):
         if State.state.player.pos.rounded() == self.pos:

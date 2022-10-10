@@ -21,6 +21,7 @@ class Combat(Event_Base.EventBase):
 
     def __init__(self):
         super().__init__()
+
         self.colour = State.state.player.hp / State.state.player.max_hp
         self.colour2 = State.state.player.hp / State.state.player.max_hp
         self.truthy = False
@@ -35,6 +36,7 @@ class Combat(Event_Base.EventBase):
     def on_draw(self):
         arcade.set_background_color((18, 18, 18))
         arcade.start_render()
+        cell_render_size = (State.state.cell_size * ((State.state.window.width / State.state.default_window_size.xf), (State.state.window.height / State.state.default_window_size.y)))
 
         self.button_manager.render()
         State.state.render_mouse()
@@ -51,7 +53,7 @@ class Combat(Event_Base.EventBase):
             self.current_window_size = Vector(State.state.window.width, State.state.window.height)
 
     def buttons(self):
-        pass
+        self.button_manager.append('flee', 'Flee', State.state.screen_center, Vector(150, 60), on_click=self.flee, text_colour=(200, 100, 100))
 
     def update(self, delta_time: float):
         self.check_if_resized()

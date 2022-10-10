@@ -68,7 +68,6 @@ class PlayerSelect(Event_Base.EventBase):
         Inventory_GUI._inventory_toggle = False
         State.state.preoccupied = False
         State.cache_state.clear()
-        State.state.render_radius = 3
         State.state.current_page = 0
         from W_Main_File.Views import Exploration
         self.ui_manager.purge_ui_elements()
@@ -130,7 +129,6 @@ class PlayerSelect(Event_Base.EventBase):
         State.state.preoccupied = False
         State.cache_state.clear()
         State.state.camera_pos = Vector.Vector(0, 0)
-        State.state.render_radius = 3
         State.state.current_page = 0
         import os
         if os.path.exists(f'Interactable_Tiles/Guest/'):

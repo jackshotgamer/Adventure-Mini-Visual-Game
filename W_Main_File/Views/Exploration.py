@@ -27,7 +27,7 @@ class Explore(Event_Base.EventBase):
         Button_Functions.register_custom_exploration_buttons(self.button_manager, self.ui_manager)
         State.state.is_moving = False
         if ((State.state.moves_since_texture_save > 2 and State.state.is_new_tile) or State.state.player.pos.rounded() == (0, 0)) and not State.state.player.meta_data.is_guest:
-            for offset in State.state.generate_radius(5):
+            for offset in State.state.generate_radius(State.state.render_radius):
                 State.state.tile_type_pos(*(offset + State.state.player.pos.rounded()))
             State.state.is_new_tile = False
             State.state.moves_since_texture_save = 0
@@ -156,7 +156,6 @@ class Explore(Event_Base.EventBase):
         char_draw_pos = State.state.pos_of_player_on_screen
         center_screen = State.state.screen_center
         cell_render_size = (State.state.cell_size * ((State.state.window.width / State.state.default_window_size.xf), (State.state.window.height / State.state.default_window_size.y)))
-        # TODO fix stuff around here
         self.tile_renderer.on_draw(State.state.render_radius)
         self.tile_renderer.on_draw_tile()
         arcade.draw_texture_rectangle(((State.state.player.pos.xf * State.state.cell_render_size.xf) - State.state.camera_pos.xf) + State.state.screen_center.xf,
@@ -191,8 +190,6 @@ class Explore(Event_Base.EventBase):
         self.tile_renderer.on_draw_foreground()
         arcade.draw_rectangle_filled(center_screen.xf, center_screen.yf - (State.state.window.height * 0.3375), State.state.window.width * 0.625, State.state.window.height * 0.0475, (0, 0, 0))
         arcade.draw_rectangle_filled(center_screen.xf, center_screen.yf + (State.state.window.height * 0.3375), State.state.window.width * 0.625, State.state.window.height * 0.0475, (0, 0, 0))
-        arcade.draw_text(f'FPS = {self.fps:.1f}', 2, self.window.height - 22, arcade.color.GREEN,
-                         font_name='arial', font_size=14)
         self.text_render(char_draw_pos)
         Sprites_.draw_backdrop()
         arcade.draw_rectangle_outline(center_screen.xf, center_screen.yf, State.state.window.width * 0.5, State.state.window.height * 0.625, (120, 120, 120), 4)
@@ -205,6 +202,8 @@ class Explore(Event_Base.EventBase):
         self.button_manager.render()
         Inventory_GUI.render_inventory(Vector(self.window._mouse_x, self.window._mouse_y))
         self.menu_manager.display_menu('Inv_Item_Menu')
+        arcade.draw_text(f'FPS = {self.fps:.1f}', 2, self.window.height - 22, arcade.color.GREEN,
+                         font_name='arial', font_size=14)
         if Inventory_GUI.is_inv():
             if Inventory_GUI._menu_toggle:
                 State.state.render_mouse()
@@ -334,6 +333,16 @@ class Explore(Event_Base.EventBase):
 
     def on_key_press(self, symbol: int, modifiers: int):
         super().on_key_press(symbol, modifiers)
+        if symbol == arcade.key.MINUS:
+            if modifiers & arcade.key.MOD_SHIFT:
+                State.state.render_radius -= 1
+            else:
+                State.state.cell_size -= 10
+        if symbol == arcade.key.EQUAL:
+            if modifiers & arcade.key.MOD_SHIFT:
+                State.state.render_radius += 1
+            else:
+                State.state.cell_size += 10
         if symbol == arcade.key.P:
             print(State.state.grid.get(*State.state.player.pos.rounded()))
             print(State.state.player.pos)
@@ -397,7 +406,7 @@ class Explore(Event_Base.EventBase):
                     print(f'Activated: {State.state.player.pos.rounded()} Tile: {State.state.get_tile_id(State.state.player.pos.rounded())}')
                 if (
                         not State.state.grid.get(*State.state.player.pos.rounded())
-                        and random.random() < 0.05
+                        and random.random() < 0.0
                         and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in Sprites_.loot_options
                         and new_player_pos.tuple() not in State.state.grid.visited_tiles
                 ):
@@ -407,7 +416,7 @@ class Explore(Event_Base.EventBase):
                         print('Loot')
                 elif (
                         not State.state.grid.get(*State.state.player.pos.rounded())
-                        and random.random() < 0.0
+                        and random.random() < 0.4
                         and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in Sprites_.enemy_options
                         and new_player_pos.tuple() not in State.state.grid.visited_tiles
                 ):

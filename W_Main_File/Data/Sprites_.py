@@ -187,6 +187,15 @@ backdrop_frame_count = 0
 reversing = False
 
 
+def texture_to_sprite(image, width=None, height=None):
+    import arcade
+    text_sprite = arcade.Sprite()
+    text_sprite._texture = image
+    text_sprite.width = image.width if width is None else width
+    text_sprite.height = image.height if height is None else height
+    return text_sprite
+
+
 def update_backdrop():
     global current_backdrop_frame
     global backdrop_frame_count

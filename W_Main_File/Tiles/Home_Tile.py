@@ -14,7 +14,7 @@ class HomeTile(Tile.Tile):
 
     def on_render(self, center, top_left, cell_size):
         arcade.draw_rectangle_outline(center.x, center.y, State.state.cell_size.x - 2, State.state.cell_size.y - 2, arcade.color.BRONZE)
-        arcade.draw_texture_rectangle(center.x, center.y, State.state.window.width * 0.097, State.state.window.height * 0.12125, Sprites_.home_sprite)
+        arcade.draw_texture_rectangle(center.x, center.y, State.state.cell_render_size.x-2, State.state.cell_render_size.x-2, Sprites_.home_sprite)
 
     def on_render_foreground(self, center, top_left, cell_size):
         if State.state.player.pos.rounded() == self.pos:
