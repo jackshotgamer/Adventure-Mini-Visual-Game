@@ -52,6 +52,7 @@ class Explore(Event_Base.EventBase):
         State.cache_state.prior_player_grid_pos = State.state.player.pos.rounded()
         State.cache_state.prior_camera_pos = State.state.camera_pos
         State.cache_state.trap_additive_distance = 0
+        self.synced = True
         self.menu_manager = Custom_Menu.MenuManager()
 
     def update(self, delta_time: float):
@@ -84,8 +85,9 @@ class Explore(Event_Base.EventBase):
         for symbol in tuple(Event_Base.symbols):
             if symbol in self.key_offset:
                 # TODO: separate from camera logic
-                State.state.player.pos += ((Vector(*self.key_offset[symbol]) * self.movement_speed) * self.delta) / State.state.cell_render_size
-                State.state.camera_pos += (Vector(*self.key_offset[symbol]) * self.movement_speed) * self.delta
+                State.state.player.pos += (self.movement_calc(symbol) * self.delta) / State.state.cell_render_size
+                if self.synced:
+                    State.state.camera_pos += self.movement_calc(symbol) * self.delta
                 rounded_player_pos = State.state.player.pos.rounded()
                 State.state.tile_type_pos(*rounded_player_pos)
                 if (State.state.texture_mapping[f'{rounded_player_pos.x} {rounded_player_pos.y}']) in Sprites_.trap_options:
@@ -99,7 +101,7 @@ class Explore(Event_Base.EventBase):
                         State.cache_state.trap_additive_distance = 0
                         Action_Queue.action_queue.append(tile.on_enter)
                     elif not run_once:
-                        State.cache_state.trap_additive_distance += ((Vector(*self.key_offset[symbol]) * self.movement_speed) * self.delta).distance()
+                        State.cache_state.trap_additive_distance += ((self.movement_calc(symbol) * self.delta).distance() / 2) * self.movement_speed
                     print(State.cache_state.trap_additive_distance)
                 elif State.cache_state.trap_additive_distance:
                     State.cache_state.trap_additive_distance = 0
@@ -128,7 +130,7 @@ class Explore(Event_Base.EventBase):
         }
         for symbol1 in Event_Base.symbols:
             if symbol1 in corresponding_directions:
-                State.state.camera_pos += (corresponding_directions[symbol1] * 2.5)
+                State.state.camera_pos += (((corresponding_directions[symbol1] * (self.movement_speed*1))*State.state.cell_size)) * self.delta
 
     def check_if_resized(self):
         if self.current_window_size.xf == State.state.window.width and self.current_window_size.yf == State.state.window.height:
@@ -148,7 +150,12 @@ class Explore(Event_Base.EventBase):
         key.D: (1, 0)
     }
 
-    movement_speed = 200
+    movement_speed = 3
+
+    def movement_calc(self, symbol):
+        move1 = (Vector(*self.key_offset[symbol]) * self.movement_speed)
+        move1 *= State.state.cell_size
+        return move1
 
     # noinspection PyProtectedMember
     def on_draw(self):
@@ -343,6 +350,8 @@ class Explore(Event_Base.EventBase):
                 State.state.render_radius += 1
             else:
                 State.state.cell_size += 10
+        if symbol == arcade.key.PERIOD:
+            self.synced = not self.synced
         if symbol == arcade.key.P:
             print(State.state.grid.get(*State.state.player.pos.rounded()))
             print(State.state.player.pos)
@@ -368,7 +377,7 @@ class Explore(Event_Base.EventBase):
                 return
             self.__class__.previous_pos = State.state.player.pos
             State.state.moves_since_texture_save += 1
-            offset = ((Vector(*self.key_offset[symbol]) * self.movement_speed) * self.delta / State.state.cell_render_size).rounded()
+            offset = (self.movement_calc(symbol) * self.delta / State.state.cell_render_size).rounded()
             prior_player_pos = State.state.player.pos
             new_player_pos = prior_player_pos + offset
             prev_tile = State.state.grid.get(*prior_player_pos.rounded())
@@ -387,7 +396,7 @@ class Explore(Event_Base.EventBase):
     def gen_new_inter_tiles(self, symbol):
         self.__class__.previous_pos = State.state.player.pos
         State.state.moves_since_texture_save += 1
-        offset = ((Vector(*self.key_offset[symbol]) * self.movement_speed) * self.delta / State.state.cell_render_size).rounded()
+        offset = (self.movement_calc(symbol) * self.delta / State.state.cell_render_size).rounded()
         prior_player_pos = State.state.player.pos
         new_player_pos = (prior_player_pos + offset).rounded()
         prev_tile = State.state.grid.get(*prior_player_pos.rounded())
@@ -416,7 +425,7 @@ class Explore(Event_Base.EventBase):
                         print('Loot')
                 elif (
                         not State.state.grid.get(*State.state.player.pos.rounded())
-                        and random.random() < 0.4
+                        and random.random() < 0.0
                         and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in Sprites_.enemy_options
                         and new_player_pos.tuple() not in State.state.grid.visited_tiles
                 ):
