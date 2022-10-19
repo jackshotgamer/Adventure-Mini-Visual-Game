@@ -46,6 +46,12 @@ class EventBase(arcade.View):
         held_modifiers &= _modifiers
 
 
+tile_chances = {
+    'Loot': 0.0,
+    'Enemy': 0.2,
+}
+
+
 """
 100 shift
 010 ctrl

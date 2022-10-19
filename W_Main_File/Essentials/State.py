@@ -5,7 +5,7 @@ from typing import List, Dict, Any, Union, Type
 
 import arcade
 
-from W_Main_File.Data import HpEntity, Grid, Sprites_, Meta_Data
+from W_Main_File.Data import HpEntity, Grid, Meta_Data
 from W_Main_File.Utilities import Vector, Seeding
 
 
@@ -38,7 +38,7 @@ class State:
         self.camera_pos = Vector.Vector(0, 0)
         self.window = None
         self.grid = Grid.Grid()
-        self.cell_size = Vector.Vector(100, 100)
+        self._cell_size = Vector.Vector(100, 100)
         self.render_radius = 4
         self.default_window_size = Vector.Vector(1000, 800)
         self.texture_mapping = {}
@@ -51,6 +51,14 @@ class State:
         self._preoccupied = False
         self.debug_mode = False
         # Meta_Data.is_me = True
+
+    @property
+    def cell_size(self):
+        return self._cell_size
+
+    @cell_size.setter
+    def cell_size(self, value):
+        self._cell_size = value
 
     @property
     def grid_camera_pos(self):
@@ -80,6 +88,7 @@ class State:
     def tile_type_pos(self, x, y):
         poss = Vector.Vector(x, y)
         xy = f'{int(x)} {int(y)}'
+        from W_Main_File.Data import Sprites_
         if xy not in self.texture_mapping:
             rnjesus = Seeding.seed_for_vector(poss)
             sprite_textures = rnjesus.choices(tuple(Sprites_.sprite_alias), k=1, weights=Sprites_.weights)

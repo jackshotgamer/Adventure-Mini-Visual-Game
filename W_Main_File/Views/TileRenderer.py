@@ -34,14 +34,12 @@ class TileRenderer:
         center = State.state.screen_center
         # todo: fix not generating new sprites
         var = ((State.state.grid_camera_pos * State.state.cell_render_size) - State.state.camera_pos)
-
         if State.cache_state.last_values != [State.state.camera_pos, State.state.render_radius, State.state.cell_size] or self.first_render:
-            print('Refreshing Sprite List')
             State.cache_state.tile_cache = arcade.SpriteList()
             for offset in State.state.generate_radius(render_radius):
                 real_grid_pos = State.state.grid_camera_pos + offset
                 render_pos = (center + (State.state.cell_render_size * offset)) + var
-                temp_sprite = texture_to_sprite(State.state.tile_type_pos(*real_grid_pos), State.state.cell_render_size.x, State.state.cell_render_size.y)
+                temp_sprite = texture_to_sprite(State.state.tile_type_pos(*real_grid_pos), State.state.cell_render_size.xf, State.state.cell_render_size.yf)
                 temp_sprite.position = render_pos
                 State.cache_state.tile_cache.append(temp_sprite)
             State.cache_state.last_values = [State.state.camera_pos, State.state.render_radius, State.state.cell_size]

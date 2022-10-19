@@ -1,8 +1,12 @@
 from arcade import load_texture
 from pathlib import Path
 from collections import OrderedDict
+from PIL import Image
+import numpy as np
+import arcade
 
 from W_Main_File.Data.Item import ItemType
+from W_Main_File.Utilities import Vector
 from W_Main_File.Essentials import State
 from W_Main_File.Data import Item
 
@@ -71,6 +75,7 @@ arrow_button_light_right = load_texture(Path('Sprites') / 'ButtonArrow_LightRigh
 arrow_button_bright_left = load_texture(Path('Sprites') / 'ButtonArrow_BrightLeft.png')
 arrow_button_bright_right = load_texture(Path('Sprites') / 'ButtonArrow_BrightRight.png')
 # = load_texture(Path('Sprites') / '.png')
+combat_terrain = load_texture(Path('Sprites') / 'Combat_Terrain.png')
 swamp_monster = load_texture(Path('Sprites') / 'Swamp_Monster_0.png')
 black_sprite = load_texture(Path('Sprites') / 'Black_Square.png')
 black_circle_sprite = load_texture(Path('Sprites') / 'Black_Circle.png')
@@ -119,6 +124,15 @@ item_dict = OrderedDict(
 # 6 = Jungle
 # 7 = Arctic
 # 8 = Cave
+
+ranges = {
+    1: (0, 0, 0),
+    2: (0, 0, 0),
+    3: (0, 0, 0),
+    4: (0, 0, 0),
+    5: (1, -1, 0),
+    6: (0, 0, 0),
+}
 
 weights, sprite_alias = (
     (
@@ -171,7 +185,6 @@ CHEST_OPENING_FRAMES = [
 
 BACKGROUND_FRAMES = [
     load_texture(Path('Background_Frames') / f'backdrop_{num}.png') for num in range(1, 8)
-
 ]
 
 CHARACTER_FRAMES = [
@@ -196,6 +209,30 @@ def texture_to_sprite(image, width=None, height=None):
     return text_sprite
 
 
+def nullify_image_area(image, size):
+    image_array = np.array(image)
+    image_array[int((image.height * .5) - (size.y * .5)): int((image.height * .5) + (size.y * .5)), int((image.width * .5) - (size.x * .5)): int((image.width * .5) + (size.x * .5))] = (0, 0, 0, 0)
+    return Image.fromarray(image_array)
+
+
+def nullify_image_area_with_other_image(image, image2, offset):
+    image_array = np.array(image)
+    image_array[int(0 + offset.y): int(image2.height + offset.y), int(0 + offset.x): int(image2.width + offset.x)] = (0, 0, 0, 0)
+    return Image.fromarray(image_array)
+
+
+def png_to_image(image_path):
+    return Image.open(image_path)
+
+
+_image_to_sprite_counter = 0
+
+
+def image_to_texture(image: Image.Image):
+    global _image_to_sprite_counter
+    return arcade.Texture(f'Namernamer{(_image_to_sprite_counter := _image_to_sprite_counter + 1)}123Hi', image)
+
+
 def update_backdrop():
     global current_backdrop_frame
     global backdrop_frame_count
@@ -209,6 +246,36 @@ def update_backdrop():
         current_backdrop_frame += 1 if not reversing else -1
     if backdrop_frame_count > 20:
         backdrop_frame_count = 1
+
+
+crop_current_backdrop_frame = 0
+crop_backdrop_frame_count = 0
+crop_reversing = False
+CROPPED_BACKGROUND_FRAMES = []
+
+
+def renew_cropped_backdrop():
+    global CROPPED_BACKGROUND_FRAMES
+    CROPPED_BACKGROUND_FRAMES = [
+        image_to_texture(nullify_image_area(
+            png_to_image(Path('Background_Frames') / f'backdrop_{num}.png').resize((int(State.state.window.width), int(State.state.window.height))),
+            Vector.Vector(700, 700))) for num in range(1, 8)
+    ]
+
+
+def update_cropped_backdrop():
+    global crop_current_backdrop_frame
+    global crop_backdrop_frame_count
+    global crop_reversing
+    crop_backdrop_frame_count += 1
+    if not crop_backdrop_frame_count % 13:
+        if crop_current_backdrop_frame >= 7 - 1:
+            crop_reversing = True
+        elif crop_current_backdrop_frame <= 0:
+            crop_reversing = False
+        crop_current_backdrop_frame += 1 if not crop_reversing else -1
+    if crop_backdrop_frame_count > 20:
+        crop_backdrop_frame_count = 1
 
 
 current_character_frame = 0
@@ -230,6 +297,11 @@ def update_character():
 def draw_backdrop():
     import arcade
     arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y, State.state.window.width, State.state.window.height, BACKGROUND_FRAMES[current_backdrop_frame])
+
+
+def draw_cropped_backdrop():
+    import arcade
+    arcade.draw_texture_rectangle(State.state.screen_center.x, State.state.screen_center.y, State.state.window.width, State.state.window.height, CROPPED_BACKGROUND_FRAMES[crop_current_backdrop_frame])
 
 
 def draw_character():

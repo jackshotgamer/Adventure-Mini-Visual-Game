@@ -1,6 +1,7 @@
 import arcade
 import arcade.gui
 from arcade import key
+from pathlib import Path
 
 from W_Main_File.Utilities import Button_Functions, Action_Queue
 from W_Main_File.Views import Purgatory_Screen, Event_Base
@@ -14,49 +15,71 @@ from W_Main_File.Utilities.Vector import Vector
 
 class Combat(Event_Base.EventBase):
     sprite = {
-        'Witch': Sprites_.swamp_monster,
-        'Dragon': Sprites_.swamp_monster,
-        'Ogre': Sprites_.swamp_monster,
+        'Death Knight': Sprites_.death_knight,
+        'Devouring Horror': Sprites_.devouring_horror,
+        'Golden Serpent': Sprites_.golden_serpent,
+        'Offspring of Shrub Niggurath': Sprites_.offspring_of_shub_niggurath,
+        'Purgatory Dragon Skeleton': Sprites_.purgatory_dragon_skeleton,
+        'Troglodyte': Sprites_.troglodyte,
+        'Troglodyte Hellebardier': Sprites_.troglodyte_hellebardier,
     }
 
     def __init__(self):
         super().__init__()
-
+        self.prev_cell_size = State.state.cell_size
         self.colour = State.state.player.hp / State.state.player.max_hp
         self.colour2 = State.state.player.hp / State.state.player.max_hp
         self.truthy = False
         self.truthy2 = False
         self.key_ = False
+        self.delta_timer = 0
         self.symbol2 = arcade.key.D
         self.current_window_size = Vector(State.state.window.width, State.state.window.height)
         from W_Main_File.Views import Exploration
         self.explore = Exploration.Explore()
+        self.rendered_once = 0
         self.buttons()
 
     def on_draw(self):
         arcade.set_background_color((18, 18, 18))
         arcade.start_render()
-        cell_render_size = (State.state.cell_size * ((State.state.window.width / State.state.default_window_size.xf), (State.state.window.height / State.state.default_window_size.y)))
+        Sprites_.draw_backdrop()
+        arcade.draw_texture_rectangle(State.state.screen_center.xf, State.state.screen_center.yf, 700, 700, Sprites_.combat_terrain)
+        if self.rendered_once == 1:
+            State.state.cell_size = Vector((State.state.window.width * 0.5) / 9, (State.state.window.height * 0.625) / 9)
+            self.rendered_once = 2
+        elif self.rendered_once == 0:
+            self.rendered_once = 1
+        arcade.draw_rectangle_outline(State.state.screen_center.xf, State.state.screen_center.yf, 700, 700, arcade.color.GRAY, 6)
+        # noinspection PyGlobalUndefined
 
+        Sprites_.draw_cropped_backdrop()
         self.button_manager.render()
         State.state.render_mouse()
 
-    @staticmethod
-    def change_background_colour():
+    def change_background_colour(self):
+        State.state.cell_size = self.prev_cell_size
+        self.explore.tile_renderer.first_render = True
         arcade.set_background_color((0, 0, 0))
 
     def check_if_resized(self):
         if self.current_window_size.x == State.state.window.width and self.current_window_size.y == State.state.window.height:
             return
         else:
+            Sprites_.renew_cropped_backdrop()
             self.buttons()
             self.current_window_size = Vector(State.state.window.width, State.state.window.height)
 
     def buttons(self):
-        self.button_manager.append('flee', 'Flee', State.state.screen_center, Vector(150, 60), on_click=self.flee, text_colour=(200, 100, 100))
+        self.button_manager.append('flee', 'Flee', Vector(State.state.window.width - (State.state.screen_center.x * 0.15), State.state.screen_center.y), Vector(100, 60),
+                                   on_click=self.flee, text_colour=(200, 100, 100))
 
     def update(self, delta_time: float):
-        self.check_if_resized()
+        self.delta_timer += delta_time
+        if self.delta_timer > 0.35:
+            self.check_if_resized()
+            print(f'Resized {self.delta_timer}')
+            self.delta_timer = 0
         self.colour = State.state.player.hp / State.state.player.max_hp
         # self.colour2 = self.combatant.hp / self.combatant.max_hp
         if State.state.player.hp <= 0:
@@ -76,6 +99,7 @@ class Combat(Event_Base.EventBase):
             self.key_ = False
         elif self.symbol2 == arcade.key.A:
             self.key_ = True
+        Sprites_.update_backdrop()
 
     def on_mouse_press(self, x: float, y: float, button: int, modifiers: int):
         print(f'*{x}*, *{y}*')

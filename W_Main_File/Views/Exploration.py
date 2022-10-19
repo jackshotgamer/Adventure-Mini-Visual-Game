@@ -137,7 +137,10 @@ class Explore(Event_Base.EventBase):
             return
         else:
             Button_Functions.register_custom_exploration_buttons(self.button_manager, self.ui_manager)
+            State.state.camera_pos /= ((self.current_window_size.x / State.state.default_window_size.xf), (self.current_window_size.y / State.state.default_window_size.yf))
             self.current_window_size = Vector(State.state.window.width, State.state.window.height)
+            State.state.camera_pos *= ((self.current_window_size.x / State.state.default_window_size.xf), (self.current_window_size.y / State.state.default_window_size.yf))
+            self.tile_renderer.first_render = True
         from W_Main_File.Utilities import Inventory_GUI
         if Inventory_GUI.is_inv():
             Inventory_GUI.hide_inv(self.button_manager)
@@ -154,7 +157,7 @@ class Explore(Event_Base.EventBase):
 
     def movement_calc(self, symbol):
         move1 = (Vector(*self.key_offset[symbol]) * self.movement_speed)
-        move1 *= State.state.cell_size
+        move1 *= State.state.cell_render_size
         return move1
 
     # noinspection PyProtectedMember
@@ -343,11 +346,15 @@ class Explore(Event_Base.EventBase):
         if symbol == arcade.key.MINUS:
             if modifiers & arcade.key.MOD_SHIFT:
                 State.state.render_radius -= 1
+            elif modifiers & arcade.key.MOD_CTRL:
+                State.state.cell_size = Vector((State.state.window.width * 0.5) / 9, (State.state.window.height * 0.625) / 9)
             else:
                 State.state.cell_size -= 10
         if symbol == arcade.key.EQUAL:
             if modifiers & arcade.key.MOD_SHIFT:
                 State.state.render_radius += 1
+            elif modifiers & arcade.key.MOD_CTRL:
+                State.state.cell_size = Vector(100, 100)
             else:
                 State.state.cell_size += 10
         if symbol == arcade.key.PERIOD:
@@ -358,8 +365,11 @@ class Explore(Event_Base.EventBase):
             print(State.state.player.pos.rounded())
             print(State.state.texture_mapping[f'{State.state.player.pos.rounded().x} {State.state.player.pos.rounded().y}'])
             print(State.state.get_tile_id(State.state.player.pos.rounded()), State.state.grid.get(*State.state.player.pos.rounded()))
-        if symbol == arcade.key.C:
+            print(State.state.camera_pos)
+        if symbol == arcade.key.C and not (modifiers & arcade.key.MOD_SHIFT):
             State.state.camera_pos -= State.state.camera_pos
+        if symbol == arcade.key.C and modifiers & arcade.key.MOD_SHIFT:
+            State.state.window.center_window()
         if symbol == arcade.key.R:
             State.state.camera_pos = (State.state.player.pos * State.state.cell_render_size)
         if symbol == arcade.key.B:
@@ -415,7 +425,7 @@ class Explore(Event_Base.EventBase):
                     print(f'Activated: {State.state.player.pos.rounded()} Tile: {State.state.get_tile_id(State.state.player.pos.rounded())}')
                 if (
                         not State.state.grid.get(*State.state.player.pos.rounded())
-                        and random.random() < 0.0
+                        and random.random() < Event_Base.tile_chances['Loot']
                         and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in Sprites_.loot_options
                         and new_player_pos.tuple() not in State.state.grid.visited_tiles
                 ):
@@ -425,7 +435,7 @@ class Explore(Event_Base.EventBase):
                         print('Loot')
                 elif (
                         not State.state.grid.get(*State.state.player.pos.rounded())
-                        and random.random() < 0.0
+                        and random.random() < Event_Base.tile_chances['Enemy']
                         and State.state.texture_mapping.get(f'{new_player_pos.x} {new_player_pos.y}') in Sprites_.enemy_options
                         and new_player_pos.tuple() not in State.state.grid.visited_tiles
                 ):
