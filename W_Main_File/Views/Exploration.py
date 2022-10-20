@@ -130,7 +130,7 @@ class Explore(Event_Base.EventBase):
         }
         for symbol1 in Event_Base.symbols:
             if symbol1 in corresponding_directions:
-                State.state.camera_pos += (((corresponding_directions[symbol1] * (self.movement_speed*1))*State.state.cell_size)) * self.delta
+                State.state.camera_pos += (((corresponding_directions[symbol1] * (self.movement_speed * 1)) * State.state.cell_size)) * self.delta
 
     def check_if_resized(self):
         if self.current_window_size.xf == State.state.window.width and self.current_window_size.yf == State.state.window.height:
@@ -357,15 +357,26 @@ class Explore(Event_Base.EventBase):
                 State.state.cell_size = Vector(100, 100)
             else:
                 State.state.cell_size += 10
+        if symbol == arcade.key.J:
+            if modifiers & arcade.key.MOD_SHIFT:
+                State.state.camera_pos -= (10, 0)
+            else:
+                State.state.camera_pos -= (0, 10)
+        if symbol == arcade.key.K:
+            if modifiers & arcade.key.MOD_SHIFT:
+                State.state.camera_pos += (10, 0)
+            else:
+                State.state.camera_pos += (0, 10)
+        if symbol == arcade.key.U:
+            State.state.camera_pos = State.state.grid_camera_pos * State.state.cell_render_size
         if symbol == arcade.key.PERIOD:
             self.synced = not self.synced
         if symbol == arcade.key.P:
-            print(State.state.grid.get(*State.state.player.pos.rounded()))
-            print(State.state.player.pos)
-            print(State.state.player.pos.rounded())
-            print(State.state.texture_mapping[f'{State.state.player.pos.rounded().x} {State.state.player.pos.rounded().y}'])
-            print(State.state.get_tile_id(State.state.player.pos.rounded()), State.state.grid.get(*State.state.player.pos.rounded()))
-            print(State.state.camera_pos)
+            print(f'Grid Tile Type: {State.state.grid.get(*State.state.player.pos.rounded())}')
+            print(f'Player Pos: {State.state.player.pos}')
+            print(f'Tile ID: {State.state.get_tile_id(State.state.player.pos.rounded())}')
+            print(f'Camera Pos: {State.state.camera_pos}')
+            print(f'Grid Camera Pos: {State.state.grid_camera_pos_raw}')
         if symbol == arcade.key.C and not (modifiers & arcade.key.MOD_SHIFT):
             State.state.camera_pos -= State.state.camera_pos
         if symbol == arcade.key.C and modifiers & arcade.key.MOD_SHIFT:

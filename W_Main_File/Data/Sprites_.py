@@ -74,6 +74,11 @@ arrow_button_light_left = load_texture(Path('Sprites') / 'ButtonArrow_LightLeft.
 arrow_button_light_right = load_texture(Path('Sprites') / 'ButtonArrow_LightRight.png')
 arrow_button_bright_left = load_texture(Path('Sprites') / 'ButtonArrow_BrightLeft.png')
 arrow_button_bright_right = load_texture(Path('Sprites') / 'ButtonArrow_BrightRight.png')
+barcode = load_texture(Path('Sprites') / 'Barcode_Sprite.png')
+barcode2 = load_texture(Path('Sprites') / 'Barcode_Sprite_2.png')
+# = load_texture(Path('Sprites') / '.png')
+# = load_texture(Path('Sprites') / '.png')
+# = load_texture(Path('Sprites') / '.png')
 # = load_texture(Path('Sprites') / '.png')
 combat_terrain = load_texture(Path('Sprites') / 'Combat_Terrain.png')
 swamp_monster = load_texture(Path('Sprites') / 'Swamp_Monster_0.png')
@@ -154,8 +159,8 @@ weights, sprite_alias = (
         1
     ),
     {
-        '0.1': plains_sprite_01,
-        '0.2': plains_sprite_02,
+        '0.1': barcode,
+        '0.2': barcode2,
         '0.3': plains_sprite_03,
         '0.4': plains_sprite_04,
         '0.5': plains_trap_sprite,
