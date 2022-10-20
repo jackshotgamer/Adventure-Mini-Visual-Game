@@ -1,5 +1,5 @@
 import time
-
+import pyglet
 import arcade
 import arcade.gui
 from W_Main_File.Data import Sprites_
@@ -42,9 +42,10 @@ class TileRenderer:
                 temp_sprite = texture_to_sprite(State.state.tile_type_pos(*real_grid_pos), State.state.cell_render_size.xf, State.state.cell_render_size.yf)
                 temp_sprite.position = render_pos
                 State.cache_state.tile_cache.append(temp_sprite)
+                offset1 = Vector.Vector(*render_pos/100)
             State.cache_state.last_values = [State.state.camera_pos, State.state.render_radius, State.state.cell_size]
             self.first_render = False
-        State.cache_state.tile_cache.draw()
+        State.cache_state.tile_cache.draw(filter=pyglet.gl.GL_NEAREST)
 
     def on_draw_tile(self, grid=None):
         grid = grid or State.state.grid

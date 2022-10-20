@@ -159,8 +159,8 @@ weights, sprite_alias = (
         1
     ),
     {
-        '0.1': barcode,
-        '0.2': barcode2,
+        '0.1': plains_sprite_01,
+        '0.2': plains_sprite_02,
         '0.3': plains_sprite_03,
         '0.4': plains_sprite_04,
         '0.5': plains_trap_sprite,

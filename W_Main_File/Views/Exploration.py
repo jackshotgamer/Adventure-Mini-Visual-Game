@@ -165,6 +165,7 @@ class Explore(Event_Base.EventBase):
         arcade.start_render()
         char_draw_pos = State.state.pos_of_player_on_screen
         center_screen = State.state.screen_center
+        arcade.draw_rectangle_filled(center_screen.x, center_screen.y, State.state.window.width, State.state.window.height, arcade.color.BLUE)
         cell_render_size = (State.state.cell_size * ((State.state.window.width / State.state.default_window_size.xf), (State.state.window.height / State.state.default_window_size.y)))
         self.tile_renderer.on_draw(State.state.render_radius)
         self.tile_renderer.on_draw_tile()
@@ -214,6 +215,7 @@ class Explore(Event_Base.EventBase):
         self.menu_manager.display_menu('Inv_Item_Menu')
         arcade.draw_text(f'FPS = {self.fps:.1f}', 2, self.window.height - 22, arcade.color.GREEN,
                          font_name='arial', font_size=14)
+        # arcade.draw_rectangle_filled(center_screen.x, center_screen.y, State.state.window.width, State.state.window.height, (0, 0, 0, 20))
         if Inventory_GUI.is_inv():
             if Inventory_GUI._menu_toggle:
                 State.state.render_mouse()
@@ -358,20 +360,23 @@ class Explore(Event_Base.EventBase):
             else:
                 State.state.cell_size += 10
         if symbol == arcade.key.J:
+            increment = 10 if not modifiers & arcade.key.MOD_CTRL else 1
             if modifiers & arcade.key.MOD_SHIFT:
-                State.state.camera_pos -= (10, 0)
+                State.state.camera_pos -= (increment, 0)
             else:
-                State.state.camera_pos -= (0, 10)
+                State.state.camera_pos -= (0, increment)
         if symbol == arcade.key.K:
+            increment = 10 if not modifiers & arcade.key.MOD_CTRL else 1
             if modifiers & arcade.key.MOD_SHIFT:
-                State.state.camera_pos += (10, 0)
+                State.state.camera_pos += (increment, 0)
             else:
-                State.state.camera_pos += (0, 10)
+                State.state.camera_pos += (0, increment)
         if symbol == arcade.key.U:
             State.state.camera_pos = State.state.grid_camera_pos * State.state.cell_render_size
         if symbol == arcade.key.PERIOD:
             self.synced = not self.synced
         if symbol == arcade.key.P:
+            print(f'Cell Render Size: {State.state.cell_render_size}')
             print(f'Grid Tile Type: {State.state.grid.get(*State.state.player.pos.rounded())}')
             print(f'Player Pos: {State.state.player.pos}')
             print(f'Tile ID: {State.state.get_tile_id(State.state.player.pos.rounded())}')
