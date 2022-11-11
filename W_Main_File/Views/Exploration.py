@@ -165,7 +165,6 @@ class Explore(Event_Base.EventBase):
         arcade.start_render()
         char_draw_pos = State.state.pos_of_player_on_screen
         center_screen = State.state.screen_center
-        arcade.draw_rectangle_filled(center_screen.x, center_screen.y, State.state.window.width, State.state.window.height, arcade.color.BLUE)
         cell_render_size = (State.state.cell_size * ((State.state.window.width / State.state.default_window_size.xf), (State.state.window.height / State.state.default_window_size.y)))
         self.tile_renderer.on_draw(State.state.render_radius)
         self.tile_renderer.on_draw_tile()
@@ -345,6 +344,12 @@ class Explore(Event_Base.EventBase):
 
     def on_key_press(self, symbol: int, modifiers: int):
         super().on_key_press(symbol, modifiers)
+        if symbol == arcade.key.NUM_7:
+            State.state.player.lvl += (1 if State.state.player.lvl == 1 else -1)
+            if Sprites_.weights[4] == 1.1:
+                Sprites_.weights[4] = 100
+            else:
+                Sprites_.weights[4] = 1.1
         if symbol == arcade.key.MINUS:
             if modifiers & arcade.key.MOD_SHIFT:
                 State.state.render_radius -= 1

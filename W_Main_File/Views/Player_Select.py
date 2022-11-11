@@ -58,6 +58,9 @@ class PlayerSelect(Event_Base.EventBase):
         from W_Main_File.Views.Saving import load_player_data
         print(f'Username: {player_username}')
         load_player_data(player_username)
+        if State.state.player.lvl == 2:
+            from W_Main_File.Data.Sprites_ import weights
+            weights[4] = 100
         state_player = State.state.player
         print(f'State Name: {state_player.name}')
         State.state.inventory.load(state_player.name)

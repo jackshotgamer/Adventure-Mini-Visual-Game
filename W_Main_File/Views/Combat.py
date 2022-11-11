@@ -66,6 +66,7 @@ class Combat(Event_Base.EventBase):
         if self.current_window_size.x == State.state.window.width and self.current_window_size.y == State.state.window.height:
             return
         else:
+            print('Resized')
             Sprites_.renew_cropped_backdrop()
             self.buttons()
             self.current_window_size = Vector(State.state.window.width, State.state.window.height)
@@ -78,7 +79,6 @@ class Combat(Event_Base.EventBase):
         self.delta_timer += delta_time
         if self.delta_timer > 0.35:
             self.check_if_resized()
-            print(f'Resized {self.delta_timer}')
             self.delta_timer = 0
         self.colour = State.state.player.hp / State.state.player.max_hp
         # self.colour2 = self.combatant.hp / self.combatant.max_hp

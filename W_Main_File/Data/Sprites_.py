@@ -140,7 +140,7 @@ ranges = {
 }
 
 weights, sprite_alias = (
-    (
+    [
         11,
         11,
         11,
@@ -157,7 +157,7 @@ weights, sprite_alias = (
         0.8,
         0.8,
         1
-    ),
+    ],
     {
         '0.1': plains_sprite_01,
         '0.2': plains_sprite_02,
