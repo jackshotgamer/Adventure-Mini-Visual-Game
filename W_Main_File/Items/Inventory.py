@@ -60,13 +60,15 @@ class InventoryContainer:
             self.clear_empty_pages()
             self.trim_inventory()
 
-    def trim_inventory(self):
+    def trim_inventory(self, remove_all=False):
         items_removed = 0
         items_length = len(self.items)
         for index, item in reversed(list(enumerate(self.items))):
             if item is None:
                 del self.items[index]
                 items_removed += 1
+            elif remove_all:
+                continue
             else:
                 break
         if State.state.current_page >= self.page_count:
@@ -123,19 +125,32 @@ class InventoryContainer:
             items_to_return.append(self.items[index])
         return items_to_return
 
+    def get_items_and_indexes_on_page(self, page_num=None):
+        if page_num is None:
+            page_num = State.state.current_page
+        if not isinstance(page_num, int) or not self.items or page_num > self.page_count:
+            return []
+        lower_upper_bound = [(page_num * 25), (page_num * 25) + 25]
+        if lower_upper_bound[1] > len(self.items) - 1:
+            lower_upper_bound[1] = len(self.items) - 1
+        items_to_return = []
+        for index in range(lower_upper_bound[0], lower_upper_bound[1]+1):
+            items_to_return.append((self.items[index], index))
+        return items_to_return
+
     def load(self, file_path):
         from W_Main_File.Essentials.State import state
         if not (state.player_data_path / file_path).exists():
             (state.player_data_path / file_path).mkdir()
-        if not (state.player_data_path / file_path / 'inv').exists():
-            with open((state.player_data_path / file_path / 'inv'), 'wb') as file:
+        if not (state.player_data_path / file_path / 'inv.pickle').exists():
+            with open((state.player_data_path / file_path / 'inv.pickle'), 'wb') as file:
                 pickle.dump([], file)
-        with open((state.player_data_path / file_path / 'inv'), 'rb') as file:
+        with open((state.player_data_path / file_path / 'inv.pickle'), 'rb') as file:
             self.items = pickle.load(file)
 
     def save(self, file_path):
         from W_Main_File.Essentials.State import state
         if not (state.player_data_path / file_path).exists():
             (state.player_data_path / file_path).mkdir()
-        with open((state.player_data_path / file_path / 'inv'), 'wb') as file:
+        with open((state.player_data_path / file_path / 'inv.pickle'), 'wb') as file:
             pickle.dump(self.items, file)

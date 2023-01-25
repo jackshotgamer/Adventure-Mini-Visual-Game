@@ -1,5 +1,5 @@
 class HpEntity:
-    def __init__(self, name, pos, max_hp, hp, gold, xp, lvl, floor, meta_data=None, deaths=0):
+    def __init__(self, name, pos, max_hp, hp, gold, xp, lvl, floor, meta_data=None, deaths=0, realm='Overworld',):
         self.name = name
         self.pos = pos
         self.max_hp = max_hp
@@ -10,6 +10,7 @@ class HpEntity:
         self.floor = floor
         self.deaths = deaths
         self.meta_data = meta_data
+        self.realm = realm
 
     @property
     def resistances(self):

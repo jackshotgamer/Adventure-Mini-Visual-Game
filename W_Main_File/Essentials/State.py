@@ -35,9 +35,16 @@ class State:
 
     def __init__(self):
         self.player = HpEntity.HpEntity('', Vector.Vector(0, 0), 1000, 1000, 0, 0, 1, 1, Meta_Data.MetaData(is_player=True))
+        from W_Main_File.Data import Sprites_
+        self.sprite_options = Sprites_.sprite_alias_options.get(self.player.realm, Sprites_.sprite_alias_o)
+        self.safe_sprite_alias = Sprites_.safe_sprite_alias
         self.camera_pos = Vector.Vector(0, 0)
         self.window = None
-        self.grid = Grid.Grid()
+        self.grid_storage = {
+            'Overworld': Grid.Grid(),
+            'Purgatory': Grid.Grid(),
+        }
+        self.grid = self.grid_storage[self.player.realm]
         self._cell_size = Vector.Vector(100, 100)
         self.render_radius = 4
         self.default_window_size = Vector.Vector(1000, 800)
@@ -76,6 +83,24 @@ class State:
     def preoccupied(self):
         return self._preoccupied
 
+    def change_realm(self, new_realm):
+        from W_Main_File.Data import Sprites_
+        self.player.realm = new_realm
+        self.texture_mapping.clear()
+        self.grid = self.grid_storage[self.player.realm]
+        from W_Main_File.Utilities import Data_Saving
+        Data_Saving.SaveManager.load_floor(self.player.floor, self.player.realm, force_load=True)
+        from W_Main_File.Tiles import Home_Tile
+        if self.grid.get(0, 0) != Home_Tile.HomeTile and self.player.floor == 1:
+            if self.grid.get(0, 0):
+                self.grid.remove(Vector.Vector(0, 0))
+            self.grid.add(Home_Tile.HomeTile(Vector.Vector(0, 0)))
+        self.sprite_options = Sprites_.sprite_alias_options.get(self.player.realm, Sprites_.sprite_alias_o)
+
+    @staticmethod
+    def split_list(list_: list):
+        return [[item[i] for item in list_] for i in range(len(list_[0]))]
+
     @preoccupied.setter
     def preoccupied(self, value):
         if self._preoccupied == value:
@@ -88,14 +113,17 @@ class State:
     def tile_type_pos(self, x, y):
         poss = Vector.Vector(x, y)
         xy = f'{int(x)} {int(y)}'
-        from W_Main_File.Data import Sprites_
+        rnjesus = Seeding.seed_for_vector(poss)
         if xy not in self.texture_mapping:
-            rnjesus = Seeding.seed_for_vector(poss)
-            sprite_textures = rnjesus.choices(tuple(Sprites_.sprite_alias), k=1, weights=Sprites_.weights)
+            split_lists = self.split_list(list(self.sprite_options.values()))
+            sprite_textures = rnjesus.choices(tuple(self.sprite_options), k=1, weights=split_lists[1])
             # 20, 15, 10, 5, 3,
             self.texture_mapping[xy] = rnjesus.choice(sprite_textures)
             self.is_new_tile = True
-        return Sprites_.sprite_alias[self.texture_mapping[xy]]
+        try:
+            return self.sprite_options[self.texture_mapping[xy]][0]
+        except KeyError:
+            return self.sprite_options[rnjesus.choice(self.safe_sprite_alias)][0]
 
     def get_tile_id(self, vector):
         """

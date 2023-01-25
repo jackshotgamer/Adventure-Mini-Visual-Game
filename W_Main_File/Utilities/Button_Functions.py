@@ -2,7 +2,7 @@ import typing
 # noinspection PyUnresolvedReferences
 from arcade.gui import UIFlatButton, UIManager
 
-from W_Main_File.Utilities import Action_Queue, Floor_Data_Saving, Inventory_GUI
+from W_Main_File.Utilities import Action_Queue, Data_Saving, Inventory_GUI
 from W_Main_File.Essentials import State
 from W_Main_File.Utilities import Vector
 from W_Main_File.Views import Exploration, Fading, Log_Out
@@ -40,7 +40,7 @@ def invalidate_floor_data():
 def go_home_button():
     if State.state.preoccupied:
         return
-    Floor_Data_Saving.FloorSaveManager.floor_save()
+    Data_Saving.SaveManager.floor_save()
     explore = Exploration.Explore()
     Action_Queue.action_queue.append(
         lambda: State.state.window.show_view(

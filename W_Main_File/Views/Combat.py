@@ -78,7 +78,8 @@ class Combat(Event_Base.EventBase):
         self.delta_timer += delta_time
         if self.delta_timer > 0.35:
             self.check_if_resized()
-            print(f'Resized {self.delta_timer}')
+            if State.state.debug_mode:
+                print(f'Resized {self.delta_timer}')
             self.delta_timer = 0
         self.colour = State.state.player.hp / State.state.player.max_hp
         # self.colour2 = self.combatant.hp / self.combatant.max_hp
@@ -102,7 +103,8 @@ class Combat(Event_Base.EventBase):
         Sprites_.update_backdrop()
 
     def on_mouse_press(self, x: float, y: float, button: int, modifiers: int):
-        print(f'*{x}*, *{y}*')
+        if State.state.debug_mode:
+            print(f'*{x}*, *{y}*')
 
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol == arcade.key.H:

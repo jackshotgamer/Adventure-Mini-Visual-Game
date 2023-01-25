@@ -91,7 +91,6 @@ class Explore(Event_Base.EventBase):
                 rounded_player_pos = State.state.player.pos.rounded()
                 State.state.tile_type_pos(*rounded_player_pos)
                 if (State.state.texture_mapping[f'{rounded_player_pos.x} {rounded_player_pos.y}']) in Sprites_.trap_options:
-                    print('True')
                     if not isinstance(State.state.grid.get(*State.state.player.pos.rounded()), Trap_Functions.TrapTile):
                         tile = Trap_Functions.TrapTile(State.state.player.pos.rounded())
                         State.state.grid.add(tile)
@@ -102,7 +101,8 @@ class Explore(Event_Base.EventBase):
                         Action_Queue.action_queue.append(tile.on_enter)
                     elif not run_once:
                         State.cache_state.trap_additive_distance += ((self.movement_calc(symbol) * self.delta).distance() / 2) * self.movement_speed
-                    print(State.cache_state.trap_additive_distance)
+                    if State.state.debug_mode:
+                        print(State.cache_state.trap_additive_distance)
                 elif State.cache_state.trap_additive_distance:
                     State.cache_state.trap_additive_distance = 0
                 if State.state.player.pos.rounded().tuple() != State.cache_state.prior_player_grid_pos.tuple():
@@ -248,13 +248,18 @@ class Explore(Event_Base.EventBase):
         origin_pos_se = Inventory_GUI.inventory_se()
         origin_pos_sw = Vector(origin_pos_nw.x, origin_pos_se.y)
         origin_pos_ne = Vector(origin_pos_se.x, origin_pos_nw.y)
+        print(f'Mouse button pressed: {"LEFT_CLICK" if button == arcade.MOUSE_BUTTON_LEFT else "RIGHT_CLICK" if button == arcade.MOUSE_BUTTON_RIGHT else "MIDDLE CLICK"}')
         if not ((origin_pos_sw.x < x < origin_pos_ne.x) and (origin_pos_sw.y < y < origin_pos_ne.y)):
             mouse_in_game_box = False
         else:
             mouse_in_game_box = True
         if button == arcade.MOUSE_BUTTON_RIGHT:
             if Inventory_GUI.is_inv():
+                print(self.menu_manager.menus)
+                print(mouse_in_game_box)
+                print(Inventory_GUI.get_hovered_item(Vector(x, y)))
                 Inventory_GUI._menu_toggle = True
+                print('Step 1')
                 if not State.cache_state.selected_list or ((var := Inventory_GUI.get_hovered_item(Vector(x, y))) is not None and not var.selected):
                     if State.cache_state.selected_list is not None:
                         for index in reversed(State.cache_state.selected_list):
@@ -273,16 +278,21 @@ class Explore(Event_Base.EventBase):
                         if self.menu_manager.check_if_mouse_on_menu('Inv_Item_Menu', Vector(x, y)):
                             self.menu_manager.remove_menu('Inv_Item_Menu')
                 elif mouse_in_game_box:
+                    print('Step 2')
                     list_of_indexes = [index for index in State.cache_state.selected_list if isinstance(index, int)]
                     # TODO add selling
-                    gvacfi = {'trash': lambda: State.state.inventory.remove_mass_items(list_of_indexes)}
-                    if gvacfi is not None:
-                        if Inventory_GUI.get_hovered_item(Vector(x, y)) is not None:
+                    if Inventory_GUI.get_hovered_item(Vector(x, y)) is not None:
+                        gvacfi = {'trash': lambda: State.state.inventory.remove_mass_items(list_of_indexes)}
+                        if gvacfi is not None:
                             if mouse_in_game_box:
                                 self.menu_manager.make_menu('Inv_Item_Menu', Vector(x, y), '', gvacfi, True)
-                    else:
-                        if self.menu_manager.check_if_mouse_on_menu('Inv_Item_Menu', Vector(x, y)):
-                            self.menu_manager.remove_menu('Inv_Item_Menu')
+                        else:
+                            print('WAAA?')
+                            if self.menu_manager.check_if_mouse_on_menu('Inv_Item_Menu', Vector(x, y)):
+                                self.menu_manager.remove_menu('Inv_Item_Menu')
+                if mouse_in_game_box and Inventory_GUI.get_hovered_item(Vector(x, y)) is None:
+                    gvacfi = {'sort': lambda: State.state.inventory.trim_inventory(True)}
+                    self.menu_manager.make_menu('Inv_Item_Menu', Vector(x, y), '', gvacfi, True)
         else:
             if not self.menu_manager.check_if_mouse_on_menu('Inv_Item_Menu', Vector(x, y)):
                 Inventory_GUI._menu_toggle = False
@@ -296,7 +306,8 @@ class Explore(Event_Base.EventBase):
                 if State.cache_state.selected_list is None:
                     State.cache_state.selected_list = []
                 State.cache_state.selected_list.append(hovered_item_index)
-                print("Selected!")
+                if State.state.debug_mode:
+                    print("Selected!")
             elif not self.menu_manager.check_if_mouse_on_menu('Inv_Item_Menu', Vector(x, y)) and not arcade.key.MOD_CTRL & modifiers:
                 if State.cache_state.selected_list is not None:
                     for index in reversed(State.cache_state.selected_list):
@@ -311,7 +322,8 @@ class Explore(Event_Base.EventBase):
                 rel_mouse_pos = Vector(x - menu.pos.x, abs(menu.pos.y - y))
                 option_item = self.menu_manager.check_which_hovered_option('Inv_Item_Menu', rel_mouse_pos)
                 if option_item is None:
-                    print('Error: Could not find option on menu')
+                    if State.state.debug_mode:
+                        print('Error: Could not find option on menu')
                     return
                 option_item[1]()
                 Inventory_GUI._menu_toggle = False
@@ -376,6 +388,7 @@ class Explore(Event_Base.EventBase):
         if symbol == arcade.key.PERIOD:
             self.synced = not self.synced
         if symbol == arcade.key.P:
+            print(f'Realm: {State.state.player.realm}')
             print(f'Cell Render Size: {State.state.cell_render_size}')
             print(f'Grid Tile Type: {State.state.grid.get(*State.state.player.pos.rounded())}')
             print(f'Player Pos: {State.state.player.pos}')
@@ -395,6 +408,14 @@ class Explore(Event_Base.EventBase):
         if symbol == arcade.key.I:
             for num in range(0, 10 if modifiers & arcade.key.MOD_SHIFT else 3):
                 State.state.inventory.add_item(random.choice(tuple(item() for item in Sprites_.item_dict.values())))
+        if symbol == arcade.key.A:
+            if modifiers & arcade.key.MOD_CTRL:
+                items_on_page = State.state.inventory.get_items_and_indexes_on_page()
+                for item, index in items_on_page:
+                    item.selected = True
+                    if State.cache_state.selected_list is None:
+                        State.cache_state.selected_list = []
+                    State.cache_state.selected_list.append(index)
         if symbol in self.key_offset:
             if symbol in (arcade.key.A, arcade.key.D):
                 self.__class__.symbol_ = symbol
@@ -418,6 +439,11 @@ class Explore(Event_Base.EventBase):
         else:
             if tile := State.state.grid.get(*State.state.player.pos.rounded()):
                 tile.key_down(symbol, modifiers)
+        if symbol == arcade.key.NUM_7:
+            State.state.change_realm('Purgatory' if State.state.player.realm == 'Overworld' else 'Overworld')
+            self.tile_renderer.first_render = True
+            if State.state.debug_mode:
+                print(State.state.player.realm)
 
     def gen_new_inter_tiles(self, symbol):
         self.__class__.previous_pos = State.state.player.pos

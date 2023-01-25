@@ -3,7 +3,7 @@ from arcade import gui
 from urllib.parse import quote
 
 from W_Main_File.Essentials import State, Button_Sprite_Manager
-from W_Main_File.Utilities import Vector, Seeding, Floor_Data_Saving, Button_Functions
+from W_Main_File.Utilities import Vector, Seeding, Data_Saving, Button_Functions
 from requests import get
 import time
 import sys
@@ -19,7 +19,7 @@ class CursorPriorityManager(gui.UIManager):
             State.state.render_mouse()
 
 
-PlayerDataTemplate = namedtuple('PlayerDataTemplate', 'name pos max_hp hp gold xp level floor deaths')
+PlayerDataTemplate = namedtuple('PlayerDataTemplate', 'name pos max_hp hp gold xp level floor deaths realm')
 
 
 class PlayerSelect(Event_Base.EventBase):
@@ -32,7 +32,7 @@ class PlayerSelect(Event_Base.EventBase):
         self.current_window_size = Vector.Vector(1000, 800)
         self.incorrect_password_end = 0
         self.buttons()
-        self.player_data = PlayerDataTemplate('Guest', Vector.Vector(0, 0), 1000, 1000, 0, 0, 1, 1, 0)
+        self.player_data = PlayerDataTemplate('Guest', Vector.Vector(0, 0), 1000, 1000, 0, 0, 1, 1, 0, 'Overworld')
         State.state.clear_current_floor_data()
 
     def on_username_update(self, player):
@@ -42,12 +42,12 @@ class PlayerSelect(Event_Base.EventBase):
         from W_Main_File.Essentials.State import state
         import pickle
         if not (state.player_data_path / player / 'player').exists():
-            self.player_data = PlayerDataTemplate('Guest', Vector.Vector(0, 0), 1000, 1000, 0, 0, 1, 1, 0)
+            self.player_data = PlayerDataTemplate('Guest', Vector.Vector(0, 0), 1000, 1000, 0, 0, 1, 1, 0, 'Overworld')
             return
         with open((state.player_data_path / player / 'player'), 'rb') as file:
             data = pickle.load(file)
             self.player_data = PlayerDataTemplate(data['character_name'], Vector.Vector(data['player_x'], data['player_y']), data['max_hp'], data['hp'], data['gold'], data['xp'], data['lvl'],
-                                                  data['floor'], data['deaths'])
+                                                  data['floor'], data['deaths'], data['realm'])
 
     def enter_button(self):
         player_username = self.username.text.strip()
@@ -55,9 +55,9 @@ class PlayerSelect(Event_Base.EventBase):
             return
         if player_username.lower() == 'guest':
             return
-        from W_Main_File.Views.Saving import load_player_data
+        from W_Main_File.Utilities.Data_Saving import SaveManager
         print(f'Username: {player_username}')
-        load_player_data(player_username)
+        SaveManager.load_player_data(player_username)
         state_player = State.state.player
         print(f'State Name: {state_player.name}')
         State.state.inventory.load(state_player.name)
@@ -78,7 +78,7 @@ class PlayerSelect(Event_Base.EventBase):
         elif not State.state.grid.get(0, 0):
             from W_Main_File.Tiles import Home_Tile
             State.state.grid.add(Home_Tile.HomeTile(Vector.Vector(0, 0)))
-        Floor_Data_Saving.FloorSaveManager.load_floor(state_player.floor, force_load=True)
+        Data_Saving.SaveManager.load_floor(state_player.floor, state_player.realm, force_load=True)
         self.render_mouse = False
         State.state.window.show_view(Exploration.Explore())
 
@@ -91,6 +91,7 @@ class PlayerSelect(Event_Base.EventBase):
 
     def buttons(self):
         self.ui_manager.purge_ui_elements()
+
         self.username = gui.UIInputBox(State.state.screen_center.x, State.state.screen_center.y + 100, 300, 50)
         self.username.text_adapter = LimitText(self.on_username_update)
         self.ui_manager.add_ui_element(self.username)
@@ -124,6 +125,7 @@ class PlayerSelect(Event_Base.EventBase):
         state.lvl = 1
         state.floor = 1
         state.deaths = 0
+        state.realm = 'Overworld'
         from W_Main_File.Utilities import Inventory_GUI
         Inventory_GUI._inventory_toggle = False
         State.state.preoccupied = False
@@ -163,6 +165,8 @@ class PlayerSelect(Event_Base.EventBase):
         arcade.draw_text(f'Floor: {self.player_data.floor}', center_screen.x - (63 - 1), (self.username.center_y - (250 + 125)), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=20)
         arcade.draw_text(f'Deaths: {self.player_data.deaths}', center_screen.x - (85 - 1), (self.username.center_y - (275 + 125)), arcade.color.LIGHT_GRAY,
+                         font_name='arial', font_size=20)
+        arcade.draw_text(f'Realm: {self.player_data.realm}', center_screen.x - (78 - 1), (self.username.center_y - (300 + 125)), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=20)
         State.state.render_mouse()
 

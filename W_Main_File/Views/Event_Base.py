@@ -47,8 +47,8 @@ class EventBase(arcade.View):
 
 
 tile_chances = {
-    'Loot': 0.0,
-    'Enemy': 0.2,
+    'Loot': 0.1,
+    'Enemy': 0.1,
 }
 
 

@@ -5,7 +5,7 @@ import arcade
 import random
 
 from W_Main_File.Essentials import State
-from W_Main_File.Utilities import Vector, Seeding, Floor_Data_Saving
+from W_Main_File.Utilities import Vector, Seeding, Data_Saving
 
 CIRCLE_FADE_FRAMES = [
     # <-- is apparently called an "Octothorp", but anyways    \/ this can be typed {i:0>2}, bruh
@@ -63,7 +63,7 @@ class Fading(View):
             return self.fading_process
         elif self.reversing:
             if self.only_reverse:
-                Floor_Data_Saving.FloorSaveManager.load_floor(self.reset_floor_number)
+                Data_Saving.SaveManager.load_floor(self.reset_floor_number, State.state.player.realm)
                 State.state.player.floor = self.reset_floor_number
             return self.reversing_process
 
@@ -77,7 +77,7 @@ class Fading(View):
                 State.state.player.pos = Vector.Vector(*self.reset_pos)
                 State.state.camera_pos = Vector.Vector(*(self.reset_pos * State.state.cell_render_size))
             if self.reset_floor_number is not None:
-                Floor_Data_Saving.FloorSaveManager.load_floor(self.reset_floor_number)
+                Data_Saving.SaveManager.load_floor(self.reset_floor_number, State.state.player.realm)
                 State.state.player.floor = self.reset_floor_number
             if self.should_reverse:
                 self.reversing = True

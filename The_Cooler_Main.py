@@ -22,6 +22,7 @@ decipherer_2 = ['=', '!=', '<', '>', '<=', '>=']
 6*(1+2)
 """
 
+
 def parse_equation(equation):
     parsed_equation = []
     is_simplify_only = True
@@ -63,6 +64,8 @@ def order_of_ops(parsed_equation):
                 except:
                     return 'Invalid_Equation'
             operations_in_order.append((inbetween, 'B'))
-        if part[1] == ''
+        if part[1] == '':
+            pass
+
 
 print(parse_equation(equation_))

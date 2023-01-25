@@ -34,7 +34,8 @@ class TrapTile(Tile.Tile):
                            int(State.state.player.max_hp * random.uniform(0.05, 0.15)))
         # noinspection PyAttributeOutsideInit
         self.goal_hp = State.state.player.hp - subtract_amount
-        print(self.goal_hp)
+        if State.state.debug_mode:
+            print(self.goal_hp)
 
     def on_update(self, delta_time):
         from W_Main_File.Utilities import Inventory_GUI

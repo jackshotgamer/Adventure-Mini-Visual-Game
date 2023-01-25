@@ -9,7 +9,6 @@ from W_Main_File.Data.Item import ItemType
 from W_Main_File.Utilities import Vector
 from W_Main_File.Essentials import State
 from W_Main_File.Data import Item
-
 black_rapier = load_texture(Path('Sprites') / 'Black_Rapier_1.png')
 dark_bident = load_texture(Path('Sprites') / 'dark_bident.png')
 moon_axe = load_texture(Path('Sprites') / 'moon_axe.png')
@@ -139,50 +138,57 @@ ranges = {
     6: (0, 0, 0),
 }
 
-weights, sprite_alias = (
-    (
-        11,
-        11,
-        11,
-        11,
-        1.1,
-        7,
-        7,
-        7,
-        1.1,
-        2,
-        2,
-        3,
-        3,
-        0.8,
-        0.8,
-        1
-    ),
-    {
-        '0.1': plains_sprite_01,
-        '0.2': plains_sprite_02,
-        '0.3': plains_sprite_03,
-        '0.4': plains_sprite_04,
-        '0.5': plains_trap_sprite,
-        '1': forest_sprite_1,
-        '1.1': forest_sprite_11,
-        '1.2': forest_sprite_12,
-        '1.5': forest_trap_sprite,
-        '2': mountain_sprite_1,
-        '2.1': mountain_sprite_2,
-        '2.2': mountain_sprite_3,
-        '2.3': mountain_sprite_4,
-        '4': village_sprite,
-        '4.1': village_sprite_02,
-        '10': trapdoor_sprite
-    }
-)
+safe_sprite_alias = ['0.1', '0.2', '0.3', '0.4']
+
+sprite_alias_o = {
+    '0.1': (plains_sprite_01, 11),
+    '0.2': (plains_sprite_02, 11),
+    '0.3': (plains_sprite_03, 11),
+    '0.4': (plains_sprite_04, 11),
+    '0.5': (plains_trap_sprite, 1.1),
+    '1': (forest_sprite_1, 7),
+    '1.1': (forest_sprite_11, 7),
+    '1.2': (forest_sprite_12, 7),
+    '1.5': (forest_trap_sprite, 1.1),
+    '2': (mountain_sprite_1, 2),
+    '2.1': (mountain_sprite_2, 2),
+    '2.2': (mountain_sprite_3, 3),
+    '2.3': (mountain_sprite_4, 3),
+    '4': (village_sprite, 0.8),
+    '4.1': (village_sprite_02, 0.8),
+    '10': (trapdoor_sprite, 1)
+    # total = 79.8
+}
+
+sprite_alias_p = {
+    '0.1': (purgatory_plain_01, 11),
+    '0.2': (purgatory_plain_02, 11),
+    '0.3': (purgatory_plain_01, 11),
+    '0.4': (purgatory_plain_02, 11),
+    '0.5': (plains_trap_sprite, 1.1),
+    '1': (forest_sprite_1, 7),
+    '1.1': (forest_sprite_11, 7),
+    '1.2': (forest_sprite_12, 7),
+    '1.5': (forest_trap_sprite, 1.1),
+    '2': (purgatory_mountain_01, 2),
+    '2.1': (purgatory_mountain_02, 2),
+    '2.2': (purgatory_mountain_01, 3),
+    '2.3': (purgatory_mountain_02, 3),
+    '4': (village_sprite, 0.8),
+    '4.1': (village_sprite_02, 0.8),
+    '10': (trapdoor_sprite, 1)
+}
+
+sprite_alias_options = {
+    'Overworld': sprite_alias_o,
+    'Purgatory': sprite_alias_p,
+}
 
 loot_options = {'1', '1.1', '1.2', '2', '2.1', '2.2', '2.3'}
 enemy_options = {'1', '1.1', '1.2'}
 trapdoor_options = ('10',)
 trap_options = ('0.5', '1.5')
-excluded_tiles = ('0.1', '0.2', '0.3', '0.4')
+excluded_tiles = ('0.1', '0.2', '0.3', '0.4', '0.5', '1.5', '10')
 
 CHEST_OPENING_FRAMES = [
     load_texture(Path('Chest_Opening_Frames') / f'chest_sprite_{num}.png') for num in range(0, 9)

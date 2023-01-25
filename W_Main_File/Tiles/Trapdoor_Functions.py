@@ -41,8 +41,8 @@ class TrapdoorTile(Tile.Tile):
         State.state.clear_current_floor_data()
 
     def after_fadein(self):
-        from W_Main_File.Utilities import Floor_Data_Saving, Seeding
-        Floor_Data_Saving.FloorSaveManager.floor_save()
+        from W_Main_File.Utilities import Data_Saving, Seeding
+        Data_Saving.SaveManager.floor_save()
         explore = Exploration.Explore()
         fade_to_explore = Fading.Fading(Exploration.Explore, 7, 2,
                                         should_reverse=False,

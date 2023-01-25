@@ -95,7 +95,6 @@ class PurgatoryScreen(Event_Base.EventBase):
         self.current_window_size = Vector.Vector(State.state.window.width, State.state.window.height)
         self.buttons()
         if increment_death:
-            print('hi')
             State.state.player.deaths += 1
             from W_Main_File.Utilities import Seeding
             Seeding.set_world_seed_from_player_name()
