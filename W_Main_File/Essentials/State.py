@@ -14,7 +14,7 @@ class CacheState:
         self._values = {}
 
     def __getattr__(self, item):
-        return self._values.get(item)
+        return self._values.get(item, )
 
     def __setattr__(self, key, value):
         if key == '_values':
@@ -34,11 +34,10 @@ class State:
     player_data_path = pathlib.Path('PLAYERDATA/')
 
     def __init__(self):
-        self.player = HpEntity.HpEntity('', Vector.Vector(0, 0), 1000, 1000, 0, 0, 1, 1, Meta_Data.MetaData(is_player=True))
+        self.player = HpEntity.PlayerEntity('', Vector.Vector(0, 0), 1000, 1000, 0, 0, 1, 1)
         from W_Main_File.Data import Sprites_
         self.sprite_options = Sprites_.sprite_alias_options.get(self.player.realm, Sprites_.sprite_alias_o)
         self.safe_sprite_alias = Sprites_.safe_sprite_alias
-        self.camera_pos = Vector.Vector(0, 0)
         self.window = None
         self.grid_storage = {
             'Overworld': Grid.Grid(),
@@ -49,8 +48,6 @@ class State:
         self.render_radius = 4
         self.default_window_size = Vector.Vector(1000, 800)
         self.texture_mapping = {}
-        from W_Main_File.Items.Inventory import InventoryContainer
-        self.inventory = InventoryContainer()
         self.current_page = 0
         self.is_new_tile = False
         self.is_moving = False
@@ -69,15 +66,15 @@ class State:
 
     @property
     def grid_camera_pos(self):
-        return (self.camera_pos / self.cell_render_size).rounded()
+        return (self.player.camera_pos / self.cell_render_size).rounded()
 
     @property
     def grid_camera_pos_raw(self):
-        return self.camera_pos / self.cell_render_size
+        return self.player.camera_pos / self.cell_render_size
 
     @property
     def pos_of_player_on_screen(self):
-        return ((self.player.pos * self.cell_render_size) - self.camera_pos) + self.screen_center
+        return ((self.player.pos * self.cell_render_size) - self.player.camera_pos) + self.screen_center
 
     @property
     def preoccupied(self):

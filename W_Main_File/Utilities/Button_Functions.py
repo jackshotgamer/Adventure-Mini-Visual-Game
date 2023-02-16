@@ -93,7 +93,7 @@ def confirm_funct(ui_manager: UIManager):
     ui_manager.purge_ui_elements()
     from W_Main_File.Essentials.State import state
     state.clear_current_floor_data()
-    State.state.inventory.items.clear()
+    State.state.player.inventory.items.clear()
     Action_Queue.action_queue.append(lambda: State.state.window.show_view(Player_Select.PlayerSelect()))
 
 

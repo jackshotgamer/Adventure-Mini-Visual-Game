@@ -1,7 +1,17 @@
+import contextlib
 import pathlib
 import pickle
+import arcade
 from W_Main_File.Essentials import State
 from W_Main_File.Utilities import Vector, Seeding
+from W_Main_File.Data import HpEntity
+from enum import Enum, auto
+
+
+class IST(Enum):
+    assign_path_to_sprites = auto()
+    assign_image_to_sprites = auto()
+    both = auto()
 
 
 class SaveManager:
@@ -85,18 +95,56 @@ class SaveManager:
             state.grid.add(final_tile)
         return True
 
+    @staticmethod
+    @contextlib.contextmanager
+    def inventory_save_manager(file_path, data=None, tasks: IST = IST.both, player_or_inv='player'):
+        if tasks is IST.both or tasks is IST.assign_path_to_sprites:
+            for item in State.state.player.inventory.items:
+                if isinstance(item.sprite, arcade.Texture):
+                    item.sprite = item.sprite.name.split('-', 1)[0]
+                elif isinstance(item.sprite, str):
+                    item.sprite = item.sprite
+                else:
+                    print(item.sprite)
+                    raise AttributeError
+
+        yield
+
+        if tasks is IST.both or tasks is IST.assign_image_to_sprites:
+            if data is None:
+                with open((State.state.player_data_path / file_path / f'{player_or_inv}.pickle'), 'rb') as file:
+                    data = pickle.load(file)
+            from arcade import load_texture
+            if player_or_inv == 'player':
+                for item in data['player'].inventory.items:
+                    # noinspection PyTypeChecker
+                    if isinstance(item.sprite, str):
+                        item.sprite = load_texture(item.sprite)
+                    else:
+                        raise ValueError
+            elif player_or_inv == 'inv':
+                for item in data:
+                    if isinstance(item.sprite, str):
+                        item.sprite = load_texture(item.sprite)
+                    else:
+                        raise ValueError
+            else:
+                raise ValueError
+
     @classmethod
     def save_player_data(cls, file_path):
         player = State.state.player
-        data = {'character_name': player.name, 'player_x': player.pos.xf, 'player_y': player.pos.yf, 'camera_x': State.state.camera_pos.xf, 'camera_y': State.state.camera_pos.yf,
-                'hp': player.hp, 'max_hp': player.max_hp, 'gold': player.gold, 'xp': player.xp, 'lvl': player.lvl, 'floor': player.floor, 'deaths': player.deaths, 'realm': player.realm}
-        from W_Main_File.Essentials.State import state
-        cls.ensure_save_directory()
-        if not (state.player_data_path / file_path).exists():
-            (state.player_data_path / file_path).mkdir()
-        import pickle
-        with open((state.player_data_path / file_path / 'player.pickle'), 'wb') as file:
-            pickle.dump(data, file)
+        # data = {'character_name': player.name, 'player_x': player.pos.xf, 'player_y': player.pos.yf, 'camera_x': State.state.player.camera_pos.xf, 'camera_y': State.state.player.camera_pos.yf,
+        #         'hp': player.hp, 'max_hp': player.max_hp, 'gold': player.gold, 'xp': player.xp, 'lvl': player.lvl, 'floor': player.floor, 'deaths': player.deaths, 'realm': player.realm}
+        with cls.inventory_save_manager(file_path, player_or_inv='player'):
+            data = {'player': player}
+            from W_Main_File.Essentials.State import state
+            cls.ensure_save_directory()
+            if not (state.player_data_path / file_path).exists():
+                (state.player_data_path / file_path).mkdir()
+            import pickle
+            with open((state.player_data_path / file_path / 'player.pickle'), 'wb') as file:
+                pickle.dump(data, file)
 
     @classmethod
     def load_player_data(cls, file_path):
@@ -107,19 +155,14 @@ class SaveManager:
             (state.player_data_path / file_path).mkdir()
         if not (state.player_data_path / file_path / 'player.pickle').exists():
             with open((state.player_data_path / file_path / 'player.pickle'), 'wb') as file:
-                pickle.dump({'character_name': file_path, 'player_x': 0, 'player_y': 0, 'camera_x': 0, 'camera_y': 0, 'hp': 1000, 'max_hp': 1000,
-                             'gold': 0, 'xp': 0, 'lvl': 1, 'floor': 1, 'deaths': 0, 'realm': 'Overworld'}, file)
+                # pickle.dump({'character_name': file_path, 'player_x': 0, 'player_y': 0, 'camera_x': 0, 'camera_y': 0, 'hp': 1000, 'max_hp': 1000,
+                #              'gold': 0, 'xp': 0, 'lvl': 1, 'floor': 1, 'deaths': 0, 'realm': 'Overworld'}, file)
+                pickle.dump({'player': HpEntity.PlayerEntity(file_path, Vector.Vector(0, 0), 1000, 1000, 0, 0, 1, 1)}, file)
         with open((state.player_data_path / file_path / 'player.pickle'), 'rb') as file:
             data = pickle.load(file)
-        from W_Main_File.Utilities import Vector
-        State.state.player.name = data['character_name']
-        State.state.player.pos = Vector.Vector(data['player_x'], data['player_y'])
-        State.state.camera_pos = Vector.Vector(data['camera_x'], data['camera_y'])
-        State.state.player.hp = data['hp']
-        State.state.player.max_hp = data['max_hp']
-        State.state.player.gold = data['gold']
-        State.state.player.xp = data['xp']
-        State.state.player.lvl = data['lvl']
-        State.state.player.floor = data['floor']
-        State.state.player.deaths = data['deaths']
-        State.state.change_realm(data['realm'])
+        print(f'loading 1 (data): {[x.sprite for x in data["player"].inventory.items]}')
+        with cls.inventory_save_manager(file_path, data, tasks=IST.assign_image_to_sprites, player_or_inv='player'):
+            pass
+        print(f'loading 2 (data): {[x.sprite for x in data["player"].inventory.items]}')
+        State.state.player = data['player']
+        State.state.change_realm(State.state.player.realm)

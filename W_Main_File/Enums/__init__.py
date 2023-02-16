@@ -1,5 +1,6 @@
 import enum
 
+
 class Terrains(enum.Enum):
     plains = enum.auto()
     p_trap = enum.auto()

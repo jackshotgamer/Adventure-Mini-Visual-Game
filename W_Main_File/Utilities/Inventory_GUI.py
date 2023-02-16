@@ -31,7 +31,7 @@ def show_inv(button_manager: 'Button_Sprite_Manager.ButtonManager'):
 
 
 def page_left():
-    for item in State.state.inventory.get_items_on_page(State.state.current_page):
+    for item in State.state.player.inventory.get_items_on_page(State.state.current_page):
         if item is not None:
             item.selected = False
     from W_Main_File.Views import Event_Base
@@ -44,16 +44,16 @@ def page_left():
 
 
 def page_right():
-    for item in State.state.inventory.get_items_on_page(State.state.current_page):
+    for item in State.state.player.inventory.get_items_on_page(State.state.current_page):
         if item is not None:
             item.selected = False
     from W_Main_File.Views import Event_Base
-    if State.state.current_page < State.state.inventory.page_count and not Event_Base.held_modifiers & arcade.key.MOD_SHIFT:
+    if State.state.current_page < State.state.player.inventory.page_count and not Event_Base.held_modifiers & arcade.key.MOD_SHIFT:
         State.state.current_page += 1
-    elif State.state.current_page < (State.state.inventory.page_count - 4) and Event_Base.held_modifiers & arcade.key.MOD_SHIFT:
+    elif State.state.current_page < (State.state.player.inventory.page_count - 4) and Event_Base.held_modifiers & arcade.key.MOD_SHIFT:
         State.state.current_page += 5
-    elif State.state.current_page < State.state.inventory.page_count and Event_Base.held_modifiers & arcade.key.MOD_SHIFT:
-        State.state.current_page = State.state.inventory.page_count
+    elif State.state.current_page < State.state.player.inventory.page_count and Event_Base.held_modifiers & arcade.key.MOD_SHIFT:
+        State.state.current_page = State.state.player.inventory.page_count
 
 
 def hide_inv(button_manager: 'Button_Sprite_Manager.ButtonManager'):
@@ -92,17 +92,17 @@ def render_inventory(mouse_pos: Vector):
             arcade.draw_line(x, State.state.window.height * 0.1875, x, State.state.window.height * 0.8125, (90, 90, 90), 2)
         arcade.draw_rectangle_filled(State.state.screen_center.x, State.state.screen_center.y * .25, State.state.window.width * .05, State.state.window.height * .06250, arcade.color.BLACK)
         screen_percentage_of_default = (State.state.window.height / State.state.default_window_size.y)
-        arcade.draw_text(f'Page:\n{State.state.current_page + 1}/{State.state.inventory.page_count + 1}', State.state.screen_center.x, State.state.screen_center.y * .25, arcade.color.LIGHT_GRAY,
+        arcade.draw_text(f'Page:\n{State.state.current_page + 1}/{State.state.player.inventory.page_count + 1}', State.state.screen_center.x, State.state.screen_center.y * .25, arcade.color.LIGHT_GRAY,
                          font_size=(11 * screen_percentage_of_default), width=int(State.state.window.width * .05), align='center', font_name='arial', anchor_x='center', anchor_y='center')
-        items = State.state.inventory.items
+        items = State.state.player.inventory.items
         origin_x, origin_y = (State.state.window.width * 0.25) + (State.state.cell_render_size.x / 2), (State.state.window.height * 0.8125) - (State.state.cell_render_size.y / 2)
         if items:
             item_length = len(items)
             inventory_contents = []
             for index, item in enumerate(range(0, item_length)):
-                if index > State.state.inventory.page_size - 1:
+                if index > State.state.player.inventory.page_size - 1:
                     break
-                inventory_contents.append(State.state.inventory.get_item(index, State.state.current_page))
+                inventory_contents.append(State.state.player.inventory.get_item(index, State.state.current_page))
             for index, item in enumerate(inventory_contents):
                 if index > 24:
                     break
@@ -144,11 +144,11 @@ def get_hovered_item_index(mouse_pos):
 
 
 def get_hovered_item(mouse_pos) -> "Item":
-    return State.state.inventory.get_item(get_hovered_item_index(mouse_pos), State.state.current_page)
+    return State.state.player.inventory.get_item(get_hovered_item_index(mouse_pos), State.state.current_page)
 
 
 def show_tooltips(mouse_pos: Vector):
-    items = State.state.inventory.items
+    items = State.state.player.inventory.items
     if not items:
         return
     origin_pos_nw = inventory_nw()

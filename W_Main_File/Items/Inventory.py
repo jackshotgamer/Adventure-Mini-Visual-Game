@@ -4,8 +4,10 @@ if TYPE_CHECKING:
     from W_Main_File.Data import Item
 from typing import Union
 from W_Main_File.Essentials import State
+from W_Main_File.Utilities import Data_Saving
 from pathlib import Path
 import pickle
+
 
 
 class InventoryContainer:
@@ -15,7 +17,7 @@ class InventoryContainer:
 
     @property
     def page_count(self):
-        return (len(self.items) // State.state.inventory.page_size) + (1 if (len(self.items) / State.state.inventory.page_size) % 1 else 0)
+        return (len(self.items) // self.page_size) + (1 if (len(self.items) / self.page_size) % 1 else 0)
 
     @staticmethod
     def get_absolute_index(index, page_num=None):
@@ -55,10 +57,18 @@ class InventoryContainer:
 
     def remove_mass_items(self, indexes, checks=True):
         for index in indexes:
-            self.remove_item(index, State.state.current_page, checks=False)
+            self.remove_item(index, State.state.current_page, checks=checks)
         if checks:
             self.clear_empty_pages()
-            self.trim_inventory()
+            self.trim_inventory(False)
+        for item in self.items:
+            if item is not None:
+                item.selected = False
+        if State.cache_state.selected_list:
+            del State.cache_state.selected_list
+
+    def sort_inventory(self):
+        self.items.sort(key=lambda x: (x.type_.value, x.name.casefold()))
 
     def trim_inventory(self, remove_all=False):
         items_removed = 0
@@ -147,10 +157,15 @@ class InventoryContainer:
                 pickle.dump([], file)
         with open((state.player_data_path / file_path / 'inv.pickle'), 'rb') as file:
             self.items = pickle.load(file)
+        print(f'loading 1 (inv): {[x.sprite for x in self.items]}')
+        with Data_Saving.SaveManager.inventory_save_manager(file_path, self.items, player_or_inv='inv'):
+            pass
+        print(f'loading 2 (inv): {[x.sprite for x in self.items]}')
 
     def save(self, file_path):
         from W_Main_File.Essentials.State import state
         if not (state.player_data_path / file_path).exists():
             (state.player_data_path / file_path).mkdir()
-        with open((state.player_data_path / file_path / 'inv.pickle'), 'wb') as file:
-            pickle.dump(self.items, file)
+        with Data_Saving.SaveManager.inventory_save_manager(file_path, player_or_inv='inv'):
+            with open((state.player_data_path / file_path / 'inv.pickle'), 'wb') as file:
+                pickle.dump(self.items, file)

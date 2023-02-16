@@ -1,7 +1,7 @@
 import arcade
 from arcade import gui
 from urllib.parse import quote
-
+from W_Main_File.Data import HpEntity, Meta_Data
 from W_Main_File.Essentials import State, Button_Sprite_Manager
 from W_Main_File.Utilities import Vector, Seeding, Data_Saving, Button_Functions
 from requests import get
@@ -19,7 +19,7 @@ class CursorPriorityManager(gui.UIManager):
             State.state.render_mouse()
 
 
-PlayerDataTemplate = namedtuple('PlayerDataTemplate', 'name pos max_hp hp gold xp level floor deaths realm')
+PlayerDataTemplate = namedtuple('PlayerDataTemplate', 'player')
 
 
 class PlayerSelect(Event_Base.EventBase):
@@ -32,7 +32,7 @@ class PlayerSelect(Event_Base.EventBase):
         self.current_window_size = Vector.Vector(1000, 800)
         self.incorrect_password_end = 0
         self.buttons()
-        self.player_data = PlayerDataTemplate('Guest', Vector.Vector(0, 0), 1000, 1000, 0, 0, 1, 1, 0, 'Overworld')
+        self.player_data = PlayerDataTemplate(HpEntity.PlayerEntity('Guest', Vector.Vector(0, 0), 1000, 1000, 0, 0, 1, 1, Meta_Data.MetaData(True, True), 0, 'Overworld'))
         State.state.clear_current_floor_data()
 
     def on_username_update(self, player):
@@ -41,13 +41,12 @@ class PlayerSelect(Event_Base.EventBase):
             return
         from W_Main_File.Essentials.State import state
         import pickle
-        if not (state.player_data_path / player / 'player').exists():
-            self.player_data = PlayerDataTemplate('Guest', Vector.Vector(0, 0), 1000, 1000, 0, 0, 1, 1, 0, 'Overworld')
+        if not (state.player_data_path / player / 'player.pickle').exists():
+            self.player_data = PlayerDataTemplate(HpEntity.PlayerEntity('Guest', Vector.Vector(0, 0), 1000, 1000, 0, 0, 1, 1, Meta_Data.MetaData(True, True), 0, 'Overworld'))
             return
-        with open((state.player_data_path / player / 'player'), 'rb') as file:
+        with open((state.player_data_path / player / 'player.pickle'), 'rb') as file:
             data = pickle.load(file)
-            self.player_data = PlayerDataTemplate(data['character_name'], Vector.Vector(data['player_x'], data['player_y']), data['max_hp'], data['hp'], data['gold'], data['xp'], data['lvl'],
-                                                  data['floor'], data['deaths'], data['realm'])
+            self.player_data = PlayerDataTemplate(data['player'])
 
     def enter_button(self):
         player_username = self.username.text.strip()
@@ -60,7 +59,7 @@ class PlayerSelect(Event_Base.EventBase):
         SaveManager.load_player_data(player_username)
         state_player = State.state.player
         print(f'State Name: {state_player.name}')
-        State.state.inventory.load(state_player.name)
+        State.state.player.inventory.load(state_player.name)
         state_player.meta_data.is_player = True
         state_player.meta_data.is_guest = False
         state_player.meta_data.is_enemy = False
@@ -130,7 +129,7 @@ class PlayerSelect(Event_Base.EventBase):
         Inventory_GUI._inventory_toggle = False
         State.state.preoccupied = False
         State.cache_state.clear()
-        State.state.camera_pos = Vector.Vector(0, 0)
+        State.state.player.camera_pos = Vector.Vector(0, 0)
         State.state.current_page = 0
         import os
         if os.path.exists(f'Interactable_Tiles/Guest/'):
@@ -150,25 +149,46 @@ class PlayerSelect(Event_Base.EventBase):
                          font_name='arial', font_size=20, anchor_x='center', anchor_y='center')
         arcade.draw_text(f'Name: {self.username.text if self.username.text != "" else "Guest"}', center_screen.x - (73 - 1), (self.username.center_y - (75 + 125)), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=20)
-        arcade.draw_text(f'Position: X: {self.player_data.pos.x}, Y: {self.player_data.pos.y}', center_screen.x - (95 - 1), (self.username.center_y - (100 + 125)), arcade.color.LIGHT_GRAY,
+        arcade.draw_text(f'Position: X: {self.player_data.player.pos.x}, Y: {self.player_data.player.pos.y}', center_screen.x - (95 - 1), (self.username.center_y - (100 + 125)),
+                         arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=20)
-        arcade.draw_text(f'Maximum HP: {self.player_data.max_hp}', center_screen.x - (156 - 1), (self.username.center_y - (125 + 125)), arcade.color.LIGHT_GRAY,
+        arcade.draw_text(f'Maximum HP: {self.player_data.player.max_hp}', center_screen.x - (156 - 1), (self.username.center_y - (125 + 125)), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=20)
-        arcade.draw_text(f'HP: {self.player_data.hp}', center_screen.x - (40 - 1), (self.username.center_y - (150 + 125)), arcade.color.LIGHT_GRAY,
+        arcade.draw_text(f'HP: {self.player_data.player.hp}', center_screen.x - (40 - 1), (self.username.center_y - (150 + 125)), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=20)
-        arcade.draw_text(f'Gold: {self.player_data.gold}', center_screen.x - (59 - 1), (self.username.center_y - (175 + 125)), arcade.color.LIGHT_GRAY,
+        arcade.draw_text(f'Gold: {self.player_data.player.gold}', center_screen.x - (59 - 1), (self.username.center_y - (175 + 125)), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=20)
-        arcade.draw_text(f'XP: {self.player_data.xp}', center_screen.x - (39 - 1), (self.username.center_y - (200 + 125)), arcade.color.LIGHT_GRAY,
+        arcade.draw_text(f'XP: {self.player_data.player.xp}', center_screen.x - (39 - 1), (self.username.center_y - (200 + 125)), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=20)
-        arcade.draw_text(f'Level: {self.player_data.level}', center_screen.x - (66 - 1), (self.username.center_y - (225 + 125)), arcade.color.LIGHT_GRAY,
+        arcade.draw_text(f'Level: {self.player_data.player.lvl}', center_screen.x - (66 - 1), (self.username.center_y - (225 + 125)), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=20)
-        arcade.draw_text(f'Floor: {self.player_data.floor}', center_screen.x - (63 - 1), (self.username.center_y - (250 + 125)), arcade.color.LIGHT_GRAY,
+        arcade.draw_text(f'Floor: {self.player_data.player.floor}', center_screen.x - (63 - 1), (self.username.center_y - (250 + 125)), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=20)
-        arcade.draw_text(f'Deaths: {self.player_data.deaths}', center_screen.x - (85 - 1), (self.username.center_y - (275 + 125)), arcade.color.LIGHT_GRAY,
+        arcade.draw_text(f'Deaths: {self.player_data.player.deaths}', center_screen.x - (85 - 1), (self.username.center_y - (275 + 125)), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=20)
-        arcade.draw_text(f'Realm: {self.player_data.realm}', center_screen.x - (78 - 1), (self.username.center_y - (300 + 125)), arcade.color.LIGHT_GRAY,
+        arcade.draw_text(f'Realm: {self.player_data.player.realm}', center_screen.x - (78 - 1), (self.username.center_y - (300 + 125)), arcade.color.LIGHT_GRAY,
                          font_name='arial', font_size=20)
         State.state.render_mouse()
+
+    def on_key_press(self, symbol: int, modifiers: int):
+        super().on_key_press(symbol, modifiers)
+        if 97 <= symbol <= 122:
+            self.username.on_press()
+            self.username.on_focus()
+            self.username.on_ui_event(gui.elements.UIEvent('MOUSE_RELEASE', x=self.username.center_x, y=self.username.center_y))
+        if symbol == arcade.key.ESCAPE:
+            self.exit_button()
+
+    def on_mouse_release(self, x: float, y: float, button: int, modifiers: int):
+        super().on_mouse_release(x, y, button, modifiers)
+        if not gui.elements.UIClickable.collides_with_point(self.username, [x, y]):
+            self.username.on_release()
+            self.username.on_unfocus()
+
+    def on_key_release(self, _symbol: int, _modifiers: int):
+        super().on_key_release(_symbol, _modifiers)
+        if _symbol == arcade.key.ENTER:
+            self.enter_button()
 
 
 # noinspection PyUnresolvedReferences,PyProtectedMember,PyAttributeOutsideInit

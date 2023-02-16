@@ -2,16 +2,18 @@ import abc
 import random
 from enum import Enum, IntFlag, auto
 from typing import Union
+import typing
 
-from W_Main_File.Data import HpEntity
+if typing.TYPE_CHECKING:
+    from W_Main_File.Data import HpEntity
 
 
 class ItemType(Enum):
-    Weapon = 1
-    Armour = 2
-    Consumable = 3
+    Weapon = 3
+    Armour = 5
+    Consumable = 2
     Accessory = 4
-    Quest = 5
+    Quest = 1
 
 
 class DamageType(IntFlag):
@@ -80,10 +82,22 @@ class Weapon(Item):
         self.has_elemental_damage = bool(self.damage_type & DamageType.Any_Elemental)
         self.has_special_move = has_special_move
 
-    def use_on_target(self, target: HpEntity.HpEntity):
+        """
+        basic plated armour:
+            16 physical def
+            
+        (enchanted) armour:
+            12 physical def
+            - attributes
+                - fire resistance 30%
+                - reflection 10%
+        
+        """
+
+    def use_on_target(self, target: "HpEntity.HpEntity"):
         pass
 
-    def use_special(self, target: HpEntity.HpEntity):
+    def use_special(self, target: "HpEntity.HpEntity"):
         pass
 
     def element_type(self):
@@ -92,7 +106,103 @@ class Weapon(Item):
         else:
             return DamageType.No
 
-    def damage_inflicted(self, target: HpEntity):
+    def damage_inflicted(self, target: "HpEntity.HpEntity"):
+        damage = random.randint(self.min_attack, self.max_attack)
+        from W_Main_File.Utilities import Damage_Calc
+        return Damage_Calc.calculate_damage(damage, self.damage_type, target)
+
+
+class Armour(Item):
+    """
+    opposite of halfing is to double
+    but opposite of -50% is +50%
+    60 * .5
+    60 / .5
+    60 - (50% of 60)
+    60 + (50% of 60)
+
+    defense: 10
+    vulnerable: 5
+    strong: 15
+    effects:
+        EFFECT_DICT = {
+            'stabby defense': def process(armour, effectiveness)
+                              def does_apply(dmg_type) -> bool
+        }
+        - physical = 1
+            - stabby = 2
+            - slashy = 2
+            - cutty = 2
+            - ghosty = 2
+            - nani = 2
+        - magic
+            - firey
+            - watery
+            - airy
+            - voidy
+            - earthy
+
+        Incoming: 300 dmg, 200 stabby, 100 fire
+        Armour: 10% stabby reduction, 50% fire reduction
+        Resulting?: -30 from stabby, -150 from fire reduction
+        Resulting?: -30 from stabby, -135 from fire reduction
+        .15 .5 .30
+        ZONED: default zone: GLOBAL
+        Armour(..., attributes={'stabby defense': lambda x: x * .5, 'fire res': .3, default=lambda x: x * 1})
+
+        100
+        .3 res
+        70
+        - 5
+        65
+
+        100-5
+        95
+        .3
+
+        5 / 0.7
+        100-7.14..
+        92.86
+
+        attributes = {DamageType.VOID: 1.5}
+        def apply_attibutes(total_dmg, dmg_types,
+
+
+        max(res % applied to dmg - flat res, 1)
+
+        Goblin {
+            wearing:
+                plated armor
+            def res():
+                {
+                    FIRE: .5
+                }
+        }
+    """
+
+    def __init__(self, name, id_, level, defense, elemental_defense, max_durability, current_durability, attributes, sprite):
+        super().__init__(name, id_, ItemType.Armour, sprite)
+        self.min_attack = min_attack
+        self.max_attack = max_attack
+        self.speed = speed
+        self.range = range_
+        self.damage_type = damage_type
+        self.has_elemental_damage = bool(self.damage_type & DamageType.Any_Elemental)
+        self.has_special_move = has_special_move
+
+    def use_on_target(self, target: "HpEntity.HpEntity"):
+        pass
+
+    def use_special(self, target: "HpEntity.HpEntity"):
+        pass
+
+    def element_type(self):
+        if self.has_elemental_damage:
+            return self.damage_type & DamageType.Any_Elemental
+        else:
+            return DamageType.No
+
+    def damage_inflicted(self, target: "HpEntity.HpEntity"):
         damage = random.randint(self.min_attack, self.max_attack)
         from W_Main_File.Utilities import Damage_Calc
         return Damage_Calc.calculate_damage(damage, self.damage_type, target)

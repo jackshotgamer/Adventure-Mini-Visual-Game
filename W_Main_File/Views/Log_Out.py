@@ -40,3 +40,9 @@ class LogOutView(Event_Base.EventBase):
                               else 'You will lose your unsaved progress. This cannot be undone!'), State.state.screen_center.x, State.state.screen_center.y + 100, arcade.color.WHITE,
                              23, 800, anchor_x='center', anchor_y='center', align='center')
         State.state.render_mouse()
+
+    def on_key_press(self, symbol: int, modifiers: int):
+        if symbol == arcade.key.ENTER:
+            self.on_confirm_func()
+        if symbol == arcade.key.ESCAPE:
+            self.on_deny_func()

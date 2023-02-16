@@ -23,7 +23,7 @@ class Saving(View):
         if self.frame_count >= 5 and not self.saved:
             Data_Saving.SaveManager.save_player_data(f'{State.state.player.name}')
             Data_Saving.SaveManager.floor_save()
-            State.state.inventory.save(f'{State.state.player.name}')
+            State.state.player.inventory.save(f'{State.state.player.name}')
             self.saved = True
         if self.frame_count >= 10 and self.saved:
             State.state.window.show_view(self.saving_screen_func())

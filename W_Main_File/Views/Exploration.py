@@ -2,7 +2,7 @@ import arcade
 import arcade.gui
 from arcade import key
 
-from W_Main_File.Utilities import Button_Functions, Action_Queue, Custom_Menu
+from W_Main_File.Utilities import Button_Functions, Action_Queue, Custom_Menu, Inventory_GUI
 from W_Main_File.Views import Purgatory_Screen, Event_Base, TileRenderer
 from W_Main_File.Data import Sprites_, Item
 from W_Main_File.Essentials import State
@@ -37,6 +37,7 @@ class Explore(Event_Base.EventBase):
         if not State.state.grid.get(2, 0):
             State.state.grid.add(Loot_Functions.LootTile(Vector(2, 0)))
         from W_Main_File.Items import Inventory
+        self.delay_actions = 2
         self.yfes = False
         self.delta = time.time()
         arcade.set_background_color((0, 0, 0))
@@ -50,7 +51,7 @@ class Explore(Event_Base.EventBase):
             if syms:
                 self.on_key_press(syms[0], Event_Base.held_modifiers)
         State.cache_state.prior_player_grid_pos = State.state.player.pos.rounded()
-        State.cache_state.prior_camera_pos = State.state.camera_pos
+        State.cache_state.prior_camera_pos = State.state.player.camera_pos
         State.cache_state.trap_additive_distance = 0
         self.synced = True
         self.menu_manager = Custom_Menu.MenuManager()
@@ -87,7 +88,7 @@ class Explore(Event_Base.EventBase):
                 # TODO: separate from camera logic
                 State.state.player.pos += (self.movement_calc(symbol) * self.delta) / State.state.cell_render_size
                 if self.synced:
-                    State.state.camera_pos += self.movement_calc(symbol) * self.delta
+                    State.state.player.camera_pos += self.movement_calc(symbol) * self.delta
                 rounded_player_pos = State.state.player.pos.rounded()
                 State.state.tile_type_pos(*rounded_player_pos)
                 if (State.state.texture_mapping[f'{rounded_player_pos.x} {rounded_player_pos.y}']) in Sprites_.trap_options:
@@ -121,7 +122,7 @@ class Explore(Event_Base.EventBase):
         if any(symbol for symbol in Event_Base.symbols if symbol in self.key_offset):
             Sprites_.update_character()
         State.cache_state.prior_player_grid_pos = State.state.player.pos.rounded()
-        State.cache_state.prior_camera_pos = State.state.camera_pos
+        State.cache_state.prior_camera_pos = State.state.player.camera_pos
         corresponding_directions = {
             arcade.key.LEFT: Vector(-1, 0),
             arcade.key.RIGHT: Vector(1, 0),
@@ -130,16 +131,16 @@ class Explore(Event_Base.EventBase):
         }
         for symbol1 in Event_Base.symbols:
             if symbol1 in corresponding_directions:
-                State.state.camera_pos += (((corresponding_directions[symbol1] * (self.movement_speed * 1)) * State.state.cell_size)) * self.delta
+                State.state.player.camera_pos += ((corresponding_directions[symbol1] * (self.movement_speed * 1)) * State.state.cell_size) * self.delta
 
     def check_if_resized(self):
         if self.current_window_size.xf == State.state.window.width and self.current_window_size.yf == State.state.window.height:
             return
         else:
             Button_Functions.register_custom_exploration_buttons(self.button_manager, self.ui_manager)
-            State.state.camera_pos /= ((self.current_window_size.x / State.state.default_window_size.xf), (self.current_window_size.y / State.state.default_window_size.yf))
+            State.state.player.camera_pos /= ((self.current_window_size.x / State.state.default_window_size.xf), (self.current_window_size.y / State.state.default_window_size.yf))
             self.current_window_size = Vector(State.state.window.width, State.state.window.height)
-            State.state.camera_pos *= ((self.current_window_size.x / State.state.default_window_size.xf), (self.current_window_size.y / State.state.default_window_size.yf))
+            State.state.player.camera_pos *= ((self.current_window_size.x / State.state.default_window_size.xf), (self.current_window_size.y / State.state.default_window_size.yf))
             self.tile_renderer.first_render = True
         from W_Main_File.Utilities import Inventory_GUI
         if Inventory_GUI.is_inv():
@@ -169,14 +170,14 @@ class Explore(Event_Base.EventBase):
         cell_render_size = (State.state.cell_size * ((State.state.window.width / State.state.default_window_size.xf), (State.state.window.height / State.state.default_window_size.y)))
         self.tile_renderer.on_draw(State.state.render_radius)
         self.tile_renderer.on_draw_tile()
-        arcade.draw_texture_rectangle(((State.state.player.pos.xf * State.state.cell_render_size.xf) - State.state.camera_pos.xf) + State.state.screen_center.xf,
-                                      ((State.state.player.pos.yf * State.state.cell_render_size.yf) - State.state.camera_pos.yf) + State.state.screen_center.yf,
+        arcade.draw_texture_rectangle(((State.state.player.pos.xf * State.state.cell_render_size.xf) - State.state.player.camera_pos.xf) + State.state.screen_center.xf,
+                                      ((State.state.player.pos.yf * State.state.cell_render_size.yf) - State.state.player.camera_pos.yf) + State.state.screen_center.yf,
                                       State.state.cell_render_size.xf * 0.73, State.state.cell_render_size.yf * 0.88, Sprites_.black_circle_sprite, 0, 75)
-        arcade.draw_texture_rectangle(((State.state.player.pos.xf * State.state.cell_render_size.xf) - State.state.camera_pos.xf) + State.state.screen_center.xf,
-                                      ((State.state.player.pos.yf * State.state.cell_render_size.yf) - State.state.camera_pos.yf) + State.state.screen_center.yf,
+        arcade.draw_texture_rectangle(((State.state.player.pos.xf * State.state.cell_render_size.xf) - State.state.player.camera_pos.xf) + State.state.screen_center.xf,
+                                      ((State.state.player.pos.yf * State.state.cell_render_size.yf) - State.state.player.camera_pos.yf) + State.state.screen_center.yf,
                                       State.state.cell_render_size.xf * 0.73, State.state.cell_render_size.yf * 0.88, Sprites_.black_circle_square_sprite, 0, 100)
-        arcade.draw_texture_rectangle(((State.state.player.pos.xf * State.state.cell_render_size.xf) - State.state.camera_pos.xf) + State.state.screen_center.xf,
-                                      ((State.state.player.pos.yf * State.state.cell_render_size.yf) - State.state.camera_pos.yf) + State.state.screen_center.yf,
+        arcade.draw_texture_rectangle(((State.state.player.pos.xf * State.state.cell_render_size.xf) - State.state.player.camera_pos.xf) + State.state.screen_center.xf,
+                                      ((State.state.player.pos.yf * State.state.cell_render_size.yf) - State.state.player.camera_pos.yf) + State.state.screen_center.yf,
                                       State.state.cell_render_size.xf * 0.73, State.state.cell_render_size.yf * 0.88, Sprites_.black_square_circle_square_sprite, 0, 125)
 
         # arcade.draw_circle_filled(center_screen.xf, center_screen.yf, 25, arcade.color.AERO_BLUE)
@@ -189,12 +190,12 @@ class Explore(Event_Base.EventBase):
                          font_name='arial', font_size=(12 * screen_percentage_of_default), anchor_x='center', anchor_y='center')
         if not any(symbol for symbol in Event_Base.symbols if symbol in self.key_offset):
             if Explore.symbol_ == arcade.key.D:
-                arcade.draw_texture_rectangle(((State.state.player.pos.xf * State.state.cell_render_size.xf) - State.state.camera_pos.xf) + State.state.screen_center.xf,
-                                              ((State.state.player.pos.yf * State.state.cell_render_size.yf) - State.state.camera_pos.yf) + State.state.screen_center.yf,
+                arcade.draw_texture_rectangle(((State.state.player.pos.xf * State.state.cell_render_size.xf) - State.state.player.camera_pos.xf) + State.state.screen_center.xf,
+                                              ((State.state.player.pos.yf * State.state.cell_render_size.yf) - State.state.player.camera_pos.yf) + State.state.screen_center.yf,
                                               State.state.cell_render_size.yf * 0.75, State.state.cell_render_size.yf * 0.75, Sprites_.knight_start_2)
             elif Explore.symbol_ == arcade.key.A:
-                arcade.draw_texture_rectangle(((State.state.player.pos.xf * State.state.cell_render_size.xf) - State.state.camera_pos.xf) + State.state.screen_center.xf,
-                                              ((State.state.player.pos.yf * State.state.cell_render_size.yf) - State.state.camera_pos.yf) + State.state.screen_center.yf,
+                arcade.draw_texture_rectangle(((State.state.player.pos.xf * State.state.cell_render_size.xf) - State.state.player.camera_pos.xf) + State.state.screen_center.xf,
+                                              ((State.state.player.pos.yf * State.state.cell_render_size.yf) - State.state.player.camera_pos.yf) + State.state.screen_center.yf,
                                               State.state.cell_render_size.yf * 0.75, State.state.cell_render_size.yf * 0.75, Sprites_.knight_start_flipped)
         else:
             Sprites_.draw_character()
@@ -263,7 +264,7 @@ class Explore(Event_Base.EventBase):
                 if not State.cache_state.selected_list or ((var := Inventory_GUI.get_hovered_item(Vector(x, y))) is not None and not var.selected):
                     if State.cache_state.selected_list is not None:
                         for index in reversed(State.cache_state.selected_list):
-                            if index is not None and (var := State.state.inventory.items[State.state.inventory.get_absolute_index(index, State.state.current_page)]) is not None:
+                            if index is not None and (var := State.state.player.inventory.items[State.state.player.inventory.get_absolute_index(index, State.state.current_page)]) is not None:
                                 # noinspection PyUnboundLocalVariable
                                 var.selected = False
                             # TODO fix index out of range
@@ -282,7 +283,7 @@ class Explore(Event_Base.EventBase):
                     list_of_indexes = [index for index in State.cache_state.selected_list if isinstance(index, int)]
                     # TODO add selling
                     if Inventory_GUI.get_hovered_item(Vector(x, y)) is not None:
-                        gvacfi = {'trash': lambda: State.state.inventory.remove_mass_items(list_of_indexes)}
+                        gvacfi = {'trash': lambda: State.state.player.inventory.remove_mass_items(list_of_indexes)}
                         if gvacfi is not None:
                             if mouse_in_game_box:
                                 self.menu_manager.make_menu('Inv_Item_Menu', Vector(x, y), '', gvacfi, True)
@@ -290,8 +291,8 @@ class Explore(Event_Base.EventBase):
                             print('WAAA?')
                             if self.menu_manager.check_if_mouse_on_menu('Inv_Item_Menu', Vector(x, y)):
                                 self.menu_manager.remove_menu('Inv_Item_Menu')
-                if mouse_in_game_box and Inventory_GUI.get_hovered_item(Vector(x, y)) is None:
-                    gvacfi = {'sort': lambda: State.state.inventory.trim_inventory(True)}
+                if mouse_in_game_box and (Inventory_GUI.get_hovered_item(Vector(x, y)) is None or modifiers & arcade.key.MOD_SHIFT):
+                    gvacfi = {'sort': (lambda: (State.state.player.inventory.trim_inventory(True), State.state.player.inventory.sort_inventory()))}
                     self.menu_manager.make_menu('Inv_Item_Menu', Vector(x, y), '', gvacfi, True)
         else:
             if not self.menu_manager.check_if_mouse_on_menu('Inv_Item_Menu', Vector(x, y)):
@@ -301,7 +302,7 @@ class Explore(Event_Base.EventBase):
             if (Inventory_GUI.is_inv() and Inventory_GUI.get_hovered_item(Vector(x, y)) is not None and modifiers & arcade.key.MOD_CTRL
                     and not self.menu_manager.check_if_mouse_on_menu('Inv_Item_Menu', Vector(x, y))):
                 hovered_item_index = Inventory_GUI.get_hovered_item_index(Vector(x, y))
-                hovered_item = State.state.inventory.items[State.state.inventory.get_absolute_index(hovered_item_index, State.state.current_page)]
+                hovered_item = State.state.player.inventory.items[State.state.player.inventory.get_absolute_index(hovered_item_index, State.state.current_page)]
                 hovered_item.selected = not hovered_item.selected
                 if State.cache_state.selected_list is None:
                     State.cache_state.selected_list = []
@@ -312,8 +313,8 @@ class Explore(Event_Base.EventBase):
                 if State.cache_state.selected_list is not None:
                     for index in reversed(State.cache_state.selected_list):
                         # noinspection PyUnboundLocalVariable
-                        if index is not None and (abs_index := State.state.inventory.get_absolute_index(index, State.state.current_page)) < len(State.state.inventory.items) and (
-                                current_item := State.state.inventory.items[abs_index]):
+                        if index is not None and (abs_index := State.state.player.inventory.get_absolute_index(index, State.state.current_page)) < len(State.state.player.inventory.items) and (
+                                current_item := State.state.player.inventory.items[abs_index]):
                             # noinspection PyUnboundLocalVariable
                             current_item.selected = False
                         State.cache_state.selected_list.remove(index)
@@ -335,7 +336,7 @@ class Explore(Event_Base.EventBase):
             return_dict = {}
             if item.type_ != Item.ItemType.Quest:
                 return_dict['sell'] = lambda: print('Sold item!')
-                return_dict['trash'] = lambda: State.state.inventory.remove_item_not_index(item)
+                return_dict['trash'] = lambda: State.state.player.inventory.remove_item_not_index(item)
             if item.type_ == Item.ItemType.Weapon:
                 pass
             elif item.type_ == Item.ItemType.Armour:
@@ -345,18 +346,25 @@ class Explore(Event_Base.EventBase):
             elif item.type_ == Item.ItemType.Consumable:
                 pass
         elif index_or_item[0] == 'index':
-            return {'trash': lambda: State.state.inventory.remove_item(index_or_item[1], State.state.current_page), 'sell': lambda: print('Sold item!')}
+            return {'trash': lambda: State.state.player.inventory.remove_item(index_or_item[1], State.state.current_page), 'sell': lambda: print('Sold item!')}
         else:
             return None
 
-    @staticmethod
-    def check_action_queue():
-        while Action_Queue.action_queue:
-            action = Action_Queue.action_queue.popleft()
-            action()
+    def check_action_queue(self):
+        if Action_Queue.action_queue:
+            self.delay_actions -= 1
+
+        if self.delay_actions <= 0:
+            while Action_Queue.action_queue:
+                action = Action_Queue.action_queue.popleft()
+                action()
+            self.delay_actions = 2
 
     def on_key_press(self, symbol: int, modifiers: int):
         super().on_key_press(symbol, modifiers)
+        if symbol == arcade.key.S and modifiers & arcade.key.MOD_CTRL:
+            Action_Queue.action_queue.append(Button_Functions.save_button)
+            Event_Base.symbols.clear()
         if symbol == arcade.key.MINUS:
             if modifiers & arcade.key.MOD_SHIFT:
                 State.state.render_radius -= 1
@@ -374,17 +382,17 @@ class Explore(Event_Base.EventBase):
         if symbol == arcade.key.J:
             increment = 10 if not modifiers & arcade.key.MOD_CTRL else 1
             if modifiers & arcade.key.MOD_SHIFT:
-                State.state.camera_pos -= (increment, 0)
+                State.state.player.camera_pos -= (increment, 0)
             else:
-                State.state.camera_pos -= (0, increment)
+                State.state.player.camera_pos -= (0, increment)
         if symbol == arcade.key.K:
             increment = 10 if not modifiers & arcade.key.MOD_CTRL else 1
             if modifiers & arcade.key.MOD_SHIFT:
-                State.state.camera_pos += (increment, 0)
+                State.state.player.camera_pos += (increment, 0)
             else:
-                State.state.camera_pos += (0, increment)
+                State.state.player.camera_pos += (0, increment)
         if symbol == arcade.key.U:
-            State.state.camera_pos = State.state.grid_camera_pos * State.state.cell_render_size
+            State.state.player.camera_pos = State.state.grid_camera_pos * State.state.cell_render_size
         if symbol == arcade.key.PERIOD:
             self.synced = not self.synced
         if symbol == arcade.key.P:
@@ -393,29 +401,38 @@ class Explore(Event_Base.EventBase):
             print(f'Grid Tile Type: {State.state.grid.get(*State.state.player.pos.rounded())}')
             print(f'Player Pos: {State.state.player.pos}')
             print(f'Tile ID: {State.state.get_tile_id(State.state.player.pos.rounded())}')
-            print(f'Camera Pos: {State.state.camera_pos}')
+            print(f'Camera Pos: {State.state.player.camera_pos}')
             print(f'Grid Camera Pos: {State.state.grid_camera_pos_raw}')
+            print([x.sprite for x in State.state.player.inventory.items])
         if symbol == arcade.key.C and not (modifiers & arcade.key.MOD_SHIFT):
-            State.state.camera_pos -= State.state.camera_pos
+            State.state.player.camera_pos -= State.state.player.camera_pos
         if symbol == arcade.key.C and modifiers & arcade.key.MOD_SHIFT:
             State.state.window.center_window()
         if symbol == arcade.key.R:
-            State.state.camera_pos = (State.state.player.pos * State.state.cell_render_size)
+            State.state.player.camera_pos = (State.state.player.pos * State.state.cell_render_size)
         if symbol == arcade.key.B:
             State.state.player.hp -= State.state.player.max_hp
         if symbol == arcade.key.L:
             State.state.debug_mode = not State.state.debug_mode
-        if symbol == arcade.key.I:
+        if symbol == arcade.key.O:
             for num in range(0, 10 if modifiers & arcade.key.MOD_SHIFT else 3):
-                State.state.inventory.add_item(random.choice(tuple(item() for item in Sprites_.item_dict.values())))
+                State.state.player.inventory.add_item(random.choice(tuple(item() for item in Sprites_.item_dict.values())))
+        if symbol == arcade.key.I:
+            if Inventory_GUI.is_inv():
+                Inventory_GUI.hide_inv(self.button_manager)
+            else:
+                Inventory_GUI.show_inv(self.button_manager)
+        if symbol == arcade.key.ESCAPE:
+            Button_Functions.log_out_button(True, self.ui_manager)
         if symbol == arcade.key.A:
             if modifiers & arcade.key.MOD_CTRL:
-                items_on_page = State.state.inventory.get_items_and_indexes_on_page()
+                items_on_page = State.state.player.inventory.get_items_and_indexes_on_page()
                 for item, index in items_on_page:
-                    item.selected = True
-                    if State.cache_state.selected_list is None:
-                        State.cache_state.selected_list = []
-                    State.cache_state.selected_list.append(index)
+                    if item is not None:
+                        item.selected = True
+                        if State.cache_state.selected_list is None:
+                            State.cache_state.selected_list = []
+                        State.cache_state.selected_list.append(index)
         if symbol in self.key_offset:
             if symbol in (arcade.key.A, arcade.key.D):
                 self.__class__.symbol_ = symbol

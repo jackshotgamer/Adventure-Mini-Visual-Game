@@ -114,7 +114,7 @@ class LootTile(Tile.Tile):
                         self.given_item = True
                         return
                     item_to_add = self.get_item_from_loot_result()
-                    State.state.inventory.add_item(item_to_add)
+                    State.state.player.inventory.add_item(item_to_add)
                     self.given_item = True
                 self.waiting += (1 * multipler_speed)
                 if self.waiting >= 60:
