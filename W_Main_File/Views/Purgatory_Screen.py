@@ -100,6 +100,7 @@ class PurgatoryScreen(Event_Base.EventBase):
             Seeding.set_world_seed_from_player_name()
             State.state.clear_current_floor_data(should_clear_grid=False)
 
+
     def on_draw(self):
         super().on_draw()
         arcade.draw_text(self.message, State.state.screen_center.x, State.state.screen_center.y + 150,

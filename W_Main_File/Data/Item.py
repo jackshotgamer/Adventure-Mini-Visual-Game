@@ -71,6 +71,12 @@ class Item:
         return f'<{self.__class__.__name__} name = {self.name!r}, id = {self.id_!r}, type = {self.type_!r}>'
 
 
+class Consumable(Item):
+    def __init__(self, name, id_, stat, quantity, sprite):
+        super().__init__(name, id_, ItemType.Consumable, sprite)
+        self.stat = stat
+        self.quantity = quantity
+
 class Weapon(Item):
     def __init__(self, name, id_, min_attack, max_attack, speed, range_, damage_type: Union[int, DamageType], has_special_move: bool, sprite):
         super().__init__(name, id_, ItemType.Weapon, sprite)

@@ -65,6 +65,7 @@ class Fading(View):
             if self.only_reverse:
                 Data_Saving.SaveManager.load_floor(self.reset_floor_number, State.state.player.realm)
                 State.state.player.floor = self.reset_floor_number
+                print('I got here!')
             return self.reversing_process
 
     def fading_process(self):

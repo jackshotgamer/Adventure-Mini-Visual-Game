@@ -44,7 +44,9 @@ class Combat(Event_Base.EventBase):
         arcade.set_background_color((18, 18, 18))
         arcade.start_render()
         Sprites_.draw_backdrop()
-        arcade.draw_texture_rectangle(State.state.screen_center.xf, State.state.screen_center.yf, 700, 700, Sprites_.combat_terrain)
+        # arcade.draw_texture_rectangle(State.state.screen_center.xf, State.state.screen_center.yf, 700, 700, Sprites_.combat_terrain)
+        # enemy = Enemy_Data.EnemyData(*random.choice(Enemy_Data.enemy_possibilities))
+        arcade.draw_texture_rectangle(State.state.screen_center.xf, State.state.screen_center.yf, 200, 200, Sprites_.death_knight)
         if self.rendered_once == 1:
             State.state.cell_size = Vector((State.state.window.width * 0.5) / 9, (State.state.window.height * 0.625) / 9)
             self.rendered_once = 2

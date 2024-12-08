@@ -55,11 +55,12 @@ class PlayerSelect(Event_Base.EventBase):
         if player_username.lower() == 'guest':
             return
         from W_Main_File.Utilities.Data_Saving import SaveManager
+        from W_Main_File.Utilities.Save_Utils import SavingFunctions
         print(f'Username: {player_username}')
-        SaveManager.load_player_data(player_username)
+        # SaveManager.load_player_data(player_username)
         state_player = State.state.player
         print(f'State Name: {state_player.name}')
-        State.state.player.inventory.load(state_player.name)
+        # State.state.player.inventory.load(state_player.name)
         state_player.meta_data.is_player = True
         state_player.meta_data.is_guest = False
         state_player.meta_data.is_enemy = False
@@ -77,7 +78,9 @@ class PlayerSelect(Event_Base.EventBase):
         elif not State.state.grid.get(0, 0):
             from W_Main_File.Tiles import Home_Tile
             State.state.grid.add(Home_Tile.HomeTile(Vector.Vector(0, 0)))
-        Data_Saving.SaveManager.load_floor(state_player.floor, state_player.realm, force_load=True)
+        # Data_Saving.SaveManager.load_floor(state_player.floor, state_player.realm, force_load=True)
+        SavingFunctions().format_directories()
+        State.state.current_auto_save = SavingFunctions().get_auto_path(True).stem
         self.render_mouse = False
         State.state.window.show_view(Exploration.Explore())
 
@@ -91,11 +94,11 @@ class PlayerSelect(Event_Base.EventBase):
     def buttons(self):
         self.ui_manager.purge_ui_elements()
 
-        self.username = gui.UIInputBox(State.state.screen_center.x, State.state.screen_center.y + 100, 300, 50)
+        self.username = gui.UIInputBox(State.state.screen_center.x, State.state.screen_center.y + 100, 350, 50)
         self.username.text_adapter = LimitText(self.on_username_update)
         self.ui_manager.add_ui_element(self.username)
         self.button_manager.append('Guest', 'Login as Guest', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y + 150), Vector.Vector(250, 50), on_click=self.guest_button)
-        self.button_manager.append('Enter', 'Enter', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y + 50), Vector.Vector(250, 50), on_click=self.enter_button)
+        self.button_manager.append('Enter', 'Load From Newest Save', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y + 50), Vector.Vector(325, 50), on_click=self.enter_button)
         self.button_manager.append('Quit', 'Quit', Vector.Vector(State.state.screen_center.x, State.state.screen_center.y), Vector.Vector(100, 50), on_click=self.exit_button)
 
     def check_if_resized(self):

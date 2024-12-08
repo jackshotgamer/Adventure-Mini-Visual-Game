@@ -83,6 +83,22 @@ class AttributeSupervisor:
     def resistances(self):
         return self._resistances.copy()
 
+    def modify_applied_attributes(self, add_or_remove_or_get, origin, *args):
+        if add_or_remove_or_get == 'get':
+            return self.applied_attributes[origin]
+        elif add_or_remove_or_get == 'remove' and args:
+            if args[0] == 'all':
+                del self.applied_attributes[origin]
+            else:
+                attributes = self.applied_attributes[origin]
+                for attribute in args:
+                    for match in reversed([l1[1] for l1 in [[x[1], i] for i, x in enumerate(attributes)] if l1[0] == attribute]):
+                        del attributes[match]
+        elif add_or_remove_or_get == 'add' and args:
+            if origin not in self.applied_attributes:
+                pass
+            self.applied_attributes[origin].append([args[0], args[1], args[2], args[3]])
+
     def apply(self, damage: dict):
         total_damage = 0
         for damage_type, damage in damage.items():
@@ -144,6 +160,7 @@ class AttributeSupervisor:
 
 
 from pprint import pprint
+
 attribute_s = AttributeSupervisor()
 attribute_s.set(DamageType.Blunt, 1.5, 'ArmourA')
 attribute_s.set(DamageType.Piercing, 1.5, 'ArmourA')

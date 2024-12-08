@@ -8,7 +8,7 @@ from W_Main_File.Data import Sprites_, Item
 from W_Main_File.Essentials import State
 import time
 import random
-from W_Main_File.Tiles import Loot_Functions, Trapdoor_Functions, Trap_Functions, Enemy
+from W_Main_File.Tiles import Loot_Functions, Trapdoor_Functions, Trap_Functions, Enemy, Village_Functions
 from W_Main_File.Utilities.Vector import Vector
 
 
@@ -269,8 +269,8 @@ class Explore(Event_Base.EventBase):
                                 var.selected = False
                             # TODO fix index out of range
                             State.cache_state.selected_list.remove(index)
-                    item = Inventory_GUI.get_hovered_item_index(Vector(x, y))
-                    gvacfi = self.get_values_and_callbacks_from_item(item, ('index', item))
+                    item = Inventory_GUI.get_hovered_item(Vector(x, y))
+                    gvacfi = self.get_values_and_callbacks_from_item(item, ('item', item))
                     if gvacfi is not None:
                         if Inventory_GUI.get_hovered_item(Vector(x, y)) is not None:
                             if mouse_in_game_box:
@@ -332,7 +332,7 @@ class Explore(Event_Base.EventBase):
 
     @staticmethod
     def get_values_and_callbacks_from_item(item, index_or_item):
-        if index_or_item[0] == 'item':
+        if index_or_item[0] == 'item' and item is not None:
             return_dict = {}
             if item.type_ != Item.ItemType.Quest:
                 return_dict['sell'] = lambda: print('Sold item!')
@@ -344,7 +344,10 @@ class Explore(Event_Base.EventBase):
             elif item.type_ == Item.ItemType.Accessory:
                 pass
             elif item.type_ == Item.ItemType.Consumable:
-                pass
+                item: Item.Consumable
+                if item.stat == "Health":
+                    return_dict['use'] = lambda: (State.state.heal(item.quantity), State.state.player.inventory.remove_item_not_index(item))
+            return return_dict
         elif index_or_item[0] == 'index':
             return {'trash': lambda: State.state.player.inventory.remove_item(index_or_item[1], State.state.current_page), 'sell': lambda: print('Sold item!')}
         else:
@@ -362,6 +365,33 @@ class Explore(Event_Base.EventBase):
 
     def on_key_press(self, symbol: int, modifiers: int):
         super().on_key_press(symbol, modifiers)
+        if symbol == arcade.key.Y:
+            print(Sprites_.plains_weight)
+            if modifiers & arcade.key.MOD_SHIFT:
+                Sprites_.plains_weight -= 10
+            else:
+                Sprites_.plains_weight += 10
+            tempvar = Sprites_.sprite_alias_o
+            tempvar['0.1'] = (tempvar['0.1'][0], Sprites_.plains_weight)
+            State.state.sprite_options = Sprites_.sprite_alias_options.get(State.state.player.realm, tempvar)
+            State.state.texture_mapping.clear()
+            State.state.grid.interactable_tiles.clear()
+        if symbol == arcade.key.KEY_5:
+            if modifiers & arcade.key.MOD_SHIFT:
+                State.state.give_xp(5)
+            elif modifiers & arcade.key.MOD_CTRL:
+                print(State.state.xp_to_level)
+            else:
+                State.state.give_xp(1)
+                print(State.state.player.xp)
+        if symbol == arcade.key.KEY_6:
+            if modifiers & arcade.key.MOD_SHIFT:
+                State.state.give_gold(5)
+            elif modifiers & arcade.key.MOD_CTRL:
+                print(State.state.player.gold)
+            else:
+                State.state.give_gold(1)
+                print(State.state.player.xp)
         if symbol == arcade.key.S and modifiers & arcade.key.MOD_CTRL:
             Action_Queue.action_queue.append(Button_Functions.save_button)
             Event_Base.symbols.clear()
@@ -404,6 +434,9 @@ class Explore(Event_Base.EventBase):
             print(f'Camera Pos: {State.state.player.camera_pos}')
             print(f'Grid Camera Pos: {State.state.grid_camera_pos_raw}')
             print([x.sprite for x in State.state.player.inventory.items])
+            print(State.state.player.deaths)
+            print(State.Seeding.world_seed)
+            print(State.Seeding.get_floor_seed())
         if symbol == arcade.key.C and not (modifiers & arcade.key.MOD_SHIFT):
             State.state.player.camera_pos -= State.state.player.camera_pos
         if symbol == arcade.key.C and modifiers & arcade.key.MOD_SHIFT:
@@ -510,6 +543,14 @@ class Explore(Event_Base.EventBase):
                     State.state.grid.add(trapdoor)
                     if State.state.debug_mode:
                         print('Trapdoor')
+                elif (
+                        State.state.get_tile_id(State.state.player.pos.rounded()) in Sprites_.village_options
+                        and not State.state.grid.get(*State.state.player.pos.rounded())
+                ):
+                    village = Village_Functions.VillageTile(Vector(new_player_pos.x, new_player_pos.y))
+                    State.state.grid.add(village)
+                    if State.state.debug_mode:
+                        print('Village')
                 State.state.grid.add_visited_tile(new_player_pos)
 
         after_update()

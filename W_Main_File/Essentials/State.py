@@ -1,4 +1,5 @@
 import json
+import math
 import pathlib
 import random
 from typing import List, Dict, Any, Union, Type
@@ -39,6 +40,8 @@ class State:
         self.sprite_options = Sprites_.sprite_alias_options.get(self.player.realm, Sprites_.sprite_alias_o)
         self.safe_sprite_alias = Sprites_.safe_sprite_alias
         self.window = None
+        self.current_official_save = 1
+        self.current_auto_save = 1
         self.grid_storage = {
             'Overworld': Grid.Grid(),
             'Purgatory': Grid.Grid(),
@@ -113,6 +116,8 @@ class State:
         rnjesus = Seeding.seed_for_vector(poss)
         if xy not in self.texture_mapping:
             split_lists = self.split_list(list(self.sprite_options.values()))
+            print(split_lists[1])
+            print(self.sprite_options)
             sprite_textures = rnjesus.choices(tuple(self.sprite_options), k=1, weights=split_lists[1])
             # 20, 15, 10, 5, 3,
             self.texture_mapping[xy] = rnjesus.choice(sprite_textures)
@@ -144,7 +149,20 @@ class State:
                 yield x, y
 
     def give_gold(self, amount):
-        self.player.gold += round((((self.player.floor - 1) / 100) + 1) * amount)
+        self.player.gold += round((((self.player.floor - 1) / 10) + 1) * amount)
+
+    def heal(self, amount):
+        self.player.hp = min(self.player.hp + amount, self.player.max_hp)
+
+    def give_xp(self, amount):
+        print(math.ceil((((self.player.pos.x**2 + self.player.pos.y**2)**0.5) / 100) * amount))
+        self.player.xp += math.ceil((((self.player.pos.x**2 + self.player.pos.y**2)**0.5) / 100) * amount)
+        if self.player.xp > self.xp_to_level:
+            self.player.lvl += 1
+
+    @property
+    def xp_to_level(self):
+        return self.player.lvl * 10 + (self.player.lvl - 1) * 10
 
     def clear_current_floor_data(self, should_clear_grid=True):
         self.texture_mapping.clear()

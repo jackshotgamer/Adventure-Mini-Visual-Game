@@ -45,6 +45,12 @@ plains_trap_sprite = load_texture(Path('Sprites') / 'Plains_Tile_0_TRAP.png')
 forest_sprite_1 = load_texture(Path('Sprites') / 'Forest_Tile_2.png')
 forest_sprite_11 = load_texture(Path('Sprites') / 'Forest_Tile_2.1.png')
 forest_sprite_12 = load_texture(Path('Sprites') / 'Forest_Tile_2.2.png')
+forest_sprite_13 = load_texture(Path('Sprites') / 'laubforest4_plains.png')
+forest_sprite_14 = load_texture(Path('Sprites') / 'laubforest5_plains.png')
+purgatory_forest_sprite_1 = load_texture(Path('Sprites') / 'purgatory_woods.png')
+purgatory_forest_sprite_2 = load_texture(Path('Sprites') / 'purgatory_woods2.png')
+purgatory_forest_sprite_1b = load_texture(Path('Sprites') / 'purgatory_woods_blooming.png')
+purgatory_forest_sprite_2b = load_texture(Path('Sprites') / 'purgatory_woods_blooming2.png')
 forest_trap_sprite = load_texture(Path('Sprites') / 'Forest_Tile_2.0_TRAP.png')
 mountain_sprite_1 = load_texture(Path('Sprites') / 'Mountain_Tile_1.png')
 mountain_sprite_2 = load_texture(Path('Sprites') / 'Mountain_Tile_2.png')
@@ -53,6 +59,7 @@ mountain_sprite_4 = load_texture(Path('Sprites') / 'Mountain_Tile_4.png')
 village_sprite = load_texture(Path('Sprites') / 'Village_Tile_1.png')
 village_sprite_02 = load_texture(Path('Sprites') / 'village_2_plains.png')
 trapdoor_sprite = load_texture(Path('Sprites') / 'Trapdoor_Tile_0.png')
+purgatory_trapdoor_sprite = load_texture(Path('Sprites') / 'purgatory_portal.png')
 home_sprite = load_texture(Path('Sprites') / 'Home_Tile.png')
 chest_sprite = load_texture(Path('Sprites') / 'Chest_0.png')
 chest_body_sprite = load_texture(Path('Sprites') / 'Chest_Body_0.png')
@@ -121,6 +128,7 @@ item_dict = OrderedDict(
                                        20, 50, 4, 6, Item.DamageType.Piercing, False, steel_billhook),
     steel_sword=lambda: Item.Weapon('Steel Sword', 'steel_swordDefaultWeapon',
                                     35, 45, 7, 3, Item.DamageType.Cutting, False, steel_sword),
+    health_potion=lambda: Item.Consumable('Health Potion',  'health_potionDefaultConsumable', 'Health', 100, Null),
 )
 
 # 3 = Desert
@@ -139,19 +147,21 @@ ranges = {
 }
 
 safe_sprite_alias = ['0.1', '0.2', '0.3', '0.4']
-
+plains_weight = 12
 sprite_alias_o = {
-    '0.1': (plains_sprite_01, 11),
+    '0.1': (plains_sprite_01, plains_weight),
     '0.2': (plains_sprite_02, 11),
     '0.3': (plains_sprite_03, 11),
     '0.4': (plains_sprite_04, 11),
     '0.5': (plains_trap_sprite, 1.1),
     '1': (forest_sprite_1, 7),
-    '1.1': (forest_sprite_11, 7),
-    '1.2': (forest_sprite_12, 7),
+    '1.1': (forest_sprite_11, 2),
+    '1.2': (forest_sprite_12, 2),
+    '1.3': (forest_sprite_13, 2),
+    '1.4': (forest_sprite_14, 2),
     '1.5': (forest_trap_sprite, 1.1),
-    '2': (mountain_sprite_1, 2),
-    '2.1': (mountain_sprite_2, 2),
+    '2': (mountain_sprite_1, 1),
+    '2.1': (mountain_sprite_2, 1),
     '2.2': (mountain_sprite_3, 3),
     '2.3': (mountain_sprite_4, 3),
     '4': (village_sprite, 0.8),
@@ -166,9 +176,11 @@ sprite_alias_p = {
     '0.3': (purgatory_plain_01, 11),
     '0.4': (purgatory_plain_02, 11),
     '0.5': (plains_trap_sprite, 1.1),
-    '1': (forest_sprite_1, 7),
-    '1.1': (forest_sprite_11, 7),
-    '1.2': (forest_sprite_12, 7),
+    '1': (purgatory_forest_sprite_1, 7),
+    '1.1': (purgatory_forest_sprite_1b, 7),
+    '1.2': (purgatory_forest_sprite_2, 7),
+    '1.3': (purgatory_forest_sprite_2b, 7),
+    '1.4': (purgatory_forest_sprite_1, 7),
     '1.5': (forest_trap_sprite, 1.1),
     '2': (purgatory_mountain_01, 2),
     '2.1': (purgatory_mountain_02, 2),
@@ -176,7 +188,7 @@ sprite_alias_p = {
     '2.3': (purgatory_mountain_02, 3),
     '4': (village_sprite, 0.8),
     '4.1': (village_sprite_02, 0.8),
-    '10': (trapdoor_sprite, 1)
+    '10': (purgatory_trapdoor_sprite, 1)
 }
 
 sprite_alias_options = {
@@ -184,10 +196,11 @@ sprite_alias_options = {
     'Purgatory': sprite_alias_p,
 }
 
-loot_options = {'1', '1.1', '1.2', '2', '2.1', '2.2', '2.3'}
-enemy_options = {'1', '1.1', '1.2'}
+loot_options = {'1', '1.1', '1.2', '1.3', '1.4', '2', '2.1', '2.2', '2.3'}
+enemy_options = {'1', '1.1', '1.2', '1.3', '1.4'}
 trapdoor_options = ('10',)
 trap_options = ('0.5', '1.5')
+village_options = ('4', '4.1')
 excluded_tiles = ('0.1', '0.2', '0.3', '0.4', '0.5', '1.5', '10')
 
 CHEST_OPENING_FRAMES = [
@@ -222,6 +235,11 @@ def texture_to_sprite(image, width=None, height=None):
 
 def nullify_image_area(image, size):
     image_array = np.array(image)
+    print()
+    print()
+    print(f'First: {image_array}')
+    print()
+    print()
     image_array[int((image.height * .5) - (size.y * .5)): int((image.height * .5) + (size.y * .5)), int((image.width * .5) - (size.x * .5)): int((image.width * .5) + (size.x * .5))] = (0, 0, 0, 0)
     return Image.fromarray(image_array)
 
@@ -257,6 +275,7 @@ def update_backdrop():
         current_backdrop_frame += 1 if not reversing else -1
     if backdrop_frame_count > 20:
         backdrop_frame_count = 1
+
 
 
 crop_current_backdrop_frame = 0

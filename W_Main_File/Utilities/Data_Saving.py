@@ -13,7 +13,31 @@ class IST(Enum):
     assign_image_to_sprites = auto()
     both = auto()
 
-
+"""
+PLAYERDATA
+    -Player_name:
+        -Autosaves:
+            - Auto3:
+                - 1_Overworld.pickle
+                - inv.pickle
+                - player.pickle
+            - Auto4:
+                - 1_Overworld.pickle
+                - inv.pickle
+                - player.pickle
+            - Auto5:
+                - 1_Overworld.pickle
+                - inv.pickle
+                - player.pickle
+        -Off_Save_1: 
+            - 1_Overworld.pickle
+            - inv.pickle
+            - player.pickle
+        -Off_Save_2:
+                - 1_Overworld.pickle
+                - inv.pickle
+                - player.pickle
+"""
 class SaveManager:
     playerdata_path = pathlib.Path('./PLAYERDATA')
 
