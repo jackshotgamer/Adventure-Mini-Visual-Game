@@ -159,25 +159,25 @@ class AttributeSupervisor:
         return a
 
 
-from pprint import pprint
+from pprint import pprint as prettyprin
 
 attribute_s = AttributeSupervisor()
 attribute_s.set(DamageType.Blunt, 1.5, 'ArmourA')
 attribute_s.set(DamageType.Piercing, 1.5, 'ArmourA')
 attribute_s.set(DamageType.Air_Elemental, 0.5, 'ArmourA')
 attribute_s.set(DamageType.Earth_Elemental, 0.7, 'ArmourC')
-pprint(f'{attribute_s.resistances}')
-print('--------------------------------')
+prettyprin(f'{attribute_s.resistances}')
+prettyprin('--------------------------------')
 attribute_s.modify(DamageType.Spectral, 0.5, 'ArmourA')
 attribute_s.modify(DamageType.Cutting, 0.1, 'ArmourA')
 attribute_s.modify(DamageType.Blunt, 0.1, 'ArmourC')
 attribute_s.modify(DamageType.Fire_Elemental, 1.3, 'ArmourC')
-pprint(f'{attribute_s.resistances}')
-print('--------------------------------')
+prettyprin(f'{attribute_s.resistances}')
+prettyprin('--------------------------------')
 attribute_s.set_and_modify({DamageType.Piercing: ([1, 'ArmourA', 'mod'], [1.1, 'ArmourB', 'mod'], [1.4, 'ArmourC', 'mod'], [0.75, 'ArmourD', 'mod'], [0.9, 'ArmourE', 'mod']),
                             DamageType.Blunt: ([1.5, 'ArmourA', 'mod'], [0.9, 'ArmourB', 'mod'], [0.6, 'ArmourC', 'mod'], [1.25, 'ArmourD', 'mod'], [1.1, 'ArmourE', 'mod'])})
-pprint(f'{attribute_s.resistances}')
-print('--------------------------------')
+prettyprin(f'{attribute_s.resistances}')
+prettyprin('--------------------------------')
 attribute_s.remove_with_origin('ArmourA')
-pprint(f'{attribute_s.resistances}')
-print('--------------------------------')
+prettyprin(f'{attribute_s.resistances}')
+prettyprin('--------------------------------')

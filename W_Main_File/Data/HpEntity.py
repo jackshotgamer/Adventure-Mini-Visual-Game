@@ -33,6 +33,8 @@ class HpEntity:
             DamageType.Air_Elemental: 1,
         }
 
+    
+
     @property
     def resistances(self):
         return self.resistance_dict

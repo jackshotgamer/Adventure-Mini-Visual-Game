@@ -13,7 +13,7 @@ class HomeTile(Tile.Tile):
         return max(1, int((State.state.player.max_hp - State.state.player.hp) * 0.1))
 
     def on_render(self, center, top_left, cell_size):
-        arcade.draw_rectangle_outline(center.xf, center.yf, State.state.cell_render_size.xf, State.state.cell_render_size.yf, arcade.color.BRONZE, 2)
+        # arcade.draw_rectangle_outline(center.xf, center.yf, State.state.cell_render_size.xf, State.state.cell_render_size.yf, arcade.color.BRONZE, 2)
         arcade.draw_texture_rectangle(center.xf, center.yf, State.state.cell_render_size.xf, State.state.cell_render_size.yf, Sprites_.home_sprite)
 
     def on_render_foreground(self, center, top_left, cell_size):

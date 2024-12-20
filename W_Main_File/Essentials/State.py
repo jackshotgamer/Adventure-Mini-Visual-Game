@@ -38,6 +38,7 @@ class State:
         self.player = HpEntity.PlayerEntity('', Vector.Vector(0, 0), 1000, 1000, 0, 0, 1, 1)
         from W_Main_File.Data import Sprites_
         self.sprite_options = Sprites_.sprite_alias_options.get(self.player.realm, Sprites_.sprite_alias_o)
+        self.home_tile_sprite = Sprites_.home_sprite
         self.safe_sprite_alias = Sprites_.safe_sprite_alias
         self.window = None
         self.current_official_save = 1
@@ -115,13 +116,15 @@ class State:
         xy = f'{int(x)} {int(y)}'
         rnjesus = Seeding.seed_for_vector(poss)
         if xy not in self.texture_mapping:
-            split_lists = self.split_list(list(self.sprite_options.values()))
-            print(split_lists[1])
-            print(self.sprite_options)
-            sprite_textures = rnjesus.choices(tuple(self.sprite_options), k=1, weights=split_lists[1])
-            # 20, 15, 10, 5, 3,
-            self.texture_mapping[xy] = rnjesus.choice(sprite_textures)
-            self.is_new_tile = True
+            if xy == '0 0' and self.player.floor == 1:
+                self.texture_mapping[xy] = "9"
+                self.is_new_tile = True
+            else:
+                split_lists = self.split_list(list(self.sprite_options.values()))
+                sprite_textures = rnjesus.choices(tuple(self.sprite_options), k=1, weights=split_lists[1])
+                # 20, 15, 10, 5, 3,
+                self.texture_mapping[xy] = rnjesus.choice(sprite_textures)
+                self.is_new_tile = True
         try:
             return self.sprite_options[self.texture_mapping[xy]][0]
         except KeyError:

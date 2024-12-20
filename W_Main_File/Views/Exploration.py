@@ -8,7 +8,7 @@ from W_Main_File.Data import Sprites_, Item
 from W_Main_File.Essentials import State
 import time
 import random
-from W_Main_File.Tiles import Loot_Functions, Trapdoor_Functions, Trap_Functions, Enemy, Village_Functions
+from W_Main_File.Tiles import Loot_Functions, Trapdoor_Functions, Trap_Functions, Enemy, Village_Functions, Home_Tile
 from W_Main_File.Utilities.Vector import Vector
 
 
@@ -249,18 +249,20 @@ class Explore(Event_Base.EventBase):
         origin_pos_se = Inventory_GUI.inventory_se()
         origin_pos_sw = Vector(origin_pos_nw.x, origin_pos_se.y)
         origin_pos_ne = Vector(origin_pos_se.x, origin_pos_nw.y)
-        print(f'Mouse button pressed: {"LEFT_CLICK" if button == arcade.MOUSE_BUTTON_LEFT else "RIGHT_CLICK" if button == arcade.MOUSE_BUTTON_RIGHT else "MIDDLE CLICK"}')
+        if State.state.debug_mode:
+            print(f'Mouse button pressed: {"LEFT_CLICK" if button == arcade.MOUSE_BUTTON_LEFT else "RIGHT_CLICK" if button == arcade.MOUSE_BUTTON_RIGHT else "MIDDLE CLICK"}')
         if not ((origin_pos_sw.x < x < origin_pos_ne.x) and (origin_pos_sw.y < y < origin_pos_ne.y)):
             mouse_in_game_box = False
         else:
             mouse_in_game_box = True
         if button == arcade.MOUSE_BUTTON_RIGHT:
             if Inventory_GUI.is_inv():
-                print(self.menu_manager.menus)
-                print(mouse_in_game_box)
-                print(Inventory_GUI.get_hovered_item(Vector(x, y)))
+                if State.state.debug_mode:
+                    print(self.menu_manager.menus)
+                    print(mouse_in_game_box)
+                    print(Inventory_GUI.get_hovered_item(Vector(x, y)))
+                    print('Step 1')
                 Inventory_GUI._menu_toggle = True
-                print('Step 1')
                 if not State.cache_state.selected_list or ((var := Inventory_GUI.get_hovered_item(Vector(x, y))) is not None and not var.selected):
                     if State.cache_state.selected_list is not None:
                         for index in reversed(State.cache_state.selected_list):
@@ -279,7 +281,8 @@ class Explore(Event_Base.EventBase):
                         if self.menu_manager.check_if_mouse_on_menu('Inv_Item_Menu', Vector(x, y)):
                             self.menu_manager.remove_menu('Inv_Item_Menu')
                 elif mouse_in_game_box:
-                    print('Step 2')
+                    if State.state.debug_mode:
+                        print('Step 2')
                     list_of_indexes = [index for index in State.cache_state.selected_list if isinstance(index, int)]
                     # TODO add selling
                     if Inventory_GUI.get_hovered_item(Vector(x, y)) is not None:
@@ -365,7 +368,7 @@ class Explore(Event_Base.EventBase):
 
     def on_key_press(self, symbol: int, modifiers: int):
         super().on_key_press(symbol, modifiers)
-        if symbol == arcade.key.Y:
+        if symbol == arcade.key.Y and State.state.player.meta_data.is_me:
             print(Sprites_.plains_weight)
             if modifiers & arcade.key.MOD_SHIFT:
                 Sprites_.plains_weight -= 10
@@ -376,56 +379,58 @@ class Explore(Event_Base.EventBase):
             State.state.sprite_options = Sprites_.sprite_alias_options.get(State.state.player.realm, tempvar)
             State.state.texture_mapping.clear()
             State.state.grid.interactable_tiles.clear()
-        if symbol == arcade.key.KEY_5:
+        if symbol == arcade.key.KEY_5 and State.state.player.meta_data.is_me:
             if modifiers & arcade.key.MOD_SHIFT:
                 State.state.give_xp(5)
             elif modifiers & arcade.key.MOD_CTRL:
                 print(State.state.xp_to_level)
             else:
                 State.state.give_xp(1)
-                print(State.state.player.xp)
-        if symbol == arcade.key.KEY_6:
+        if symbol == arcade.key.KEY_6 and State.state.player.meta_data.is_me:
             if modifiers & arcade.key.MOD_SHIFT:
                 State.state.give_gold(5)
-            elif modifiers & arcade.key.MOD_CTRL:
-                print(State.state.player.gold)
             else:
                 State.state.give_gold(1)
-                print(State.state.player.xp)
         if symbol == arcade.key.S and modifiers & arcade.key.MOD_CTRL:
             Action_Queue.action_queue.append(Button_Functions.save_button)
             Event_Base.symbols.clear()
-        if symbol == arcade.key.MINUS:
+        if symbol == arcade.key.MINUS and State.state.player.meta_data.is_me:
             if modifiers & arcade.key.MOD_SHIFT:
-                State.state.render_radius -= 1
+                if modifiers & arcade.key.MOD_CTRL:
+                    State.state.render_radius = 4
+                else:
+                    State.state.render_radius -= 1
             elif modifiers & arcade.key.MOD_CTRL:
                 State.state.cell_size = Vector((State.state.window.width * 0.5) / 9, (State.state.window.height * 0.625) / 9)
             else:
                 State.state.cell_size -= 10
-        if symbol == arcade.key.EQUAL:
+        if symbol == arcade.key.EQUAL and State.state.player.meta_data.is_me:
             if modifiers & arcade.key.MOD_SHIFT:
-                State.state.render_radius += 1
+                if modifiers & arcade.key.MOD_CTRL:
+                    State.state.render_radius = 4
+                else:
+                    State.state.render_radius += 1
             elif modifiers & arcade.key.MOD_CTRL:
-                State.state.cell_size = Vector(100, 100)
+                State.state.cell_size = Vector((State.state.window.width * 0.5) / 9, (State.state.window.height * 0.625) / 9)
             else:
                 State.state.cell_size += 10
-        if symbol == arcade.key.J:
+        if symbol == arcade.key.J and State.state.player.meta_data.is_me:
             increment = 10 if not modifiers & arcade.key.MOD_CTRL else 1
             if modifiers & arcade.key.MOD_SHIFT:
-                State.state.player.camera_pos -= (increment, 0)
-            else:
-                State.state.player.camera_pos -= (0, increment)
-        if symbol == arcade.key.K:
-            increment = 10 if not modifiers & arcade.key.MOD_CTRL else 1
-            if modifiers & arcade.key.MOD_SHIFT:
-                State.state.player.camera_pos += (increment, 0)
+                State.state.player.camera_pos += (0, -increment)
             else:
                 State.state.player.camera_pos += (0, increment)
-        if symbol == arcade.key.U:
+        if symbol == arcade.key.K and State.state.player.meta_data.is_me:
+            increment = 10 if not modifiers & arcade.key.MOD_CTRL else 1
+            if modifiers & arcade.key.MOD_SHIFT:
+                State.state.player.camera_pos += (-increment, 0)
+            else:
+                State.state.player.camera_pos += (increment, 0)
+        if symbol == arcade.key.U and State.state.player.meta_data.is_me:
             State.state.player.camera_pos = State.state.grid_camera_pos * State.state.cell_render_size
-        if symbol == arcade.key.PERIOD:
+        if symbol == arcade.key.PERIOD and State.state.player.meta_data.is_me:
             self.synced = not self.synced
-        if symbol == arcade.key.P:
+        if symbol == arcade.key.P and State.state.player.meta_data.is_me:
             print(f'Realm: {State.state.player.realm}')
             print(f'Cell Render Size: {State.state.cell_render_size}')
             print(f'Grid Tile Type: {State.state.grid.get(*State.state.player.pos.rounded())}')
@@ -437,17 +442,17 @@ class Explore(Event_Base.EventBase):
             print(State.state.player.deaths)
             print(State.Seeding.world_seed)
             print(State.Seeding.get_floor_seed())
-        if symbol == arcade.key.C and not (modifiers & arcade.key.MOD_SHIFT):
+        if symbol == arcade.key.C and not (modifiers & arcade.key.MOD_SHIFT) and State.state.player.meta_data.is_me:
             State.state.player.camera_pos -= State.state.player.camera_pos
         if symbol == arcade.key.C and modifiers & arcade.key.MOD_SHIFT:
             State.state.window.center_window()
-        if symbol == arcade.key.R:
+        if symbol == arcade.key.R and State.state.player.meta_data.is_me:
             State.state.player.camera_pos = (State.state.player.pos * State.state.cell_render_size)
-        if symbol == arcade.key.B:
-            State.state.player.hp -= State.state.player.max_hp
-        if symbol == arcade.key.L:
+        if symbol == arcade.key.B and State.state.player.meta_data.is_me:
+            State.state.player.hp -= 100
+        if symbol == arcade.key.L and State.state.player.meta_data.is_me:
             State.state.debug_mode = not State.state.debug_mode
-        if symbol == arcade.key.O:
+        if symbol == arcade.key.O and State.state.player.meta_data.is_me:
             for num in range(0, 10 if modifiers & arcade.key.MOD_SHIFT else 3):
                 State.state.player.inventory.add_item(random.choice(tuple(item() for item in Sprites_.item_dict.values())))
         if symbol == arcade.key.I:
@@ -489,7 +494,7 @@ class Explore(Event_Base.EventBase):
         else:
             if tile := State.state.grid.get(*State.state.player.pos.rounded()):
                 tile.key_down(symbol, modifiers)
-        if symbol == arcade.key.NUM_7:
+        if symbol == arcade.key.NUM_7 and State.state.player.meta_data.is_me:
             State.state.change_realm('Purgatory' if State.state.player.realm == 'Overworld' else 'Overworld')
             self.tile_renderer.first_render = True
             if State.state.debug_mode:
@@ -551,6 +556,14 @@ class Explore(Event_Base.EventBase):
                     State.state.grid.add(village)
                     if State.state.debug_mode:
                         print('Village')
+                elif (
+                        State.state.get_tile_id(State.state.player.pos.rounded()) in Sprites_.home_options
+                        and not State.state.grid.get(*State.state.player.pos.rounded())
+                ):
+                    home = Home_Tile.HomeTile(Vector(new_player_pos.x, new_player_pos.y))
+                    State.state.grid.add(home)
+                    if State.state.debug_mode:
+                        print('Home')
                 State.state.grid.add_visited_tile(new_player_pos)
 
         after_update()

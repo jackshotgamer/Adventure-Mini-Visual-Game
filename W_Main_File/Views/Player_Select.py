@@ -10,7 +10,7 @@ import sys
 # noinspection PyPackages
 from . import Event_Base
 from collections import namedtuple
-
+from Main import admin_perms
 
 class CursorPriorityManager(gui.UIManager):
     def on_draw(self):
@@ -32,7 +32,7 @@ class PlayerSelect(Event_Base.EventBase):
         self.current_window_size = Vector.Vector(1000, 800)
         self.incorrect_password_end = 0
         self.buttons()
-        self.player_data = PlayerDataTemplate(HpEntity.PlayerEntity('Guest', Vector.Vector(0, 0), 1000, 1000, 0, 0, 1, 1, Meta_Data.MetaData(True, True), 0, 'Overworld'))
+        self.player_data = PlayerDataTemplate(HpEntity.PlayerEntity('Guest', Vector.Vector(0, 0), 1000, 1000, 0, 0, 1, 1, Meta_Data.MetaData(True, True, is_me=admin_perms), 0, 'Overworld'))
         State.state.clear_current_floor_data()
 
     def on_username_update(self, player):
@@ -42,10 +42,12 @@ class PlayerSelect(Event_Base.EventBase):
         from W_Main_File.Essentials.State import state
         import pickle
         if not (state.player_data_path / player / 'player.pickle').exists():
-            self.player_data = PlayerDataTemplate(HpEntity.PlayerEntity('Guest', Vector.Vector(0, 0), 1000, 1000, 0, 0, 1, 1, Meta_Data.MetaData(True, True), 0, 'Overworld'))
+            self.player_data = PlayerDataTemplate(HpEntity.PlayerEntity('Guest', Vector.Vector(0, 0), 1000, 1000, 0, 0, 1, 1, Meta_Data.MetaData(True, True, is_me=admin_perms), 0, 'Overworld'))
+            self.player_data = PlayerDataTemplate(HpEntity.PlayerEntity('Guest', Vector.Vector(0, 0), 1000, 1000, 0, 0, 1, 1, Meta_Data.MetaData(True, True, is_me=admin_perms), 0, 'Overworld'))
             return
         with open((state.player_data_path / player / 'player.pickle'), 'rb') as file:
             data = pickle.load(file)
+            data['player'].pos = data['player'].pos.rounded()
             self.player_data = PlayerDataTemplate(data['player'])
 
     def enter_button(self):
@@ -57,13 +59,14 @@ class PlayerSelect(Event_Base.EventBase):
         from W_Main_File.Utilities.Data_Saving import SaveManager
         from W_Main_File.Utilities.Save_Utils import SavingFunctions
         print(f'Username: {player_username}')
-        # SaveManager.load_player_data(player_username)
+        SaveManager.load_player_data(player_username)
         state_player = State.state.player
         print(f'State Name: {state_player.name}')
         # State.state.player.inventory.load(state_player.name)
         state_player.meta_data.is_player = True
         state_player.meta_data.is_guest = False
         state_player.meta_data.is_enemy = False
+        state_player.meta_data.is_me = admin_perms
         from W_Main_File.Utilities import Inventory_GUI
         Inventory_GUI._inventory_toggle = False
         State.state.preoccupied = False
@@ -119,6 +122,7 @@ class PlayerSelect(Event_Base.EventBase):
         state.meta_data.is_player = False
         state.meta_data.is_guest = True
         state.meta_data.is_enemy = False
+        state.meta_data.is_me = admin_perms
         state.pos = Vector.Vector(0, 0)
         state.max_hp = 1000
         state.hp = 1000

@@ -74,6 +74,7 @@ knight_start = load_texture(Path('Sprites') / 'Knight_Sprite_0_Start.png')
 knight_start_2 = load_texture(Path('Sprites') / 'Knight_Sprite_0_Start_2_Foot.png')
 knight_start_flipped = load_texture(Path('Sprites') / 'Knight_Sprite_0_Start_2_Foot_Flipped.png')
 Null = load_texture(Path('Sprites') / 'X.png')
+health_potion = load_texture(Path('Sprites') / 'Health_Potion.png')
 arrow_button_dark_left = load_texture(Path('Sprites') / 'ButtonArrow_DarkLeft.png')
 arrow_button_dark_right = load_texture(Path('Sprites') / 'ButtonArrow_DarkRight.png')
 arrow_button_light_left = load_texture(Path('Sprites') / 'ButtonArrow_LightLeft.png')
@@ -128,7 +129,7 @@ item_dict = OrderedDict(
                                        20, 50, 4, 6, Item.DamageType.Piercing, False, steel_billhook),
     steel_sword=lambda: Item.Weapon('Steel Sword', 'steel_swordDefaultWeapon',
                                     35, 45, 7, 3, Item.DamageType.Cutting, False, steel_sword),
-    health_potion=lambda: Item.Consumable('Health Potion',  'health_potionDefaultConsumable', 'Health', 100, Null),
+    health_potion=lambda: Item.Consumable('Health Potion',  'health_potionDefaultConsumable', 'Health', 100, health_potion),
 )
 
 # 3 = Desert
@@ -150,9 +151,9 @@ safe_sprite_alias = ['0.1', '0.2', '0.3', '0.4']
 plains_weight = 12
 sprite_alias_o = {
     '0.1': (plains_sprite_01, plains_weight),
-    '0.2': (plains_sprite_02, 11),
-    '0.3': (plains_sprite_03, 11),
-    '0.4': (plains_sprite_04, 11),
+    '0.2': (plains_sprite_02, plains_weight),
+    '0.3': (plains_sprite_03, plains_weight),
+    '0.4': (plains_sprite_04, plains_weight),
     '0.5': (plains_trap_sprite, 1.1),
     '1': (forest_sprite_1, 7),
     '1.1': (forest_sprite_11, 2),
@@ -166,7 +167,8 @@ sprite_alias_o = {
     '2.3': (mountain_sprite_4, 3),
     '4': (village_sprite, 0.8),
     '4.1': (village_sprite_02, 0.8),
-    '10': (trapdoor_sprite, 1)
+    '10': (trapdoor_sprite, 1),
+    '9': (home_sprite, 0),
     # total = 79.8
 }
 
@@ -188,7 +190,8 @@ sprite_alias_p = {
     '2.3': (purgatory_mountain_02, 3),
     '4': (village_sprite, 0.8),
     '4.1': (village_sprite_02, 0.8),
-    '10': (purgatory_trapdoor_sprite, 1)
+    '10': (purgatory_trapdoor_sprite, 1),
+    '9': (home_sprite, 0),
 }
 
 sprite_alias_options = {
@@ -201,7 +204,8 @@ enemy_options = {'1', '1.1', '1.2', '1.3', '1.4'}
 trapdoor_options = ('10',)
 trap_options = ('0.5', '1.5')
 village_options = ('4', '4.1')
-excluded_tiles = ('0.1', '0.2', '0.3', '0.4', '0.5', '1.5', '10')
+home_options = ('9')
+excluded_tiles = ('0.1', '0.2', '0.3', '0.4', '0.5', '1.5')
 
 CHEST_OPENING_FRAMES = [
     load_texture(Path('Chest_Opening_Frames') / f'chest_sprite_{num}.png') for num in range(0, 9)
@@ -235,11 +239,6 @@ def texture_to_sprite(image, width=None, height=None):
 
 def nullify_image_area(image, size):
     image_array = np.array(image)
-    print()
-    print()
-    print(f'First: {image_array}')
-    print()
-    print()
     image_array[int((image.height * .5) - (size.y * .5)): int((image.height * .5) + (size.y * .5)), int((image.width * .5) - (size.x * .5)): int((image.width * .5) + (size.x * .5))] = (0, 0, 0, 0)
     return Image.fromarray(image_array)
 

@@ -21,6 +21,7 @@ class Saving(View):
     def on_update(self, delta_time: float):
         self.frame_count += 1
         if self.frame_count >= 5 and not self.saved:
+            print("TESTING")
             Data_Saving.SaveManager.save_player_data(f'{State.state.player.name}')
             Data_Saving.SaveManager.floor_save()
             State.state.player.inventory.save(f'{State.state.player.name}')
